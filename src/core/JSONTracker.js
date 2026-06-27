@@ -8,6 +8,16 @@ import { getDefaultCharacters, getInitialTrackerData } from './PromptSchema.js';
 const DEFAULT_MAX_KEEP = 4;
 
 /**
+ * Clean ID String helper
+ */
+export function cleanIdString(name, prefix) {
+    if (!name) return `${prefix}_${Date.now()}`;
+    const clean = name.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+    return clean ? `${prefix}_${clean}` : `${prefix}_${Date.now()}`;
+}
+
+
+/**
  * Strip Static Data
  * Returns a copy of the trackerData with fixed schemas and system prompts removed to save token usage and file size.
  */
@@ -26,7 +36,7 @@ function stripStaticData(trackerData) {
     // Remove character-specific schemas and fixed data
     if (Array.isArray(stripped.characters)) {
         stripped.characters.forEach(char => {
-            // Keep statsSchema as it is a core spec for loading/deserialization and UI rendering
+            // Keep statusSchema as it is a core spec for loading/deserialization and UI rendering
             // profileLocks and others can be removed here if necessary
         });
     }
@@ -42,7 +52,7 @@ function parseMetadata(rawVal) {
     const metaMatch = rawVal.match(/^(.*?)\s*\(\s*type:\s*([a-zA-Z_]+)(?:[^)]*?min:\s*(-?\d+))?(?:[^)]*?max:\s*(-?\d+))?.*?\)$/i);
     if (metaMatch) {
         return {
-            value: metaMatch[1],
+            value: metaMatch[1].trim(),
             type: metaMatch[2].toLowerCase(),
             min: metaMatch[3] ? parseInt(metaMatch[3], 10) : null,
             max: metaMatch[4] ? parseInt(metaMatch[4], 10) : null
@@ -52,14 +62,150 @@ function parseMetadata(rawVal) {
 }
 
 /**
+ * Sanitize and Migrate Legacy/Corrupted RPG Tracker Data
+ * - Cleans corrupted values like "100 (type: consumable, min: 0, max: 100)" back to pure numbers or text.
+ * - Migrates legacy random stat IDs (e.g. stat_1782501069471) to human-readable names derived from schema.name.
+ * - Keeps globalDefinitions synced with newly migrated IDs.
+ */
+export function sanitizeTrackerData(trackerData) {
+    if (!trackerData) return trackerData;
+    
+    // Avoid double cloning, but operate safely
+    const data = trackerData;
+
+    // Sync and migrate globalDefinitions keys if needed
+    const nextGlobalDefs = data.globalDefinitions ? { ...data.globalDefinitions } : null;
+
+    if (Array.isArray(data.characters)) {
+        data.characters.forEach(char => {
+            // Migrate character ID to name-based ID for consistency and deduplication
+            if (char.name && char.name.trim() !== '') {
+                const targetCharId = char.id === 'char_user' && char.name === 'New' ? 'char_user' : cleanIdString(char.name, 'char');
+                if (char.id !== targetCharId) {
+                    char.id = targetCharId;
+                }
+            }
+
+
+            // Top-level key migration for backward compatibility
+            if (char.statsSchema && !char.statusSchema) {
+                char.statusSchema = char.statsSchema;
+                delete char.statsSchema;
+            }
+            if (char.stats && !char.status) {
+                char.status = char.stats;
+                delete char.stats;
+            }
+
+            const originalStatus = char.status ? { ...char.status } : {};
+            const nextStatus = {};
+            const schemaIdMapping = {};
+
+            // Ensure statusSchema is processed
+            if (Array.isArray(char.statusSchema)) {
+                char.statusSchema.forEach(schema => {
+                    const oldId = schema.id;
+                    if (schema.name && schema.name.trim() !== '') {
+                        const cleanId = schema.name.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+                        const newId = cleanId || `status_${Date.now()}`;
+                        
+                        if (!oldId || oldId !== newId) {
+                            schema.id = newId;
+                            if (oldId) {
+                                schemaIdMapping[oldId] = newId;
+                            }
+                        }
+
+                        // Support English legacy keys (e.g. hp -> 체력, mp/mana -> 마나, fatigue -> 피로도)
+                                const lowercaseName = schema.name.trim().toLowerCase();
+                                const LEGACY_ENGLISH_MAPPINGS = {
+                                    'hp': ['체력', '생명력', 'health'],
+                                    'health': ['체력', '생명력'],
+                                    'mp': ['마나', 'mp', 'mana'],
+                                    'mana': ['마나'],
+                                    'sp': ['기력', '스테미나', '스태미나', 'stamina'],
+                                    'stamina': ['기력', '스테미나', '스태미나'],
+                                    'fatigue': ['피로도', '피로'],
+                                    'sanity': ['정신력', '이성'],
+                                    'exp': ['경험치', '경험'],
+                                    'gold': ['돈', '골드', '소지금'],
+                                    'money': ['돈', '골드', '소지금'],
+                                    'level': ['레벨'],
+                                    'lv': ['레벨']
+                                };
+
+                                Object.entries(LEGACY_ENGLISH_MAPPINGS).forEach(([engKey, korNames]) => {
+                                    if (korNames.some(kor => lowercaseName.includes(kor.toLowerCase()) || kor.toLowerCase().includes(lowercaseName))) {
+                                        schemaIdMapping[engKey] = newId;
+                                        schemaIdMapping[`stat_${engKey}`] = newId;
+                                        schemaIdMapping[`status_${engKey}`] = newId;
+                                    }
+                                });
+                                
+// Migrate globalDefinitions guides
+                        if (nextGlobalDefs && oldId) {
+                            const legacyGuideId1 = oldId;
+                            const legacyGuideId2 = `stat_${cleanId}`;
+                            const newGuideId = `status_${cleanId}`;
+
+                            const guideVal = nextGlobalDefs[legacyGuideId1] !== undefined ? nextGlobalDefs[legacyGuideId1] : nextGlobalDefs[legacyGuideId2];
+                            if (guideVal !== undefined) {
+                                nextGlobalDefs[newGuideId] = guideVal;
+                                if (legacyGuideId1 !== newGuideId) {
+                                    delete nextGlobalDefs[legacyGuideId1];
+                                }
+                                if (legacyGuideId2 !== newGuideId) {
+                                    delete nextGlobalDefs[legacyGuideId2];
+                                }
+                            }
+                        }
+                    } else if (schema.id && !schema.name) {
+                        schema.name = schema.id; // Fallback if name is missing
+                    } else if (!schema.id && !schema.name) {
+                        schema.id = `status_${Date.now()}`;
+                        schema.name = schema.id;
+                    }
+                });
+            }
+
+            // Clean and migrate stats
+            if (char.status) {
+                Object.entries(char.status).forEach(([key, val]) => {
+                    // 1. Clean value if corrupted like "100 (type: consumable...)"
+                    let cleanVal = val;
+                    if (typeof val === 'string' && val.includes('(type:')) {
+                        const meta = parseMetadata(val);
+                        const parsedInt = parseInt(meta.value, 10);
+                        cleanVal = !isNaN(parsedInt) ? parsedInt : meta.value;
+                    }
+
+                    // 2. Map old ID to new ID if migrated
+                    const targetId = schemaIdMapping[key] || key;
+                    nextStatus[targetId] = cleanVal;
+                });
+                char.status = nextStatus;
+            }
+        });
+    }
+
+    if (nextGlobalDefs) {
+        data.globalDefinitions = nextGlobalDefs;
+    }
+
+    return data;
+}
+
+/**
  * 0. Apply LLM Patch
  * Safely sanitizes and merges complex character JSON data output by LLM into the character state.
  * Supports updates for stats, profile, inventory, quests, etc.
  */
-export function applyLLMPatch(trackerData, patch, isPlayer = false) {
+export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType = 'patch') {
     if (!patch || typeof patch !== 'object') return trackerData;
     
-    const updatedData = JSON.parse(JSON.stringify(trackerData));
+    // Apply sanitization and migration to incoming trackerData first
+    const sanitizedTrackerData = sanitizeTrackerData(trackerData);
+    const updatedData = JSON.parse(JSON.stringify(sanitizedTrackerData));
     
     if (Array.isArray(updatedData.characters)) {
         Object.entries(patch).forEach(([charName, updates]) => {
@@ -73,33 +219,60 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false) {
                 if (updates.location !== undefined) updatedData.worldState.location = String(updates.location);
                 if (updates.weather !== undefined) updatedData.worldState.weather = String(updates.weather);
                 if (Array.isArray(updates.events)) {
-                    // Append new events to the existing array
-                    const newEvents = updates.events.map(e => {
-                        if (typeof e === 'string') return { name: '', desc: e.trim() };
-                        if (e && typeof e === 'object') return { name: e.name || '', desc: e.desc || '' };
-                        return null;
-                    }).filter(e => e !== null && (e.name !== '' || e.desc !== ''));
+                    const existingEvents = updatedData.worldState.events || [];
                     
-                    updatedData.worldState.events = [
-                        ...(updatedData.worldState.events || []),
-                        ...newEvents
-                    ];
+                    const parsedNewEvents = updates.events.map(e => {
+                        let name = '';
+                        let desc = '';
+                        if (typeof e === 'string') {
+                            desc = e.trim();
+                        } else if (e && typeof e === 'object') {
+                            name = e.name || '';
+                            desc = e.desc || '';
+                        }
+                        if (!name && !desc) return null;
+                        
+                        // 이름 기반 ID 부여
+                        const id = cleanIdString(name, 'event');
+                        return { id, name, desc };
+                    }).filter(Boolean);
+                    
+                    const mergedEvents = [...existingEvents];
+                    parsedNewEvents.forEach(newEvt => {
+                        const index = mergedEvents.findIndex(evt => 
+                            (evt.id && evt.id === newEvt.id) || 
+                            (evt.name && evt.name.trim().toLowerCase() === newEvt.name.trim().toLowerCase())
+                        );
+                        if (index !== -1) {
+                            // 이미 동일한 이벤트가 존재하면 덮어쓰기 (중복 추가 방지)
+                            mergedEvents[index] = { ...mergedEvents[index], ...newEvt };
+                        } else {
+                            // 존재하지 않으면 배열에 추가
+                            mergedEvents.push(newEvt);
+                        }
+                    });
+                    
+                    updatedData.worldState.events = mergedEvents;
                 }
                 return;
             }
 
-            let charIndex = updatedData.characters.findIndex(c => c.name === charName);
+
+            
+
+            const cleanCharId = cleanIdString(charName, 'char');
+            let charIndex = updatedData.characters.findIndex(c => c.id === cleanCharId || c.name?.trim().toLowerCase() === charName.trim().toLowerCase());
             
             // Create and append a new character if it does not exist
             if (charIndex === -1) {
                 const newChar = JSON.parse(JSON.stringify(getDefaultCharacters()[0]));
-                newChar.id = 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                newChar.id = cleanCharId;
                 newChar.name = charName;
                 newChar.activePlayer = updates.activePlayer !== undefined ? Boolean(updates.activePlayer) : isPlayer;
                 
                 // Remove default values (start empty and overwrite with LLM patch)
-                newChar.statsSchema = [];
-                newChar.stats = {};
+                newChar.statusSchema = [];
+                newChar.status = {};
                 newChar.featuresData.profile = {};
                 newChar.featuresData.profileLocks = {};
                 newChar.relations = {};
@@ -113,6 +286,9 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false) {
                 }
                 charIndex = updatedData.characters.length - 1;
             }
+
+
+            
             
             const char = updatedData.characters[charIndex];
 
@@ -121,104 +297,198 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false) {
                 char.activePlayer = Boolean(updates.activePlayer);
             }
             
-            // 1. Stats Patch (Supports backward compatibility if updates.stats is present or directly given as an object)
-            let statsUpdates = null;
-            if (updates.stats && typeof updates.stats === 'object') {
-                statsUpdates = updates.stats;
-            } else if (!updates.stats && !updates.profile && !updates.relations && !updates.inventory && !updates.quests) {
-                statsUpdates = updates; // Backward compatibility fallback
+            // 1. Stats Patch (Supports backward compatibility if updates.status is present or directly given as an object)
+            let statusUpdates = null;
+            if (updates.status && typeof updates.status === 'object') {
+                statusUpdates = updates.status;
+            } else if (updates.stats && typeof updates.stats === 'object') {
+                statusUpdates = updates.stats; // AI Hallucination & Legacy fallback
+            } else if (!updates.status && !updates.stats && !updates.profile && !updates.relations && !updates.inventory && !updates.quests) {
+                statusUpdates = updates; // Backward compatibility fallback
             }
             
-            if (statsUpdates) {
-                const statsSchema = char.statsSchema || [];
-                const currentStats = char.stats || {};
-                const newStats = {};
+            if (statusUpdates) {
+                const statusSchema = char.statusSchema || [];
+                const currentStatus = char.status || {};
 
-                // Build new stats object based on valid schema IDs only (apply sanitation)
-                statsSchema.forEach(schema => {
-                    if (currentStats[schema.id] !== undefined) {
-                        newStats[schema.id] = currentStats[schema.id];
-                    } else {
-                        const minLimit = schema.min !== undefined && schema.min !== null ? schema.min : 0;
-                        const maxLimit = schema.max !== undefined && schema.max !== null ? schema.max : 100;
-                        newStats[schema.id] = ['consumable'].includes(schema.type) ? maxLimit : minLimit;
-                    }
-                });
+                if (updateType === 'replace') {
+                    // Replace Mode: Rebuild stats and statusSchema completely using only the keys present in patch
+                    const nextStatusSchema = [];
+                    const nextStatus = {};
 
-                // Match and assign patch data (ignore case and whitespace)
-                Object.entries(statsUpdates).forEach(([patchKey, rawPatchVal]) => {
-                    const metaInfo = parseMetadata(rawPatchVal);
-                    const patchVal = metaInfo.value;
-                    const parsedType = metaInfo.type;
-                    const parsedMin = metaInfo.min;
-                    const parsedMax = metaInfo.max;
+                    Object.entries(statusUpdates).forEach(([patchKey, rawPatchVal]) => {
+                        const metaInfo = parseMetadata(rawPatchVal);
+                        const patchVal = metaInfo.value;
+                        const parsedType = metaInfo.type;
+                        const parsedMin = metaInfo.min;
+                        const parsedMax = metaInfo.max;
 
-                    const cleanPatchKey = patchKey.toLowerCase().replace(/\s+/g, '');
-                    const matchedSchema = statsSchema.find(schema => {
-                        const cleanId = (schema.id || '').toLowerCase().replace(/\s+/g, '');
-                        const cleanName = (schema.name || '').toLowerCase().replace(/\s+/g, '');
-                        return cleanId === cleanPatchKey || cleanName === cleanPatchKey;
-                    });
+                        const cleanPatchKey = patchKey.toLowerCase().replace(/\s+/g, '');
+                        const matchedSchema = statusSchema.find(schema => {
+                            const cleanId = (schema.id || '').toLowerCase().replace(/\s+/g, '');
+                            const cleanName = (schema.name || '').toLowerCase().replace(/\s+/g, '');
+                            return cleanId === cleanPatchKey || cleanName === cleanPatchKey;
+                        });
 
-                    if (matchedSchema) {
-                        const targetId = matchedSchema.id;
-                        if (['integer', 'consumable', 'stacking'].includes(matchedSchema.type)) {
-                            const parsedInt = parseInt(patchVal, 10);
-                            if (!isNaN(parsedInt)) {
-                                const minLimit = matchedSchema.min !== undefined && matchedSchema.min !== null ? matchedSchema.min : 0;
-                                const maxLimit = matchedSchema.max !== undefined && matchedSchema.max !== null ? matchedSchema.max : 100;
-                                newStats[targetId] = Math.min(maxLimit, Math.max(minLimit, parsedInt));
-                            }
+                        let targetId = patchKey.trim().replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+                        if (!targetId) targetId = 'status_' + Date.now();
+
+                        let finalType = 'text';
+                        let finalMin = 0;
+                        let finalMax = 100;
+                        let isLocked = false;
+                        let isInject = true;
+
+                        if (matchedSchema) {
+                            targetId = matchedSchema.id;
+                            finalType = matchedSchema.type || 'text';
+                            finalMin = matchedSchema.min !== undefined ? matchedSchema.min : 0;
+                            finalMax = matchedSchema.max !== undefined ? matchedSchema.max : 100;
+                            isLocked = matchedSchema.isLocked || false;
+                            isInject = matchedSchema.isInject !== false;
+                        } else if (parsedType) {
+                            finalType = parsedType;
+                            finalMin = parsedMin !== null ? parsedMin : 0;
+                            finalMax = parsedMax !== null ? parsedMax : 100;
                         } else {
-                            newStats[targetId] = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
-                        }
-                    } else {
-                        // Auto-add new fields if they do not exist in the schema
-                        const newId = patchKey.toLowerCase().replace(/[^a-z0-9_]/g, '_') || 'stat_' + Date.now();
-                        let newType = parsedType || 'text';
-                        let finalVal = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
-                        
-                        if (!parsedType) {
                             const parsedInt = parseInt(patchVal, 10);
                             if (!isNaN(parsedInt) && String(patchVal).trim() === String(parsedInt)) {
-                                newType = 'integer';
-                                finalVal = parsedInt;
-                            }
-                        } else if (['integer', 'consumable', 'stacking'].includes(newType)) {
-                            const parsedInt = parseInt(patchVal, 10);
-                            if (!isNaN(parsedInt)) {
-                                finalVal = parsedInt;
+                                finalType = 'integer';
                             }
                         }
-                        
-                        statsSchema.push({
-                            id: newId,
-                            name: patchKey,
-                            type: newType,
-                            min: parsedMin !== null ? parsedMin : 0,
-                            max: parsedMax !== null ? parsedMax : 100,
-                            isLocked: false,
-                            isInject: true
+
+                        let finalVal = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
+                        if (['integer', 'consumable', 'stacking'].includes(finalType)) {
+                            const parsedInt = parseInt(patchVal, 10);
+                            if (!isNaN(parsedInt)) {
+                                finalVal = Math.min(finalMax, Math.max(finalMin, parsedInt));
+                            } else {
+                                finalVal = ['consumable'].includes(finalType) ? finalMax : finalMin;
+                            }
+                        }
+
+                        nextStatusSchema.push({
+                            id: targetId,
+                            name: matchedSchema ? matchedSchema.name : patchKey,
+                            type: finalType,
+                            min: finalMin,
+                            max: finalMax,
+                            isLocked: isLocked,
+                            isInject: isInject
                         });
-                        newStats[newId] = finalVal;
-                    }
-                });
-                char.stats = newStats;
-                char.statsSchema = statsSchema;
+                        nextStatus[targetId] = finalVal;
+                    });
+
+                    char.status = nextStatus;
+                    char.statusSchema = nextStatusSchema;
+                } else {
+                    // Normal Patch Mode: Merge with existing schema and auto-add new fields
+                    const newStatus = {};
+
+                    // Build new stats object based on valid schema IDs only (apply sanitation)
+                    statusSchema.forEach(schema => {
+                        if (currentStatus[schema.id] !== undefined) {
+                            newStatus[schema.id] = currentStatus[schema.id];
+                        } else {
+                            const minLimit = schema.min !== undefined && schema.min !== null ? schema.min : 0;
+                            const maxLimit = schema.max !== undefined && schema.max !== null ? schema.max : 100;
+                            newStatus[schema.id] = ['consumable'].includes(schema.type) ? maxLimit : minLimit;
+                        }
+                    });
+
+                    // Match and assign patch data (ignore case and whitespace)
+                    Object.entries(statusUpdates).forEach(([patchKey, rawPatchVal]) => {
+                        const metaInfo = parseMetadata(rawPatchVal);
+                        const patchVal = metaInfo.value;
+                        const parsedType = metaInfo.type;
+                        const parsedMin = metaInfo.min;
+                        const parsedMax = metaInfo.max;
+
+                        const cleanPatchKey = patchKey.toLowerCase().replace(/\s+/g, '');
+                        const matchedSchema = statusSchema.find(schema => {
+                            const cleanId = (schema.id || '').toLowerCase().replace(/\s+/g, '');
+                            const cleanName = (schema.name || '').toLowerCase().replace(/\s+/g, '');
+                            return cleanId === cleanPatchKey || cleanName === cleanPatchKey;
+                        });
+
+                        if (matchedSchema) {
+                            const targetId = matchedSchema.id;
+                            if (['integer', 'consumable', 'stacking'].includes(matchedSchema.type)) {
+                                const parsedInt = parseInt(patchVal, 10);
+                                if (!isNaN(parsedInt)) {
+                                    const minLimit = matchedSchema.min !== undefined && matchedSchema.min !== null ? matchedSchema.min : 0;
+                                    const maxLimit = matchedSchema.max !== undefined && matchedSchema.max !== null ? matchedSchema.max : 100;
+                                    newStatus[targetId] = Math.min(maxLimit, Math.max(minLimit, parsedInt));
+                                }
+                            } else {
+                                newStatus[targetId] = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
+                            }
+                        } else {
+                            // Auto-add new fields if they do not exist in the schema
+                            const newId = patchKey.trim() || 'status_' + Date.now();
+                            let newType = parsedType || 'text';
+                            let finalVal = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
+                            
+                            if (!parsedType) {
+                                const parsedInt = parseInt(patchVal, 10);
+                                if (!isNaN(parsedInt) && String(patchVal).trim() === String(parsedInt)) {
+                                    newType = 'integer';
+                                    finalVal = parsedInt;
+                                }
+                            } else if (['integer', 'consumable', 'stacking'].includes(newType)) {
+                                const parsedInt = parseInt(patchVal, 10);
+                                if (!isNaN(parsedInt)) {
+                                    finalVal = parsedInt;
+                                }
+                            }
+                            
+                            statusSchema.push({
+                                id: newId,
+                                name: patchKey,
+                                type: newType,
+                                min: parsedMin !== null ? parsedMin : 0,
+                                max: parsedMax !== null ? parsedMax : 100,
+                                isLocked: false,
+                                isInject: true
+                            });
+                            newStatus[newId] = finalVal;
+                        }
+                    });
+                    char.status = newStatus;
+                    char.statusSchema = statusSchema;
+                }
             }
 
             // 2. Profile 패치 (Race, Height, Appearance 등)
             if (updates.profile && typeof updates.profile === 'object') {
                 char.featuresData = char.featuresData || {};
-                char.featuresData.profile = char.featuresData.profile || {};
                 char.featuresData.profileLocks = char.featuresData.profileLocks || {};
-                
-                Object.entries(updates.profile).forEach(([pKey, pVal]) => {
-                    const isLocked = char.featuresData.profileLocks[pKey] === true;
-                    if (!isLocked && pVal !== undefined && pVal !== null) {
-                        char.featuresData.profile[pKey] = String(pVal);
-                    }
-                });
+
+                if (updateType === 'replace') {
+                    const nextProfile = {};
+                    // Keep only locked profile values
+                    Object.entries(char.featuresData.profile || {}).forEach(([pKey, pVal]) => {
+                        if (char.featuresData.profileLocks[pKey] === true) {
+                            nextProfile[pKey] = pVal;
+                        }
+                    });
+                    // Overwrite with patch values
+                    Object.entries(updates.profile).forEach(([pKey, pVal]) => {
+                        const isLocked = char.featuresData.profileLocks[pKey] === true;
+                        if (!isLocked && pVal !== undefined && pVal !== null) {
+                            nextProfile[pKey] = String(pVal);
+                        }
+                    });
+                    char.featuresData.profile = nextProfile;
+                } else {
+                    char.featuresData.profile = char.featuresData.profile || {};
+                    Object.entries(updates.profile).forEach(([pKey, pVal]) => {
+                        const isLocked = char.featuresData.profileLocks[pKey] === true;
+                        if (!isLocked && pVal !== undefined && pVal !== null) {
+                            char.featuresData.profile[pKey] = String(pVal);
+                        }
+                    });
+                }
             }
 
             // 3. Inventory 패치 (Equipment, Storage)
@@ -287,24 +557,26 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false) {
                     const lockedSides = existingSides.filter(q => q.isLocked);
                     
                     const parsedNewSides = updates.quests.sideQuests.map(sq => {
+                        let qName = 'Unknown';
+                        let qDesc = '';
+                        let isCompleted = false;
+                        
                         if (typeof sq === 'string') {
-                            return { 
-                                id: `quest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, 
-                                name: sq, 
-                                desc: '',
-                                isCompleted: false,
-                                isLocked: false
-                            };
+                            qName = sq;
                         } else if (sq && typeof sq === 'object') {
-                            return { 
-                                id: sq.id || `quest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, 
-                                name: sq.name || 'Unknown', 
-                                desc: sq.description || '',
-                                isCompleted: sq.status === 'COMPLETED' || sq.isCompleted === true,
-                                isLocked: false
-                            };
+                            qName = sq.name || 'Unknown';
+                            qDesc = sq.description || '';
+                            isCompleted = sq.status === 'COMPLETED' || sq.isCompleted === true;
                         }
-                        return null;
+                        
+                        const id = cleanIdString(qName, 'quest');
+                        return { 
+                            id, 
+                            name: qName, 
+                            desc: qDesc,
+                            isCompleted,
+                            isLocked: false
+                        };
                     }).filter(Boolean);
 
                     const finalSides = [...lockedSides];
@@ -324,7 +596,18 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false) {
 
             // 5. Relations 패치
             if (updates.relations && typeof updates.relations === 'object') {
-                char.relations = char.relations || {};
+                if (updateType === 'replace') {
+                    const nextRelations = {};
+                    // Keep only locked relations
+                    Object.entries(char.relations || {}).forEach(([targetName, rData]) => {
+                        if (rData && rData.isLocked) {
+                            nextRelations[targetName] = rData;
+                        }
+                    });
+                    char.relations = nextRelations;
+                } else {
+                    char.relations = char.relations || {};
+                }
                 
                 Object.entries(updates.relations).forEach(([targetName, rData]) => {
                     if (!rData || typeof rData !== 'object') return;
@@ -471,9 +754,9 @@ export function defensiveMerge(masterSchema, backupData) {
                         ...masterChar,
                         ...backupChar,
                         // Restore static schemas missing in backupChar
-                        statsSchema: backupChar.statsSchema || masterChar.statsSchema,
+                        statusSchema: backupChar.statusSchema || masterChar.statusSchema,
                         // Deep merge of state objects
-                        stats: { ...(masterChar.stats || {}), ...(backupChar.stats || {}) },
+                        status: { ...(masterChar.status || {}), ...(backupChar.status || {}) },
                         featuresData: { ...(masterChar.featuresData || {}), ...(backupChar.featuresData || {}) },
                         relations: { ...(masterChar.relations || {}), ...(backupChar.relations || {}) }
                     };
@@ -583,7 +866,7 @@ export function rehydrateFromHistory(chat) {
             // Return immediately if the data is a valid trackerData shape (contains characters field)
             const extraData = message.swipe_info[swipeId].extra.rpgTrackerData;
             if (extraData && typeof extraData === 'object' && extraData.characters !== undefined) {
-                return extraData;
+                return sanitizeTrackerData(extraData);
             }
         }
     }
@@ -641,5 +924,5 @@ export function rehydrateFromHistory(chat) {
         }
     }
 
-    return anyUpdateApplied ? accumulatedData : null;
+    return anyUpdateApplied ? sanitizeTrackerData(accumulatedData) : null;
 }

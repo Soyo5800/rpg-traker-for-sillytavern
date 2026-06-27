@@ -49,13 +49,13 @@ export default function PromptEditor({ onClose }) {
     : getDefaultCharacters();
 
   const getUniqueFields = () => {
-    const stats = new Set();
+    const status = new Set();
     const profiles = new Set();
     const relations = new Set();
 
     characters.forEach(char => {
-      (char.statsSchema || []).forEach(s => {
-        if (s.name) stats.add(s.name);
+      (char.statusSchema || []).forEach(s => {
+        if (s.name) status.add(s.name);
       });
       
       if (char.featuresData?.profile) {
@@ -72,7 +72,7 @@ export default function PromptEditor({ onClose }) {
     });
 
     return {
-      stats: Array.from(stats),
+      status: Array.from(status),
       profiles: Array.from(profiles),
       relations: Array.from(relations)
     };
@@ -90,7 +90,7 @@ export default function PromptEditor({ onClose }) {
     setLocalAddCharPrompt(trackerData.addCharPrompt ?? DEFAULT_ADD_CHAR_PROMPT);
     setLocalAddPlayerCharPrompt(trackerData.addPlayerCharPrompt ?? DEFAULT_ADD_PLAYER_CHAR_PROMPT);
     
-    // Migration for guide prompts (ensure new 'stats' and 'world' exist)
+    // Migration for guide prompts (ensure new 'status' and 'world' exist)
     let savedGuides = trackerData.guidePrompts ? [...trackerData.guidePrompts] : JSON.parse(JSON.stringify(DEFAULT_GUIDE_PROMPTS));
     
     DEFAULT_GUIDE_PROMPTS.forEach(defaultGuide => {
@@ -386,7 +386,7 @@ export default function PromptEditor({ onClose }) {
                 {/* SWITCHES (Outside the accordion fold but inside Schema block) */}
                 <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {/* 1. Stats and Profile */}
-                  {['stats', 'profile'].map(guideId => {
+                  {['status', 'profile'].map(guideId => {
                     const guide = localGuidePrompts.find(g => g.id === guideId);
                     if (!guide) return null;
                     return (
@@ -643,16 +643,16 @@ export default function PromptEditor({ onClose }) {
               </div>
               <p style={{ fontSize: '11px', opacity: 0.6, margin: 0, color: 'var(--rpg-text)' }}>Define guidelines for your fields. Leave empty to skip injection.</p>
 
-              {uniqueFields.stats.length > 0 && (
+              {uniqueFields.status.length > 0 && (
                 <div className={styles.defGroup}>
-                  <h5 className={styles.defGroupTitle}>Stat</h5>
-                  {uniqueFields.stats.map(f => (
-                    <div key={`stat_${f}`} className={styles.defRow}>
+                   <h5 className={styles.defGroupTitle}>Stat</h5>
+                   {uniqueFields.status.map(f => (
+                    <div key={`status_${f}`} className={styles.defRow}>
                       <span className={styles.defLabel}>{f}</span>
                       <input 
                         className={styles.defInput} 
-                        value={localDefObj[`stat_${f}`] || ''} 
-                        onChange={e => setLocalDefObj({...localDefObj, [`stat_${f}`]: e.target.value})} 
+                        value={localDefObj[`status_${f}`] || ''} 
+                        onChange={e => setLocalDefObj({...localDefObj, [`status_${f}`]: e.target.value})} 
                         placeholder={`Guide for ${f}...`}
                       />
                     </div>

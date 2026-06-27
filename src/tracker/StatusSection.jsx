@@ -56,7 +56,7 @@ export default function StatusSection({ onOpenEditor }) {
   const characters = (trackerData.characters && trackerData.characters.length > 0)
     ? trackerData.characters
     : getDefaultCharacters();
-  const globalRelationSchema = settings.statsSchema?.filter(s => s.type === 'relation_schema') || [];
+  const globalRelationSchema = settings.statusSchema?.filter(s => s.type === 'relation_schema') || [];
 
   const [collapsedChars, setCollapsedChars] = useState({});
   const [activeInlineTabs, setActiveInlineTabs] = useState({});
@@ -72,7 +72,7 @@ export default function StatusSection({ onOpenEditor }) {
   const handleValueChange = (charId, statId, newVal) => {
     const updated = characters.map(c => {
       if (c.id === charId) {
-        const schemaItem = (c.statsSchema || []).find(s => s.id === statId);
+        const schemaItem = (c.statusSchema || []).find(s => s.id === statId);
         let finalVal = newVal;
         if (schemaItem && schemaItem.type !== 'text') {
           const minLimit = schemaItem.min !== undefined && schemaItem.min !== null ? schemaItem.min : 0;
@@ -81,7 +81,7 @@ export default function StatusSection({ onOpenEditor }) {
         }
         return {
           ...c,
-          stats: { ...c.stats, [statId]: finalVal }
+          status: { ...c.status, [statId]: finalVal }
         };
       }
       return c;
@@ -127,7 +127,7 @@ export default function StatusSection({ onOpenEditor }) {
         <button 
           className={styles.topActionBtn} 
           onClick={() => {
-            const newChar = { id: `char_${Date.now()}`, name: "New Character", activePlayer: false, activeInjection: true, statsSchema: [], stats: {}, relations: {} };
+            const newChar = { id: `char_${Date.now()}`, name: "New Character", activePlayer: false, activeInjection: true, statusSchema: [], status: {}, relations: {} };
             let nextChars;
             if (characters.length === 1 && characters[0].id === 'char_user' && characters[0].name === 'New') {
               nextChars = [newChar];
@@ -148,8 +148,8 @@ export default function StatusSection({ onOpenEditor }) {
       </div>
 
       {characters.map((char) => {
-        const schema = (char.statsSchema || []).filter(s => s.type !== 'relation_schema');
-        const dynamicStats = char.stats || {};
+        const schema = (char.statusSchema || []).filter(s => s.type !== 'relation_schema');
+        const dynamicStatus = char.status || {};
 
         const gaugeFields = schema.filter(item => ['stacking', 'consumable'].includes(item.type));
         const integerFields = schema.filter(item => item.type === 'integer');
@@ -190,7 +190,7 @@ export default function StatusSection({ onOpenEditor }) {
                   </div>
                 </label>
 
-                <label className={styles.switchRow} title="Inject stats into AI context">
+                <label className={styles.switchRow} title="Inject status into AI context">
                   <span>Inject</span>
                   <div className={styles.switchContainer}>
                     <input 
@@ -298,7 +298,7 @@ export default function StatusSection({ onOpenEditor }) {
                 {gaugeFields.length > 0 && (
                   <div className={styles.gaugeGrid}>
                     {gaugeFields.map((item) => {
-                      const rawValue = dynamicStats[item.id];
+                      const rawValue = dynamicStatus[item.id];
                       const currentValue = rawValue !== undefined ? rawValue : (item.max || 100);
                       const minLimit = item.min !== undefined && item.min !== null ? item.min : 0;
                       const maxLimit = item.max || 100;
@@ -313,10 +313,10 @@ export default function StatusSection({ onOpenEditor }) {
                           <div className={styles.gaugeLabelRow}>
                             <div className={styles.gaugeLabelContainer}>
                               <svg onClick={() => {
-                                const newSchema = [...char.statsSchema];
+                                const newSchema = [...char.statusSchema];
                                 const idx = newSchema.findIndex(s => s.id === item.id);
                                 if(idx !== -1) { newSchema[idx] = {...newSchema[idx], isLocked: !newSchema[idx].isLocked}; }
-                                handlePatchCharacter(char.id, c => ({...c, statsSchema: newSchema}));
+                                handlePatchCharacter(char.id, c => ({...c, statusSchema: newSchema}));
                               }} viewBox="0 0 24 24" width="14" height="14" className={`${styles.lockIcon} ${item.isLocked ? styles.lockIconActive : ''}`}>
                                 {item.isLocked ? (
                                   <path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
@@ -356,7 +356,7 @@ export default function StatusSection({ onOpenEditor }) {
                 {integerFields.length > 0 && (
                   <div className={styles.integerRowGrid}>
                     {integerFields.map((item) => {
-                      const rawValue = dynamicStats[item.id];
+                      const rawValue = dynamicStatus[item.id];
                       const currentValue = rawValue !== undefined ? rawValue : 0;
                       const isEditing = activeEdit.charId === char.id && activeEdit.statId === item.id;
 
@@ -364,10 +364,10 @@ export default function StatusSection({ onOpenEditor }) {
                         <div key={item.id} className={styles.integerBlockCard}>
                           <div className={styles.integerFieldLeft}>
                             <svg onClick={() => {
-                                const newSchema = [...char.statsSchema];
+                                const newSchema = [...char.statusSchema];
                                 const idx = newSchema.findIndex(s => s.id === item.id);
                                 if(idx !== -1) { newSchema[idx] = {...newSchema[idx], isLocked: !newSchema[idx].isLocked}; }
-                                handlePatchCharacter(char.id, c => ({...c, statsSchema: newSchema}));
+                                handlePatchCharacter(char.id, c => ({...c, statusSchema: newSchema}));
                               }} viewBox="0 0 24 24" width="14" height="14" className={`${styles.lockIcon} ${item.isLocked ? styles.lockIconActive : ''}`}>
                                 {item.isLocked ? (
                                   <path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
@@ -408,16 +408,16 @@ export default function StatusSection({ onOpenEditor }) {
                 {textFields.length > 0 && (
                   <div className={styles.textStack}>
                     {textFields.map((item) => {
-                      const rawValue = dynamicStats[item.id];
+                      const rawValue = dynamicStatus[item.id];
                       const currentValue = rawValue !== undefined ? rawValue : '';
 
                       return (
                         <div key={item.id} className={styles.textBlockCard}>
                           <svg onClick={() => {
-                              const newSchema = [...char.statsSchema];
+                              const newSchema = [...char.statusSchema];
                               const idx = newSchema.findIndex(s => s.id === item.id);
                               if(idx !== -1) { newSchema[idx] = {...newSchema[idx], isLocked: !newSchema[idx].isLocked}; }
-                              handlePatchCharacter(char.id, c => ({...c, statsSchema: newSchema}));
+                              handlePatchCharacter(char.id, c => ({...c, statusSchema: newSchema}));
                             }} viewBox="0 0 24 24" width="14" height="14" className={`${styles.lockIcon} ${item.isLocked ? styles.lockIconActive : ''}`}>
                               {item.isLocked ? (
                                 <path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>

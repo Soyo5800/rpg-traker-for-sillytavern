@@ -9,8 +9,8 @@
 export function parseResponse(text) {
   if (!text) return { cleanedText: '', patch: null };
 
-  // json뿐만 아니라 HTML 주석(<!--RPG_TRACKER 및 <!--) 및 markdown, 빈 백틱 등도 허용하며 내부에 stats나 Character Name 등의 키워드가 있는지 유연하게 확인
-  const jsonBlockRegex = /^(?:\s*<!--(?:RPG_TRACKER)?\s*)?```(?:json|markdown)?\s*\n?(\{[\s\S]*?(?:"stats"|"profile"|"inventory"|"quests"|"Character Name"|"World")[\s\S]*?\})\s*\n?```(?:\s*-->)?/i;
+  // json뿐만 아니라 HTML 주석(<!--RPG_TRACKER 및 <!--) 및 markdown, 빈 백틱 등도 허용하며 내부에 status, stats, Character Name 등의 키워드가 있는지 유연하게 확인
+  const jsonBlockRegex = /^(?:\s*<!--(?:RPG_TRACKER)?\s*)?```(?:json|markdown)?\s*\n?(\{[\s\S]*?(?:"status"|"statusSchema"|"stats"|"profile"|"inventory"|"quests"|"Character Name"|"World")[\s\S]*?\})\s*\n?```(?:\s*-->)?/i;
   const match = text.match(jsonBlockRegex);
 
   if (match && match[1]) {

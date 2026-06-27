@@ -1,9 +1,10 @@
 import { getContext, extension_settings } from "../../../extensions.js";
 import { eventSource, event_types, saveSettingsDebounced, generateQuietPrompt, saveChat, updateMessageBlock, setExtensionPrompt, extension_prompt_types, extension_prompt_roles, getRequestHeaders } from "../../../../script.js";
-import { backupToMessage, rehydrateFromHistory, defensiveMerge, applyLLMPatch } from "./src/core/JSONTracker.js";
+import { backupToMessage, rehydrateFromHistory, defensiveMerge, applyLLMPatch, sanitizeTrackerData } from "./src/core/JSONTracker.js";
 import { buildDefinitionPromptWrapper, buildStatusPromptWrapper } from "./src/core/ActivePrompt.js";
 import { DEFAULT_PROMPT_HEADER_MERGED, DEFAULT_PROMPT_FOOTER_MERGED, DEFAULT_PROMPT_HEADER_SEP, DEFAULT_PROMPT_FOOTER_SEP } from "./src/core/PromptSchema.js";
 import { parseResponse } from "./src/core/ResponseParser.js";
+
 import { SlashCommandParser } from "../../../slash-commands/SlashCommandParser.js";
 
 const extensionPath = import.meta.url.substring(0, import.meta.url.lastIndexOf('/'));
@@ -28,7 +29,7 @@ function syncRpgTrackerRegex(enabled) {
         script = {
             id: 'rpg_tracker_json_stripper',
             scriptName: 'RPG Tracker JSON Stripper',
-            findRegex: '```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"stats\"|\"profile\"|\"inventory\"|\"quests\"|\"Character Name\")[\\s\\S]*?\\}\\s*\\n?```\\s*',
+            findRegex: '```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"status\"|\"statusSchema\"|\"stats\"|\"profile\"|\"inventory\"|\"quests\"|\"Character Name\")[\\s\\S]*?\\}\\s*\\n?```\\s*',
             replaceString: '',
             trimStrings: [],
             placement: [1, 2], // 1: USER_INPUT, 2: AI_OUTPUT
@@ -51,7 +52,7 @@ function syncRpgTrackerRegex(enabled) {
         commentScript = {
             id: 'rpg_tracker_comment_stripper',
             scriptName: 'RPG Tracker Comment Stripper',
-            findRegex: '<!--RPG_TRACKER\\s*```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"stats\"|\"profile\"|\"inventory\"|\"quests\"|\"Character Name\")[\\s\\S]*?\\}\\s*\\n?```\\s*-->\\s*',
+            findRegex: '<!--RPG_TRACKER\\s*```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"status\"|\"statusSchema\"|\"stats\"|\"profile\"|\"inventory\"|\"quests\"|\"Character Name\")[\\s\\S]*?\\}\\s*\\n?```\\s*-->\\s*',
             replaceString: '',
             trimStrings: [],
             placement: [1, 2], // 1: USER_INPUT, 2: AI_OUTPUT
@@ -330,6 +331,9 @@ function establishBridgeConnection() {
                     throw e; // Let React handle the error UI
                 }
             };
+
+            window.RPGBridge.triggerFullRequestUpdate = async () => { console.log("[RPG Tracker] Full Overwrite Update is deprecated and no longer needed."); };
+            window.RPGBridge.handleFullRequestUpdate = window.RPGBridge.triggerFullRequestUpdate;
 
             window.RPGBridge.getUserPersonaName = () => {
                 try {

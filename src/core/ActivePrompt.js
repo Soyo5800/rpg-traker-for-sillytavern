@@ -11,9 +11,9 @@ export function buildStaticDefinitionsPrompt(trackerData) {
     if (guide && guide.trim() !== '') {
       let prefix = '';
       let fieldName = '';
-      if (key.startsWith('stat_')) {
-        prefix = 'Stat';
-        fieldName = key.replace('stat_', '');
+      if (key.startsWith('status_')) {
+        prefix = 'Status';
+        fieldName = key.replace('status_', '');
       } else if (key.startsWith('profile_')) {
         prefix = 'Profile';
         fieldName = key.replace('profile_', '');
@@ -30,7 +30,7 @@ export function buildStaticDefinitionsPrompt(trackerData) {
 
   if (lines.length === 0) return '';
 
-  return `\n### RPG TRACKER - STAT DEFINITIONS\n` +
+  return `\n### RPG TRACKER - STATUS DEFINITIONS\n` +
          `The following parameters govern active characters. Interpret behaviors based on these guidelines:\n` +
          `${lines.join('\n')}\n`;
 }
@@ -45,7 +45,7 @@ export function getMasterSwitches(guidePrompts = []) {
   };
 
   return {
-    stats: isEnabled('stats', true),
+    status: isEnabled('status', true),
     profile: isEnabled('profile', true),
     relations: isEnabled('relations', true),
     inventory: isEnabled('inventory', true),
@@ -77,12 +77,12 @@ export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
     charSchema.activePlayer = forcePlayer;
   }
 
-  if (ms.stats) {
-    charSchema.stats = {
-      "stat_id_1": "new_value (type: consumable, min: 0, max: 100. e.g. HP - reduce on damage, increase on rest)",
-      "stat_id_2": "new_value (type: stacking, min: 0, max: 100. e.g. Fatigue - increase on strenuous actions)",
-      "stat_id_3": "new_value (type: integer, min: 0, max: 100)",
-      "stat_id_4": "new_value (type: text. extremely short current condition)"
+  if (ms.status) {
+    charSchema.status = {
+      "Status_Name_1": "new_value (type: consumable, min: 0, max: 100. e.g. HP - reduce on damage, increase on rest)",
+      "Status_Name_2": "new_value (type: stacking, min: 0, max: 100. e.g. Fatigue - increase on strenuous actions)",
+      "Status_Name_3": "new_value (type: integer, min: 0, max: 100)",
+      "Status_Name_4": "new_value (type: text. extremely short current condition)"
     };
   }
 
@@ -120,8 +120,8 @@ export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
 
   if (ms.quests && hasActivePlayer) {
     charSchema.quests = {
-      "main": { "name": "Quest Name", "description": "Details" },
-      "sideQuests": [ { "name": "Side Quest", "description": "Details" } ]
+      "main": { "name": "Quest Name", "description": "Details", "status": "ACTIVE (or COMPLETED)" },
+      "sideQuests": [ { "name": "Side Quest", "description": "Details", "status": "ACTIVE (or COMPLETED)" } ]
     };
   }
 
@@ -178,27 +178,28 @@ export function buildDynamicValuesPrompt(trackerData) {
       const lockedFields = [];
 
       // 1. Stats
-      if (ms.stats) {
-        const schemas = char.statsSchema || [];
-        const statsMap = char.stats || {};
-        const statsObj = {};
+      if (ms.status) {
+        const schemas = char.statusSchema || [];
+        const statusMap = char.status || {};
+        const statusObj = {};
 
         schemas.forEach((schema) => {
           if (schema.isInject !== false) {
-            const value = statsMap[schema.id];
+            const value = statusMap[schema.id];
             const displayVal = value !== undefined 
               ? value 
               : (['stacking', 'consumable'].includes(schema.type) ? (schema.max || 100) : 0);
             
-            statsObj[schema.id] = displayVal;
+            const key = schema.name || schema.id;
+            statusObj[key] = displayVal;
 
             if (schema.isLocked) {
-              lockedFields.push(`stats.${schema.id}`);
+              lockedFields.push(`status.${key}`);
             }
           }
         });
-        if (Object.keys(statsObj).length > 0) {
-          charInfo.stats = statsObj;
+        if (Object.keys(statusObj).length > 0) {
+          charInfo.status = statusObj;
         }
       }
 
@@ -281,7 +282,11 @@ export function buildDynamicValuesPrompt(trackerData) {
             if (inventory.equipIsInject !== false) {
               const equipObj = {};
               Object.entries(equip).forEach(([slot, item]) => {
-                equipObj[slot] = item ? item.name : 'Empty';
+                if (item) {
+                  equipObj[slot] = item.desc ? `${item.name} (${item.desc})` : item.name;
+                } else {
+                  equipObj[slot] = 'Empty';
+                }
               });
               invObj.equipment = equipObj;
               if (inventory.equipIsLocked) lockedFields.push(`inventory.equipment`);
@@ -291,7 +296,9 @@ export function buildDynamicValuesPrompt(trackerData) {
               const storageObj = {};
               Object.entries(storage).forEach(([container, items]) => {
                 storageObj[container] = (Array.isArray(items) ? items : []).map(i => {
-                  return i.quantity > 1 ? `${i.name}x${i.quantity}` : i.name;
+                  const qtyStr = i.quantity > 1 ? `x${i.quantity}` : '';
+                  const descStr = (i.desc || i.description) ? ` (${i.desc || i.description})` : '';
+                  return `${i.name}${qtyStr}${descStr}`;
                 });
               });
               invObj.storage = storageObj;

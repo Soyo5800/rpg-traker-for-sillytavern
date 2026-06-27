@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './CharListEditor.module.css';
-import { DEFAULT_SCHEMAS, DEFAULT_STATS, getDefaultCharacters } from '../core/PromptSchema';
+import { DEFAULT_STATUS_SCHEMAS, DEFAULT_STATUS, getDefaultCharacters } from '../core/PromptSchema';
 
 export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   const { trackerData, updateTrackerData, settings, updateSettings } = useRPG();
@@ -50,9 +50,25 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   };
 
   const handleNameChange = (id, newName) => {
-    const newChars = characters.map(c => c.id === id ? { ...c, name: newName } : c);
+    const cleanIdString = (name, prefix) => {
+      if (!name) return `${prefix}_${Date.now()}`;
+      const clean = name.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+      return clean ? `${prefix}_${clean}` : `${prefix}_${Date.now()}`;
+    };
+    
+    const cleanId = newName === 'New' && id === 'char_user' ? 'char_user' : cleanIdString(newName, 'char');
+    
+    const newChars = characters.map(c => {
+      if (c.id === id) {
+        return { ...c, id: cleanId, name: newName };
+      }
+      return c;
+    });
     handleUpdateCharacters(newChars);
   };
+
+
+  
 
   const handleDelete = (id) => {
     if (characters.length <= 1) {
@@ -73,8 +89,8 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
       name: "New Character",
       activePlayer: false,
       activeInjection: true,
-      statsSchema: JSON.parse(JSON.stringify(DEFAULT_SCHEMAS)),
-      stats: JSON.parse(JSON.stringify(DEFAULT_STATS)),
+      statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
+      status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
       relations: {}
     };
     

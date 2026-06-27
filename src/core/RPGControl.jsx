@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   theme: 'default', // 💡 Theme mode: 'default' (Follow ST) or 'custom' (User defined)
   updateMode: 'merged', // 💡 API update mode: 'merged' (Inline with chat), 'separated' (Manual background)
   maxBackupCount: 4,
+
   showUserStats: true,
   showInfoBox: true,
   showCharacterThoughts: true,
@@ -141,6 +142,7 @@ export function RPGControlProvider({ children }) {
           }
         }
       },
+      handleFullRequestUpdate: async () => { console.log("[RPG Tracker] Full Overwrite Update is deprecated and disabled."); },
       resetToDefault: () => {
         setTrackerData(getDefaultTrackerData());
       }

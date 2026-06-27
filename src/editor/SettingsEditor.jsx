@@ -15,6 +15,7 @@ export default function SettingsEditor({ onClose }) {
     updateSettings({
       ...settings,
       updateMode: localUpdateMode,
+
       maxBackupCount: 20 // 백업은 넉넉하게 20개로 고정하여 안정적인 O(1) 히스토리 롤백 복구를 보장합니다.
     });
     alert("Settings saved successfully.");
@@ -69,15 +70,16 @@ export default function SettingsEditor({ onClose }) {
             </div>
           </div>
 
-          <div className={styles.section}>
+          <div className={styles.section} style={{ marginBottom: '12px' }}>
             <label className={styles.label}>Update Mode</label>
-            <p className={styles.settingsDesc}>
+            <p className={styles.settingsDesc} style={{ marginBottom: '6px' }}>
               Choose how the tracker syncs data with the AI.
             </p>
             <select 
               value={localUpdateMode}
               onChange={e => setLocalUpdateMode(e.target.value)}
               className={styles.settingsSelect}
+              style={{ width: '100%', padding: '6px 10px', borderRadius: '4px' }}
             >
               <option value="merged">Merged (Update alongside chat messages)</option>
               <option value="separated">Separated (Manual background update)</option>

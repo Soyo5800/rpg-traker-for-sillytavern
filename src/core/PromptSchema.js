@@ -1,13 +1,13 @@
 // src/core/PromptSchema.js
 
-export const DEFAULT_SCHEMAS = [
-  { id: 'hp', name: 'HP', type: 'consumable', min: 0, max: 100, color: '#e74c3c', isLocked: false, isInject: true },
-  { id: 'fatigue', name: 'Fatigue', type: 'stacking', min: 0, max: 100, color: '#f39c12', isLocked: false, isInject: true },
-  { id: 'level', name: 'Lv', type: 'integer', min: 1, max: 100, isLocked: false, isInject: true },
-  { id: 'condition', name: 'Condition', type: 'text', isLocked: false, isInject: true }
+export const DEFAULT_STATUS_SCHEMAS = [
+  { id: 'HP', name: 'HP', type: 'consumable', min: 0, max: 100, color: '#e74c3c', isLocked: false, isInject: true },
+  { id: 'Fatigue', name: 'Fatigue', type: 'stacking', min: 0, max: 100, color: '#f39c12', isLocked: false, isInject: true },
+  { id: 'Lv', name: 'Lv', type: 'integer', min: 1, max: 100, isLocked: false, isInject: true },
+  { id: 'Condition', name: 'Condition', type: 'text', isLocked: false, isInject: true }
 ];
 
-export const DEFAULT_STATS = { hp: 100, fatigue: 0, level: 1, condition: '' };
+export const DEFAULT_STATUS = { HP: 100, Fatigue: 0, Lv: 1, Condition: '' };
 
 export const DEFAULT_WORLD_STATE = {
   date: '',
@@ -29,16 +29,16 @@ export const DEFAULT_WORLD_SCHEMA = {
 };
 
 export const DEFAULT_GUIDE_PROMPTS = [
-  { id: 'stats', name: 'Update Stats', prompt: 'Update active stats (like HP, Fatigue, level, condition, etc.) based on action outcomes, damage taken, or roleplay events in the chat.', enabled: true },
-  { id: 'profile', name: 'Update Profile', prompt: 'Dynamically generate, update, or remove unlocked profile fields and stats based on character cards, user persona, or chat context.', enabled: true },
+  { id: 'status', name: 'Update Status', prompt: 'Update active status parameters (like HP, Fatigue, Lv, Condition, etc.) based on action outcomes, damage taken, or roleplay events in the chat.', enabled: true },
+  { id: 'profile', name: 'Update Profile', prompt: 'Dynamically generate, update, or remove unlocked profile fields and parameters based on character cards, user persona, or chat context.', enabled: true },
   { id: 'relations', name: 'Update Relations', prompt: 'Reflect the latest changes in emotions, relationship metrics, and impressions. If the target is a minor/one-time NPC (no separate character card exists), you can also update "targetDescription" (how they feel about this character) and "targetMetrics" (their metrics toward this character) directly within this relation.', enabled: true },
   { id: 'inventory', name: 'Update Inventory', prompt: 'If any items or equipment are acquired or lost, update the inventory and storage accordingly.', enabled: true },
-  { id: 'quests', name: 'Update Quests', prompt: 'If there is progress or a change in ongoing quests, update the quest list.', enabled: true },
+  { id: 'quests', name: 'Update Quests', prompt: 'If there is progress or a change in ongoing quests, update the quest list. Use status "ACTIVE" or "COMPLETED" to reflect progress.', enabled: true },
   { id: 'world_date', name: 'Update Date', prompt: 'Update world date.', enabled: true },
   { id: 'world_time', name: 'Update Time', prompt: 'Update world time.', enabled: true },
   { id: 'world_weather', name: 'Update Weather', prompt: 'Update world weather.', enabled: true },
   { id: 'world_location', name: 'Update Location', prompt: 'Update world location.', enabled: true },
-  { id: 'world_events', name: 'Update Events', prompt: 'Update world events.', enabled: true }
+  { id: 'world_events', name: 'Update Events', prompt: 'Update world events. Keep event names consistent to modify or update ongoing situations instead of duplicating them.', enabled: true }
 ];
 
 export const getDefaultCharacters = () => {
@@ -48,8 +48,8 @@ export const getDefaultCharacters = () => {
       name: 'New',
       activePlayer: true,
       activeInjection: true,
-      statsSchema: JSON.parse(JSON.stringify(DEFAULT_SCHEMAS)),
-      stats: JSON.parse(JSON.stringify(DEFAULT_STATS)),
+      statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
+      status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
       featuresData: {
         profile: { Race: '', Height: '', Appearance: '' },
         profileLocks: { Race: false, Height: false, Appearance: false },
@@ -78,9 +78,9 @@ export const getDefaultCharacters = () => {
   ];
 };
 
-export const DEFAULT_ADD_CHAR_PROMPT = `Based on the chat log, create a profile for the character. Create suitable stats, profile features, and relations (including 'targetDescription' to define what the target thinks about this character) that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER. Omit inventory and quests unless necessary.`;
+export const DEFAULT_ADD_CHAR_PROMPT = `Based on the chat log, create a profile for the character. Create suitable status, profile features, and relations (including 'targetDescription' to define what the target thinks about this character) that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER. Omit inventory and quests unless necessary.`;
 
-export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a profile for the player character. Create suitable stats, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
+export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a profile for the player character. Create suitable status, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
 
 export const getInitialTrackerData = () => {
   return {
@@ -104,12 +104,14 @@ At the VERY BEGINNING of your response, you MUST output a JSON code block wrappe
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_MERGED = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logical-deduct and update status parameters.
+1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
 2. REASONING RULES (CRITICAL):
    - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
    - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
    - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
-3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked stats, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
+3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked status, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
+   - Quests & World Events: Freely add, complete, or update quests and events. Use consistent 'name' values to automatically merge or update existing ones and avoid duplication.
+
 4. LOCK PROTECTION: Absolutely DO NOT change, update, or delete any element listed in '_lockedFields'. Keep them exactly as they are.
 5. OPTIMIZATION: Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
 6. RESPONSE FLOW: Place the JSON HTML comment block at the VERY TOP. Write your normal roleplay response immediately after it. Do not prefix the JSON block with any commentary.`;
@@ -119,12 +121,13 @@ You MUST output ONLY a JSON code block wrapped inside an HTML comment with the '
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_SEP = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logical-deduct and update status parameters.
+1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
 2. REASONING RULES (CRITICAL):
    - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
    - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
    - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
-3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked stats, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
+3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked status, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
+   - Quests & World Events: Freely add, complete, or update quests and events. Use consistent 'name' values to automatically merge or update existing ones and avoid duplication.
 4. LOCK PROTECTION: Absolutely DO NOT change, update, or delete any element listed in '_lockedFields'. Keep them exactly as they are.
 5. OPTIMIZATION: Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
 6. OUTPUT LIMIT: Output ONLY the JSON block. Do not write any normal roleplay response or conversational text.`;

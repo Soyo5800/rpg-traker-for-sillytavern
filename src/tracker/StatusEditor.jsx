@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './StatusEditor.module.css';
+import { sanitizeTrackerData } from '../core/JSONTracker';
 
-import { DEFAULT_SCHEMAS, DEFAULT_STATS, getDefaultCharacters } from '../core/PromptSchema';
+import { DEFAULT_STATUS_SCHEMAS, DEFAULT_STATUS, getDefaultCharacters } from '../core/PromptSchema';
 
-// StatusEditor 컴포넌트: Roster 생성 버튼 역할 및 개 개별 캐릭터 ID를 받아 스펙 에디터 모달 역할 수행
+// StatusEditor component: Acts as a Roster creation button and as a specification editor modal taking individual character ID
 export default function StatusEditor({ charId, initialTab = 'status', onClose, characters, onUpdateCharacters }) {
   const { trackerData, updateTrackerData } = useRPG();
   const [localCharacters, setLocalCharacters] = useState(() => {
@@ -25,7 +26,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     setDragItem({ loc, key, index, item });
   };
 
-  const handleDrop = (e, destLoc, destKey) => {
+  const handleDrop = (e, destLoc, destKey, destIdx = null) => {
     e.preventDefault();
     if (!dragItem) return;
 
@@ -35,15 +36,19 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     const nextEquip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
     const nextStorage = { ...(targetChar.featuresData?.inventory?.storage || {}) };
 
+    let itemToMove = dragItem.item;
     if (dragItem.loc === 'equipment') {
       nextEquip[dragItem.key] = null;
     } else {
-      nextStorage[dragItem.key] = (nextStorage[dragItem.key] || []).filter((_, i) => i !== dragItem.index);
+      const srcList = [...(nextStorage[dragItem.key] || [])];
+      const [removed] = srcList.splice(dragItem.index, 1);
+      if (removed) itemToMove = removed;
+      nextStorage[dragItem.key] = srcList;
     }
 
     if (destLoc === 'equipment') {
       const displaced = nextEquip[destKey];
-      nextEquip[destKey] = dragItem.item;
+      nextEquip[destKey] = itemToMove;
       if (displaced) {
         const firstStore = Object.keys(nextStorage)[0] || 'backpack';
         if (!nextStorage[firstStore]) nextStorage[firstStore] = [];
@@ -51,7 +56,13 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
       }
     } else {
       if (!nextStorage[destKey]) nextStorage[destKey] = [];
-      nextStorage[destKey].push(dragItem.item);
+      let destList = [...(nextStorage[destKey] || [])];
+      if (destIdx !== null && destIdx !== undefined) {
+        destList.splice(destIdx, 0, itemToMove);
+      } else {
+        destList.push(itemToMove);
+      }
+      nextStorage[destKey] = destList;
     }
 
     setLocalCharacters(localCharacters.map(c => {
@@ -77,7 +88,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     setLocalCharacters(JSON.parse(JSON.stringify(origCharacters)));
   }, [trackerData.characters, characters]);
 
-  // --- Roster 추가 버튼 기능 (charId가 없을 때) ---
+  // --- Roster Add Button Feature (when charId is absent) ---
   const handleAddCharacter = () => {
     const name = "New Character";
 
@@ -86,8 +97,8 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
       name: name,
       activePlayer: false,
       activeInjection: true,
-      statsSchema: JSON.parse(JSON.stringify(DEFAULT_SCHEMAS)),
-      stats: { ...DEFAULT_STATS },
+      statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
+      status: { ...DEFAULT_STATUS },
       relations: {}
     };
 
@@ -121,14 +132,14 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     );
   }
 
-  // --- 스펙 에디터 모달 기능 (charId가 존재할 때) ---
+  // --- Spec Editor Modal Feature (when charId exists) ---
   const targetChar = localCharacters.find(c => c.id === charId);
 
   if (!targetChar) {
     return null;
   }
 
-  const targetSchema = (targetChar.statsSchema || []).filter(s => s.type !== 'relation_schema');
+  const targetSchema = (targetChar.statusSchema || []).filter(s => s.type !== 'relation_schema');
 
   const getGroupedFields = (schema) => ({
     gauge: schema.filter(item => ['stacking', 'consumable'].includes(item.type)),
@@ -137,10 +148,20 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
   });
 
   const handleAddStat = (type) => {
-    const statId = `stat_${Date.now()}`;
+    const targetChar = localCharacters.find(c => c.id === charId);
+    const existingIds = (targetChar?.statusSchema || []).map(s => s.id);
+    
+    let baseName = 'NewField';
+    let statId = baseName;
+    let counter = 1;
+    while (existingIds.includes(statId)) {
+      statId = `${baseName}_${counter}`;
+      counter++;
+    }
+
     const newField = { 
       id: statId, 
-      name: 'New Field', 
+      name: statId === baseName ? 'NewField' : `NewField ${counter - 1}`, 
       type, 
       min: type !== 'text' ? 0 : null,
       max: type !== 'text' ? 100 : null,
@@ -152,18 +173,73 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
       c.id === charId 
         ? { 
             ...c, 
-            statsSchema: [...(c.statsSchema || []), newField], 
-            stats: { ...c.stats, [statId]: type === 'text' ? '' : 0 } 
+            statusSchema: [...(c.statusSchema || []), newField], 
+            status: { ...c.status, [statId]: type === 'text' ? '' : 0 } 
           } 
         : c
     ));
     setExpandedIds(prev => ({ ...prev, [statId]: true }));
   };
 
+  const handleSchemaNameBlur = (id, newName) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+
+    // cleanId generation rule (identical to the sanitizeTrackerData regex in JSONTracker.js)
+    const cleanId = trimmed.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+    const newId = cleanId || `NewField_${Date.now()}`;
+
+    setLocalCharacters(prevChars => prevChars.map(c => {
+      if (c.id !== charId) return c;
+
+      // If this ID is already used by another schema field, do not migrate (only update name)
+      const otherExists = (c.statusSchema || []).some(s => s.id === newId && s.id !== id);
+      if (otherExists) {
+        return {
+          ...c,
+          statusSchema: (c.statusSchema || []).map(s => s.id === id ? { ...s, name: trimmed } : s)
+        };
+      }
+
+      const nextSchema = (c.statusSchema || []).map(s => {
+        if (s.id === id) {
+          return { ...s, id: newId, name: trimmed };
+        }
+        return s;
+      });
+
+      const nextStatus = {};
+      Object.entries(c.status || {}).forEach(([k, v]) => {
+        if (k === id) {
+          nextStatus[newId] = v;
+        } else {
+          nextStatus[k] = v;
+        }
+      });
+
+      return {
+        ...c,
+        statusSchema: nextSchema,
+        status: nextStatus
+      };
+    }));
+
+    if (id !== newId) {
+      setExpandedIds(prev => {
+        const next = { ...prev };
+        if (next[id] !== undefined) {
+          next[newId] = next[id];
+          delete next[id];
+        }
+        return next;
+      });
+    }
+  };
+
   const updateSchemaField = (id, key, val) => {
     setLocalCharacters(localCharacters.map(c => 
       c.id === charId 
-        ? { ...c, statsSchema: (c.statsSchema || []).map(s => s.id === id ? { ...s, [key]: val } : s) } 
+        ? { ...c, statusSchema: (c.statusSchema || []).map(s => s.id === id ? { ...s, [key]: val } : s) } 
         : c
     ));
   };
@@ -274,21 +350,157 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     }));
   };
 
+  const handleReorderRelation = (targetName, direction) => {
+    setLocalCharacters(localCharacters.map(c => {
+      if (c.id !== charId) return c;
+      const relations = c.relations || {};
+      const keys = Object.keys(relations);
+      const index = keys.indexOf(targetName);
+      if (index === -1) return c;
+      
+      const nextKeys = [...keys];
+      if (direction === 'up' && index > 0) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index - 1];
+        nextKeys[index - 1] = temp;
+      } else if (direction === 'down' && index < keys.length - 1) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index + 1];
+        nextKeys[index + 1] = temp;
+      } else {
+        return c; // No change
+      }
+      
+      const nextRelations = {};
+      nextKeys.forEach(k => {
+        nextRelations[k] = relations[k];
+      });
+      return { ...c, relations: nextRelations };
+    }));
+  };
+
+  const handleReorderEquipmentSlot = (slotKey, direction) => {
+    setLocalCharacters(localCharacters.map(c => {
+      if (c.id !== charId) return c;
+      const equip = c.featuresData?.inventory?.equipment || {};
+      const keys = Object.keys(equip);
+      const index = keys.indexOf(slotKey);
+      if (index === -1) return c;
+
+      const nextKeys = [...keys];
+      if (direction === 'up' && index > 0) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index - 1];
+        nextKeys[index - 1] = temp;
+      } else if (direction === 'down' && index < keys.length - 1) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index + 1];
+        nextKeys[index + 1] = temp;
+      } else {
+        return c;
+      }
+
+      const nextEquip = {};
+      nextKeys.forEach(k => {
+        nextEquip[k] = equip[k];
+      });
+
+      return {
+        ...c,
+        featuresData: {
+          ...(c.featuresData || {}),
+          inventory: {
+            ...(c.featuresData?.inventory || {}),
+            equipment: nextEquip
+          }
+        }
+      };
+    }));
+  };
+
+  const handleReorderInventoryItem = (storageKey, idx, direction) => {
+    setLocalCharacters(localCharacters.map(c => {
+      if (c.id !== charId) return c;
+      const storage = { ...(c.featuresData?.inventory?.storage || {}) };
+      const items = [...(storage[storageKey] || [])];
+      if (idx < 0 || idx >= items.length) return c;
+
+      const nextIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (nextIdx < 0 || nextIdx >= items.length) return c;
+
+      const temp = items[idx];
+      items[idx] = items[nextIdx];
+      items[nextIdx] = temp;
+
+      storage[storageKey] = items;
+      return {
+        ...c,
+        featuresData: {
+          ...(c.featuresData || {}),
+          inventory: {
+            ...(c.featuresData?.inventory || {}),
+            storage
+          }
+        }
+      };
+    }));
+  };
+
+
+  const handleReorderStorage = (storageKey, direction) => {
+    setLocalCharacters(localCharacters.map(c => {
+      if (c.id !== charId) return c;
+      const storage = c.featuresData?.inventory?.storage || {};
+      const keys = Object.keys(storage);
+      const index = keys.indexOf(storageKey);
+      if (index === -1) return c;
+
+      const nextKeys = [...keys];
+      if (direction === 'up' && index > 0) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index - 1];
+        nextKeys[index - 1] = temp;
+      } else if (direction === 'down' && index < keys.length - 1) {
+        const temp = nextKeys[index];
+        nextKeys[index] = nextKeys[index + 1];
+        nextKeys[index + 1] = temp;
+      } else {
+        return c;
+      }
+
+      const nextStorage = {};
+      nextKeys.forEach(k => {
+        nextStorage[k] = storage[k];
+      });
+
+      return {
+        ...c,
+        featuresData: {
+          ...(c.featuresData || {}),
+          inventory: {
+            ...(c.featuresData?.inventory || {}),
+            storage: nextStorage
+          }
+        }
+      };
+    }));
+  };
+
   const removeField = (id) => {
     setLocalCharacters(localCharacters.map(c => {
       if (c.id !== charId) return c;
-      const nextStats = { ...c.stats };
-      delete nextStats[id];
+      const nextStatus = { ...c.status };
+      delete nextStatus[id];
       return { 
         ...c, 
-        statsSchema: (c.statsSchema || []).filter(s => s.id !== id),
-        stats: nextStats
+        statusSchema: (c.statusSchema || []).filter(s => s.id !== id),
+        status: nextStatus
       };
     }));
   };
 
   const handleMoveStat = (id, direction) => {
-    const nextSchema = [...(targetChar.statsSchema || [])];
+    const nextSchema = [...(targetChar.statusSchema || [])];
     const idx = nextSchema.findIndex(s => s.id === id);
     const nextIdx = direction === 'up' ? idx - 1 : idx + 1;
     if (nextIdx < 0 || nextIdx >= nextSchema.length) return;
@@ -298,7 +510,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     nextSchema[nextIdx] = temp;
 
     setLocalCharacters(localCharacters.map(c => 
-      c.id === charId ? { ...c, statsSchema: nextSchema } : c
+      c.id === charId ? { ...c, statusSchema: nextSchema } : c
     ));
   };
 
@@ -316,8 +528,8 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
             name: c.name,
             activePlayer: false,
             activeInjection: true,
-            statsSchema: JSON.parse(JSON.stringify(DEFAULT_SCHEMAS)),
-            stats: JSON.parse(JSON.stringify(DEFAULT_STATS)),
+            statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
+            status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
             relations: {},
             featuresData: {
               profile: { Race: '', Height: '', Appearance: '' },
@@ -371,7 +583,11 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
         const importedData = JSON.parse(event.target.result);
         if (importedData && importedData.id) {
           setLocalCharacters(localCharacters.map(c => 
-            c.id === charId ? { ...importedData, id: charId } : c
+            c.id === charId ? { ...(() => {
+              const tempTracker = { characters: [importedData] };
+              const sanitizedTemp = sanitizeTrackerData(tempTracker);
+              return sanitizedTemp.characters[0];
+            })(), id: charId } : c
           ));
         } else {
           alert("Invalid character JSON file.");
@@ -386,34 +602,44 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
 
   const handleSaveChanges = () => {
     if (updateTrackerData) {
-      // 실존 캐릭터 간의 양방향 관계 데이터를 백그라운드에서 동기화해 줍니다.
-      const syncedCharacters = JSON.parse(JSON.stringify(localCharacters));
+      // Synchronize two-way relationship data between real characters in the background.
+      // 1. Build temporary trackerData and perform unified migration via sanitizeTrackerData.
+      const tempTracker = {
+        characters: JSON.parse(JSON.stringify(localCharacters)),
+        globalDefinitions: JSON.parse(JSON.stringify(trackerData.globalDefinitions || {}))
+      };
+      
+      const sanitizedTracker = sanitizeTrackerData(tempTracker);
+      const syncedCharacters = sanitizedTracker.characters;
+      const nextGlobalDefs = sanitizedTracker.globalDefinitions;
+
+
       
       syncedCharacters.forEach(char => {
         if (!char.relations) return;
         
         Object.entries(char.relations).forEach(([targetName, rData]) => {
-          // targetName이 실존하는 캐릭터 카드인지 검사
+          // Check if targetName is a real character card
           const targetChar = syncedCharacters.find(c => c.name?.trim().toLowerCase() === targetName.trim().toLowerCase());
           
           if (targetChar) {
-            // CharA 가 가진 CharB를 향한 targetText/targetValues 가 존재한다면, 
-            // 실존하는 CharB의 relations["CharA"] 에 덮어씌워 동기화해 줍니다.
+            // If targetText/targetValues directed towards CharB exists in CharA, 
+            // override and sync it to relations["CharA"] of CharB.
             targetChar.relations = targetChar.relations || {};
             
-            // 상대방 카드에 주인공을 향한 관계 데이터가 없을 경우 초기화해서 추가해 줌
+            // Initialize and add relationship data if it doesn't exist on the opponent's card
             if (!targetChar.relations[char.name]) {
               targetChar.relations[char.name] = { text: '', isLocked: false, isInject: true, values: {} };
             }
             
             const targetRel = targetChar.relations[char.name];
             
-            // CharA의 targetText가 정의되어 있다면 CharB의 text로 동기화
+            // Sync CharA's targetText to CharB's text if defined
             if (rData.targetText !== undefined) {
               targetRel.text = rData.targetText;
             }
             
-            // CharA의 targetValues가 정의되어 있다면 CharB의 values로 동기화
+            // Sync CharA's targetValues to CharB's values if defined
             if (rData.targetValues) {
               targetRel.values = targetRel.values || {};
               Object.entries(rData.targetValues).forEach(([mName, mVal]) => {
@@ -437,7 +663,8 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
 
       updateTrackerData({
         ...trackerData,
-        characters: syncedCharacters
+        characters: syncedCharacters,
+        globalDefinitions: nextGlobalDefs
       });
       alert("Character configuration saved successfully.");
       onClose();
@@ -466,7 +693,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
     handleUpdateNestedField('profile', null, newProf);
   };
 
-  const groupedStats = getGroupedFields(targetSchema);
+  const groupedStatus = getGroupedFields(targetSchema);
   const profileKeys = targetChar.featuresData?.profile ? Object.keys(targetChar.featuresData.profile) : ['race', 'height', 'hair', 'eye', 'personality'];
 
   return (
@@ -526,15 +753,15 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                 <h5>Consumables & Stackings</h5>
                 <button className={styles.addQuickFieldBtn} onClick={() => handleAddStat('consumable')}>+ Add Gauge</button>
               </div>
-              {groupedStats.gauge.length === 0 ? (
+              {groupedStatus.gauge.length === 0 ? (
                 <p className={styles.emptySectionText}>No gauge fields defined.</p>
               ) : (
-                groupedStats.gauge.map((item, fIdx) => (
+                groupedStatus.gauge.map((item, fIdx) => (
                   <div key={item.id} className={`${styles.schemaItem} ${expandedIds[item.id] ? styles.itemExpanded : ''}`}>
                     <div className={styles.itemHeader}>
                       <div className={styles.headerLeftZone}>
                         <button type="button" className={`${styles.accordionToggleBtn} ${expandedIds[item.id] ? styles.activeToggle : ''}`} onClick={() => toggleAccordion(item.id)}>▶</button>
-                        <input type="text" value={item.name} onChange={e => updateSchemaField(item.id, 'name', e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
+                        <input type="text" value={item.name} onChange={e => updateSchemaField(item.id, 'name', e.target.value)} onBlur={e => handleSchemaNameBlur(item.id, e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
                         <span className={styles.fixedBadge}>{item.type.toUpperCase()}</span>
                       </div>
                       <div className={styles.headerRightZone}>
@@ -546,7 +773,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           </div>
                         </label>
                         <button type="button" className={styles.sortBtn} disabled={fIdx === 0} onClick={() => handleMoveStat(item.id, 'up')}>▲</button>
-                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStats.gauge.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
+                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStatus.gauge.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
                         <button type="button" className={styles.removeInlineBtn} onClick={() => removeField(item.id)}>X</button>
                       </div>
                     </div>
@@ -583,15 +810,15 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                 <h5>Integer</h5>
                 <button className={styles.addQuickFieldBtn} onClick={() => handleAddStat('integer')}>+ Add Integer</button>
               </div>
-              {groupedStats.integer.length === 0 ? (
+              {groupedStatus.integer.length === 0 ? (
                 <p className={styles.emptySectionText}>No integer fields defined.</p>
               ) : (
-                groupedStats.integer.map((item, fIdx) => (
+                groupedStatus.integer.map((item, fIdx) => (
                   <div key={item.id} className={`${styles.schemaItem} ${expandedIds[item.id] ? styles.itemExpanded : ''}`}>
                     <div className={styles.itemHeader}>
                       <div className={styles.headerLeftZone}>
                         <button type="button" className={`${styles.accordionToggleBtn} ${expandedIds[item.id] ? styles.activeToggle : ''}`} onClick={() => toggleAccordion(item.id)}>▶</button>
-                        <input type="text" value={item.name} placeholder="Field Name" onChange={e => updateSchemaField(item.id, 'name', e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
+                        <input type="text" value={item.name} placeholder="Field Name" onChange={e => updateSchemaField(item.id, 'name', e.target.value)} onBlur={e => handleSchemaNameBlur(item.id, e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
                         <span className={styles.fixedBadge}>INT</span>
                       </div>
                       <div className={styles.headerRightZone}>
@@ -603,7 +830,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           </div>
                         </label>
                         <button type="button" className={styles.sortBtn} disabled={fIdx === 0} onClick={() => handleMoveStat(item.id, 'up')}>▲</button>
-                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStats.integer.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
+                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStatus.integer.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
                         <button type="button" className={styles.removeInlineBtn} onClick={() => removeField(item.id)}>X</button>
                       </div>
                     </div>
@@ -629,14 +856,14 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                 <h5>Text</h5>
                 <button className={styles.addQuickFieldBtn} onClick={() => handleAddStat('text')}>+ Add Text</button>
               </div>
-              {groupedStats.text.length === 0 ? (
+              {groupedStatus.text.length === 0 ? (
                 <p className={styles.emptySectionText}>No custom text fields defined.</p>
               ) : (
-                groupedStats.text.map((item, fIdx) => (
+                groupedStatus.text.map((item, fIdx) => (
                   <div key={item.id} className={styles.schemaItem}>
                     <div className={styles.itemHeader}>
                       <div className={styles.headerLeftZone}>
-                        <input type="text" value={item.name} placeholder="Field Name" onChange={e => updateSchemaField(item.id, 'name', e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
+                        <input type="text" value={item.name} placeholder="Field Name" onChange={e => updateSchemaField(item.id, 'name', e.target.value)} onBlur={e => handleSchemaNameBlur(item.id, e.target.value)} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', width: '100px', padding: '4px 8px', borderRadius: '4px' }} />
                         <span className={styles.fixedBadge}>TEXT</span>
                       </div>
                       <div className={styles.headerRightZone}>
@@ -648,7 +875,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           </div>
                         </label>
                         <button type="button" className={styles.sortBtn} disabled={fIdx === 0} onClick={() => handleMoveStat(item.id, 'up')}>▲</button>
-                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStats.text.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
+                        <button type="button" className={styles.sortBtn} disabled={fIdx === groupedStatus.text.length - 1} onClick={() => handleMoveStat(item.id, 'down')}>▼</button>
                         <button type="button" className={styles.removeInlineBtn} onClick={() => removeField(item.id)}>X</button>
                       </div>
                     </div>
@@ -663,7 +890,14 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                 <button 
                   className={styles.addQuickFieldBtn} 
                   onClick={() => {
-                    const newKey = `New_Field_${Date.now()}`;
+                    const prof = targetChar.featuresData?.profile || {};
+                    let baseKey = 'NewField';
+                    let newKey = baseKey;
+                    let counter = 1;
+                    while (prof[newKey] !== undefined) {
+                      newKey = `${baseKey}_${counter}`;
+                      counter++;
+                    }
                     handleUpdateNestedField('profile', newKey, '');
                   }}
                 >
@@ -777,21 +1011,41 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
               <div className={styles.tabHeaderRow}>
                 <span>Relations Schema & Values</span>
                 <button className={styles.addQuickFieldBtn} onClick={() => {
-                  const name = `New_Target_${Date.now()}`;
+                  const existingTargets = Object.keys(targetChar.relations || {});
+                  let baseName = 'NewTarget';
+                  let name = baseName;
+                  let counter = 1;
+                  while (existingTargets.includes(name)) {
+                    name = `${baseName}_${counter}`;
+                    counter++;
+                  }
                   handleUpdateRelations(name, 'add');
                 }}>+ Add Target</button>
               </div>
               
-              {Object.keys(targetChar.relations || {}).length === 0 ? (
-                <p className={styles.emptySectionText}>No relations recorded.</p>
-              ) : (
-                Object.entries(targetChar.relations || {}).map(([targetName, data]) => {
+              {(() => {
+                const relationsList = Object.entries(targetChar.relations || {});
+                const totalRelations = relationsList.length;
+                if (totalRelations === 0) {
+                  return <p className={styles.emptySectionText}>No relations recorded.</p>;
+                }
+                return relationsList.map(([targetName, data], rIdx) => {
+                  const isExpanded = expandedIds[`relation_${targetName}`] !== false;
+
                   const existingCharNames = localCharacters.map(c => c.name?.trim().toLowerCase());
                   const isRealCharacter = existingCharNames.includes(targetName?.trim().toLowerCase());
 
                   return (
                     <div key={targetName} className={styles.relationCard}>
                       <div className={styles.relationCardHeader}>
+                        <button 
+                          type="button" 
+                          className={`${styles.accordionToggleBtn} ${isExpanded ? styles.activeToggle : ''}`} 
+                          onClick={() => setExpandedIds(prev => ({ ...prev, [`relation_${targetName}`]: prev[`relation_${targetName}`] === false ? true : false }))}
+                          style={{ marginRight: '6px' }}
+                        >
+                          ▶
+                        </button>
                         <input 
                           type="text" 
                           defaultValue={targetName} 
@@ -809,6 +1063,22 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', padding: '5px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', outline: 'none', marginRight: '10px' }}
                         />
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <button 
+                            type="button" 
+                            className={styles.sortBtn} 
+                            disabled={rIdx === 0} 
+                            onClick={() => handleReorderRelation(targetName, 'up')}
+                          >
+                            ▲
+                          </button>
+                          <button 
+                            type="button" 
+                            className={styles.sortBtn} 
+                            disabled={rIdx === totalRelations - 1} 
+                            onClick={() => handleReorderRelation(targetName, 'down')}
+                          >
+                            ▼
+                          </button>
                           {isRealCharacter && (
                             <span style={{ fontSize: '10px', background: 'rgba(52, 152, 219, 0.1)', color: '#3498db', padding: '2px 6px', borderRadius: '3px', border: '1px solid rgba(52, 152, 219, 0.3)' }}>
                               Real Character (Synced)
@@ -838,14 +1108,28 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                         </div>
                       </div>
 
-                      {/* --- Outgoing: 주인공 -> 상대방 --- */}
-                      <div style={{ padding: '8px', borderLeft: '3px solid var(--rpg-highlight)', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', marginBottom: '10px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-highlight)', display: 'block', marginBottom: '6px' }}>
-                          My Status ➔ {targetName}
-                        </span>
+                      {isExpanded && (
+                        <>
+                          {/* --- Outgoing: Current -> Target --- */}
+                      <div style={{ padding: '8px', borderLeft: '3px solid var(--rpg-text)', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-text)' }}>
+                            {targetChar.name} ➔ {targetName}
+                          </span>
+                          <button className={styles.addQuickFieldBtn} onClick={() => {
+                            const existingMetrics = Object.keys(data.values || {});
+                            let baseName = 'NewMetric';
+                            let mName = baseName;
+                            let counter = 1;
+                            while (existingMetrics.includes(mName)) {
+                              mName = `${baseName}_${counter}`;
+                              counter++;
+                            }
+                            handleUpdateRelations(targetName, 'addMetric', { metric: mName });
+                          }}>+ Add Metric</button>
+                        </div>
                         
                         <div style={{ marginBottom: '8px' }}>
-                          <span style={{ fontSize: '10px', opacity: 0.6, display: 'block', marginBottom: '2px' }}>Description (My Thoughts)</span>
                           <textarea 
                             value={data.text || ''} 
                             placeholder={`How ${targetChar.name} feels about ${targetName}...`}
@@ -860,7 +1144,6 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           const mType = isObj ? mVal.type : 'integer';
                           const mMin = isObj && mVal.min !== undefined ? mVal.min : 0;
                           const mMax = isObj ? mVal.max : 100;
-                          const mRealValue = isObj ? mVal.value : mVal;
 
                           return (
                             <div key={mName} className={styles.relationInputRow} style={{ flexWrap: 'wrap', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
@@ -868,8 +1151,18 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                                 type="text" 
                                 defaultValue={mName} 
                                 onBlur={e => {
-                                  if (e.target.value && e.target.value !== mName && !(data.values || {})[e.target.value]) {
-                                    handleUpdateRelations(targetName, 'renameMetric', { oldKey: mName, newKey: e.target.value });
+                                  const trimmed = e.target.value.trim();
+                                  if (!trimmed) return;
+
+                                  const cleanId = trimmed.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+                                  const newId = cleanId || `NewMetric_${Date.now()}`;
+
+                                  if (newId !== mName) {
+                                    const otherExists = (data.values || {})[newId] !== undefined;
+                                    if (otherExists) {
+                                      return;
+                                    }
+                                    handleUpdateRelations(targetName, 'renameMetric', { oldKey: mName, newKey: newId });
                                   }
                                 }}
                                 style={{ flex: 1, minWidth: '80px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', padding: '5px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', outline: 'none' }}
@@ -908,21 +1201,28 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                             </div>
                           );
                         })}
-                        
-                        <button className={styles.addQuickFieldBtn} style={{ alignSelf: 'flex-start', marginTop: '6px' }} onClick={() => {
-                          const mName = `New_Metric_${Date.now()}`;
-                          handleUpdateRelations(targetName, 'addMetric', { metric: mName });
-                        }}>+ Add Metric</button>
                       </div>
 
-                      {/* --- Incoming: 상대방 -> 주인공 (쌍방 데이터) --- */}
-                      <div style={{ padding: '8px', borderLeft: '3px solid var(--rpg-highlight)', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-highlight)', display: 'block', marginBottom: '6px' }}>
-                          {targetName} ➔ My Status
-                        </span>
+                      {/* --- Incoming: Target -> Current (Two-way Data) --- */}
+                      <div style={{ padding: '8px', borderLeft: '3px solid var(--rpg-text)', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-text)' }}>
+                            {targetName} ➔ {targetChar.name}
+                          </span>
+                          <button className={styles.addQuickFieldBtn} onClick={() => {
+                            const existingTargetMetrics = Object.keys(data.targetValues || {});
+                            let baseName = 'NewMetric';
+                            let mName = baseName;
+                            let counter = 1;
+                            while (existingTargetMetrics.includes(mName)) {
+                              mName = `${baseName}_${counter}`;
+                              counter++;
+                            }
+                            handleUpdateRelations(targetName, 'addTargetMetric', { metric: mName });
+                          }}>+ Add Metric</button>
+                        </div>
                         
                         <div style={{ marginBottom: '8px' }}>
-                          <span style={{ fontSize: '10px', opacity: 0.6, display: 'block', marginBottom: '2px' }}>Target Description (Their Thoughts)</span>
                           <textarea 
                             value={data.targetText || ''} 
                             placeholder={`How ${targetName} feels about ${targetChar.name}...`}
@@ -944,8 +1244,18 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                                 type="text" 
                                 defaultValue={tmName} 
                                 onBlur={e => {
-                                  if (e.target.value && e.target.value !== tmName && !(data.targetValues || {})[e.target.value]) {
-                                    handleUpdateRelations(targetName, 'renameTargetMetric', { oldKey: tmName, newKey: e.target.value });
+                                  const trimmed = e.target.value.trim();
+                                  if (!trimmed) return;
+
+                                  const cleanId = trimmed.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+                                  const newId = cleanId || `NewMetric_${Date.now()}`;
+
+                                  if (newId !== tmName) {
+                                    const otherExists = (data.targetValues || {})[newId] !== undefined;
+                                    if (otherExists) {
+                                      return;
+                                    }
+                                    handleUpdateRelations(targetName, 'renameTargetMetric', { oldKey: tmName, newKey: newId });
                                   }
                                 }}
                                 style={{ flex: 1, minWidth: '80px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', padding: '5px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', outline: 'none' }}
@@ -984,16 +1294,13 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                             </div>
                           );
                         })}
-                        
-                        <button className={styles.addQuickFieldBtn} style={{ alignSelf: 'flex-start', marginTop: '6px' }} onClick={() => {
-                          const mName = `New_Metric_${Date.now()}`;
-                          handleUpdateRelations(targetName, 'addTargetMetric', { metric: mName });
-                        }}>+ Add Metric</button>
                       </div>
+                    </>
+                  )}
                     </div>
                   );
-                })
-              )}
+                });
+              })()}
             </div>
           )}
 
@@ -1001,14 +1308,26 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
             <div className={styles.inventoryTabBody}>
               <div className={styles.invActionBar}>
                 <button type="button" className={styles.invActionBtn} onClick={() => {
-                  const name = `New_Slot_${Date.now()}`;
                   const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
+                  let baseName = 'NewSlot';
+                  let name = baseName;
+                  let counter = 1;
+                  while (equip[name] !== undefined) {
+                    name = `${baseName}_${counter}`;
+                    counter++;
+                  }
                   equip[name] = null;
                   handleUpdateNestedField('inventory', 'equipment', equip);
                 }}>+ Add Slot</button>
                 <button type="button" className={styles.invActionBtn} onClick={() => {
-                  const name = `New_Container_${Date.now()}`;
                   const storage = { ...(targetChar.featuresData?.inventory?.storage || {}) };
+                  let baseName = 'NewContainer';
+                  let name = baseName;
+                  let counter = 1;
+                  while (storage[name] !== undefined) {
+                    name = `${baseName}_${counter}`;
+                    counter++;
+                  }
                   storage[name] = [];
                   handleUpdateNestedField('inventory', 'storage', storage);
                 }}>+ Add Container</button>
@@ -1029,7 +1348,10 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
               <div className={styles.invSection}>
                 <h5 className={styles.invSectionTitle}>Equipment Slots</h5>
                 <div className={styles.invEquipGrid}>
-                  {Object.entries(targetChar.featuresData?.inventory?.equipment || {}).map(([slotKey, item]) => (
+                  {(() => {
+                    const slotsList = Object.entries(targetChar.featuresData?.inventory?.equipment || {});
+                    const totalSlots = slotsList.length;
+                    return slotsList.map(([slotKey, item], slotIdx) => (
                     <div 
                       key={slotKey} 
                       className={styles.invSlotCard}
@@ -1037,26 +1359,32 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                       onDrop={e => handleDrop(e, 'equipment', slotKey)}
                     >
                       <div className={styles.slotHeader}>
-                        <input 
-                          type="text" 
-                          className={styles.slotRenameInput} 
-                          defaultValue={slotKey}
-                          onBlur={e => {
-                            const newKey = e.target.value.trim();
-                            if (newKey && newKey !== slotKey && !(targetChar.featuresData?.inventory?.equipment || {})[newKey]) {
-                              const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
-                              equip[newKey] = equip[slotKey];
-                              delete equip[slotKey];
-                              handleUpdateNestedField('inventory', 'equipment', equip);
-                            }
-                          }}
-                          style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', padding: '4px 8px', borderRadius: '4px' }}
-                        />
-                        <button type="button" className={styles.removeInlineBtn} onClick={() => {
-                          const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
-                          delete equip[slotKey];
-                          handleUpdateNestedField('inventory', 'equipment', equip);
-                        }}>X</button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1, marginRight: "10px" }}>
+                          <input 
+                            type="text" 
+                            className={styles.slotRenameInput} 
+                            defaultValue={slotKey}
+                            onBlur={e => {
+                              const newKey = e.target.value.trim();
+                              if (newKey && newKey !== slotKey && !(targetChar.featuresData?.inventory?.equipment || {})[newKey]) {
+                                const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
+                                equip[newKey] = equip[slotKey];
+                                delete equip[slotKey];
+                                handleUpdateNestedField("inventory", "equipment", equip);
+                              }
+                            }}
+                            style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid var(--rpg-border)", color: "var(--rpg-text)", fontSize: "11px", outline: "none", padding: "4px 8px", borderRadius: "4px" }}
+                          />
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                          <button type="button" className={styles.sortBtn} disabled={slotIdx === 0} onClick={() => handleReorderEquipmentSlot(slotKey, "up")} style={{ padding: "2px 4px", fontSize: "9px" }}>▲</button>
+                          <button type="button" className={styles.sortBtn} disabled={slotIdx === totalSlots - 1} onClick={() => handleReorderEquipmentSlot(slotKey, "down")} style={{ padding: "2px 4px", fontSize: "9px" }}>▼</button>
+                          <button type="button" className={styles.removeInlineBtn} onClick={() => {
+                            const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
+                            delete equip[slotKey];
+                            handleUpdateNestedField("inventory", "equipment", equip);
+                          }}>X</button>
+                        </div>
                       </div>
 
                       {item ? (
@@ -1065,9 +1393,31 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                           draggable
                           onDragStart={e => handleDragStart(e, 'equipment', slotKey, null, item)}
                         >
-                          <div className={styles.itemText}>
-                            <span className={styles.name}>{item.name || '(No Name)'}</span>
-                            <span className={styles.desc}>{item.desc || '(No Description)'}</span>
+                          <div className={styles.itemText} style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '3px' }}>
+                            <input 
+                              type="text"
+                              className={styles.itemTitleInput}
+                              value={item.name || ''}
+                              placeholder="Equipped item name..."
+                              onChange={e => {
+                                const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
+                                equip[slotKey] = { ...(equip[slotKey] || {}), name: e.target.value };
+                                handleUpdateNestedField('inventory', 'equipment', equip);
+                              }}
+                              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid transparent', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', padding: '2px 0' }}
+                            />
+                            <input 
+                              type="text"
+                              className={styles.itemDescInput}
+                              value={item.desc || ''}
+                              placeholder="Description..."
+                              onChange={e => {
+                                const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
+                                equip[slotKey] = { ...(equip[slotKey] || {}), desc: e.target.value };
+                                handleUpdateNestedField('inventory', 'equipment', equip);
+                              }}
+                              style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--rpg-text)', fontSize: '10px', opacity: 0.6, outline: 'none', padding: '2px 0' }}
+                            />
                           </div>
                           <button type="button" className={styles.unequipBtn} onClick={() => {
                             const equip = { ...(targetChar.featuresData?.inventory?.equipment || {}) };
@@ -1083,14 +1433,18 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                         <span className={styles.emptyText}>Empty</span>
                       )}
                     </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               </div>
 
               <div className={styles.invSection}>
                 <h5 className={styles.invSectionTitle}>Containers & Items</h5>
                 <div className={styles.invStorageGrid}>
-                  {Object.entries(targetChar.featuresData?.inventory?.storage || {}).map(([storageKey, items]) => {
+                  {(() => {
+                    const storagesList = Object.entries(targetChar.featuresData?.inventory?.storage || {});
+                    const totalStorages = storagesList.length;
+                    return storagesList.map(([storageKey, items], sIdx) => {
                     const itemList = Array.isArray(items) ? items : [];
                     return (
                       <div 
@@ -1100,7 +1454,7 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                         onDrop={e => handleDrop(e, 'storage', storageKey)}
                       >
                         <div className={styles.slotHeader}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '70%' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, marginRight: '10px' }}>
                             <button 
                               type="button" 
                               className={`${styles.accordionToggleBtn} ${expandedIds[`storage_${storageKey}`] !== false ? styles.activeToggle : ''}`} 
@@ -1124,11 +1478,15 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                               style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', padding: '4px 8px', borderRadius: '4px' }}
                             />
                           </div>
-                          <button type="button" className={styles.removeInlineBtn} onClick={() => {
-                            const storage = { ...(targetChar.featuresData?.inventory?.storage || {}) };
-                            delete storage[storageKey];
-                            handleUpdateNestedField('inventory', 'storage', storage);
-                          }}>X</button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <button type="button" className={styles.sortBtn} disabled={sIdx === 0} onClick={() => handleReorderStorage(storageKey, 'up')} style={{ padding: '2px 4px', fontSize: '9px' }}>▲</button>
+                            <button type="button" className={styles.sortBtn} disabled={sIdx === totalStorages - 1} onClick={() => handleReorderStorage(storageKey, 'down')} style={{ padding: '2px 4px', fontSize: '9px' }}>▼</button>
+                            <button type="button" className={styles.removeInlineBtn} onClick={() => {
+                              const storage = { ...(targetChar.featuresData?.inventory?.storage || {}) };
+                              delete storage[storageKey];
+                              handleUpdateNestedField('inventory', 'storage', storage);
+                            }}>X</button>
+                          </div>
                         </div>
 
                         {expandedIds[`storage_${storageKey}`] !== false && (
@@ -1142,9 +1500,14 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                                 className={styles.invItemRow}
                                 draggable
                                 onDragStart={e => handleDragStart(e, 'storage', storageKey, idx, item)}
+                                onDragOver={e => e.preventDefault()}
+                                onDrop={e => {
+                                  e.stopPropagation();
+                                  handleDrop(e, 'storage', storageKey, idx);
+                                }}
                               >
                                 <div style={{ width: '100%' }}>
-                                  <div className={styles.itemTitleLine}>
+                                  <div className={styles.itemTitleLine} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <input 
                                       type="text" 
                                       className={styles.itemTitleInput} 
@@ -1155,9 +1518,9 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                                         storage[storageKey][idx].name = e.target.value;
                                         handleUpdateNestedField('inventory', 'storage', storage);
                                       }}
+                                      style={{ flex: 1, width: 'auto' }}
                                     />
-                                    <div className={styles.itemQtyBox}>
-                                      <span>[</span>
+                                    <div className={styles.itemQtyBox} style={{ opacity: 0.95, flexShrink: 0 }}>
                                       <input 
                                         type="number" 
                                         className={styles.itemQtyInput} 
@@ -1167,9 +1530,8 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                                           storage[storageKey][idx].quantity = Number(e.target.value);
                                           handleUpdateNestedField('inventory', 'storage', storage);
                                         }}
-                                        style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', padding: '2px 4px', borderRadius: '4px', width: '40px', textAlign: 'center' }}
+                                        style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid var(--rpg-border)', color: 'var(--rpg-text)', fontSize: '11px', outline: 'none', padding: '2px 6px', borderRadius: '4px', width: '32px', textAlign: 'center', fontWeight: 'bold', display: 'inline-block' }}
                                       />
-                                      <span>]</span>
                                     </div>
                                     <button type="button" className={styles.itemDeleteBtn} onClick={() => {
                                       const storage = { ...(targetChar.featuresData?.inventory?.storage || {}) };
@@ -1196,7 +1558,8 @@ export default function StatusEditor({ charId, initialTab = 'status', onClose, c
                         )}
                       </div>
                     );
-                  })}
+                  });
+                  })()}
                 </div>
               </div>
             </div>

@@ -747,7 +747,7 @@
 }
 
 .itemTitleInput:focus {
-  border-bottom: 1px dashed var(--rpg-highlight);
+  border-bottom: 1px solid var(--rpg-highlight);
   outline: none;
 }
 
@@ -787,7 +787,7 @@
 }
 
 .itemDescInput:focus {
-  border-bottom: 1px dashed var(--rpg-highlight);
+  border-bottom: 1px solid var(--rpg-highlight);
   outline: none;
 }
 
@@ -812,4 +812,15 @@ input[type=number] {
 
 .itemDeleteBtn:hover {
   color: #e74c3c;
+}
+
+/* Relations tab overriding to use normal text colors instead of rpg-highlight */
+.tabHeaderRow span {
+  color: var(--rpg-text) !important;
+}
+.relationCardHeader strong {
+  color: var(--rpg-text) !important;
+}
+.relationCardHeader .switchRow {
+  display: none !important;
 }

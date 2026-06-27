@@ -498,7 +498,17 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
       const currentData = c.featuresData || {};
       const currentQuests = currentData.quests || { main: { name: '', desc: '' }, sides: [] };
       const currentSides = currentQuests.sides || [];
-      const updatedSides = currentSides.map(q => q.id === id ? { ...q, [key]: value } : q);
+      const updatedSides = currentSides.map(q => {
+        if (q.id === id) {
+          const updatedQ = { ...q, [key]: value };
+          if (key === 'name') {
+            const cleanName = value.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+            updatedQ.id = cleanName ? `quest_${cleanName}` : `quest_${Date.now()}`;
+          }
+          return updatedQ;
+        }
+        return q;
+      });
       return {
         ...c,
         featuresData: {
@@ -508,6 +518,9 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
       };
     });
   };
+
+
+  
 
   const handleRemoveSideQuest = (id) => {
     onPatchCharacter(c => {
@@ -817,11 +830,18 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
               </div>
               <div className={styles.sideBySideRow}>
                 {Object.entries(inventory.equipment || {}).map(([slotKey, item]) => (
-                  <div key={slotKey} className={styles.sidebarEquipSlot}>
+                  <div key={slotKey} className={styles.sidebarEquipSlot} title={item?.desc || ''}>
                     <span className={styles.slotSmallLabel}>
                       {slotKey.charAt(0).toUpperCase() + slotKey.slice(1).replace('_', ' ')}
                     </span>
-                    <span className={styles.itemSidebarText}>{item ? item.name : 'Empty'}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className={styles.itemSidebarText}>{item ? item.name : 'Empty'}</span>
+                      {item && item.desc && (
+                        <span className={styles.itemSidebarDescText} style={{ fontSize: '9px', opacity: 0.5, marginTop: '2px' }}>
+                          {item.desc}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -862,9 +882,16 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                       </span>
                       <div className={styles.sidebarStorageList}>
                         {itemList.map((item, idx) => (
-                          <span key={item.id || idx} className={styles.itemSidebarText}>
-                            • {item.name || '(Unnamed)'} {item.quantity > 1 ? `(${item.quantity})` : ''}
-                          </span>
+                          <div key={item.id || idx} style={{ display: 'flex', flexDirection: 'column', marginBottom: '4px' }} title={item.desc || ''}>
+                            <span className={styles.itemSidebarText}>
+                              • {item.name || '(Unnamed)'} {item.quantity > 1 ? `(${item.quantity})` : ''}
+                            </span>
+                            {item.desc && (
+                              <span className={styles.itemSidebarDescText} style={{ fontSize: '9px', opacity: 0.5, paddingLeft: '8px' }}>
+                                {item.desc}
+                              </span>
+                            )}
+                          </div>
                         ))}
                         {itemList.length === 0 && <span className={styles.emptyTextIndicator}>No items</span>}
                       </div>

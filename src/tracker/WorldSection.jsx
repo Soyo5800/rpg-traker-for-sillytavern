@@ -83,9 +83,18 @@ export default function WorldSection() {
       newEvents[index] = { id: `event_${Date.now()}`, name: '', desc: newEvents[index] };
     }
     
-    newEvents[index] = { ...newEvents[index], [key]: value };
+    const updatedEvt = { ...newEvents[index], [key]: value };
+    if (key === 'name') {
+      const cleanName = value.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+      updatedEvt.id = cleanName ? `event_${cleanName}` : `event_${Date.now()}`;
+    }
+    
+    newEvents[index] = updatedEvt;
     handleUpdate({ events: newEvents });
   };
+
+
+  
 
   const handleDeleteEvent = (index) => {
     const newEvents = events.filter((_, i) => i !== index);
