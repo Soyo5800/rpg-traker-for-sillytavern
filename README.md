@@ -29,7 +29,6 @@ The core value of this extension is **eliminating the need to manually modify co
 2. **Connect to Your Chat:** 
    * Enter the chatroom where you want to apply the tracker. It will automatically connect. You can check the connection status via the indicator light next to the RPG Tracker header.
    * Click the tracker toggle button to open the panel. (Default position is top-left. You can right-click the button to drag and adjust its position.)
-   * Go to the **Settings** tab in the panel and click **Connect**.
    * Choose your preferred update mode:
      * **Merged Mode:** Automatically handles updates during normal chat generation.
      * **Separated Mode:** Separates the logic. You can manually trigger a standalone API call by clicking the **Update Profile** button at the very top of the sidebar.
