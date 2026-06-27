@@ -58,8 +58,8 @@ export default function PromptEditor({ onClose }) {
         if (s.name) status.add(s.name);
       });
       
-      if (char.featuresData?.profile) {
-        Object.keys(char.featuresData.profile).forEach(k => profiles.add(k));
+      if (char.profile) {
+        Object.keys(char.profile).forEach(k => profiles.add(k));
       }
       
       if (char.relations) {
@@ -231,18 +231,45 @@ export default function PromptEditor({ onClose }) {
     const name = isPlayer ? playerCharNameInput.trim() : charNameInput.trim();
     const basePrompt = isPlayer ? localAddPlayerCharPrompt : localAddCharPrompt;
 
-    // Generate dynamic JSON schema example customized for this generation request
+    // 1. SillyTavern 컨텍스트에서 캐릭터 카드 일치 여부 확인 및 설명문(Description) 확보
+    let cardDescription = "";
+    try {
+      const stContext = window.SillyTavern?.getContext?.();
+      if (stContext && name) {
+        // 등록된 모든 캐릭터 카드 목록에서 이름 검색 (대소문자 무시)
+        const matchedCard = stContext.characters?.find(
+          c => c.name?.toLowerCase() === name.toLowerCase()
+        );
+        
+        if (matchedCard) {
+          // 캐릭터 카드의 핵심 묘사(Description) 및 성격(Personality) 추출
+          cardDescription = `\n\n[ORIGINAL CHARACTER CARD DETAILS FOR '${name}']`;
+          if (matchedCard.description) cardDescription += `\nDescription:\n${matchedCard.description}`;
+          if (matchedCard.personality) cardDescription += `\nPersonality:\n${matchedCard.personality}`;
+        }
+      }
+    } catch (err) {
+      console.warn("SillyTavern context is not fully available or character search failed:", err);
+    }
+
+    // 2. 동적 JSON 스키마 예시 빌드
     const schemaExample = getDynamicSchemaExample({ guidePrompts: localGuidePrompts, characters }, isPlayer);
 
+    // 3. 프롬프트 조합 (확보한 카드 설명문이 존재하면 본문에 주입)
     let finalPrompt = "";
     if (name) {
-      finalPrompt = `Based on the chat log, create a profile for '${name}' following these guidelines:\n${basePrompt}\n\nStrictly output the JSON block following this exact schema layout:\n${schemaExample.trim()}`;
+      finalPrompt = `Based on the chat log, create a profile for '${name}' following these guidelines:\n${basePrompt}`;
+      if (cardDescription) {
+        finalPrompt += cardDescription; // 캐릭터 카드 원본 정보 주입
+      }
+      finalPrompt += `\n\nStrictly output the JSON block following this exact schema layout:\n${schemaExample.trim()}`;
     } else {
       finalPrompt = `Based on the recent chat log, identify a new or existing character that needs a profile and generate one. Guidelines:\n${basePrompt}\n\nStrictly output the JSON block following this exact schema layout:\n${schemaExample.trim()}`;
     }
 
+    // 4. SillyTavern API 브릿지 호출
     if (window.RPGBridge && typeof window.RPGBridge.triggerCharacterGeneration === 'function') {
-      alert(`Requesting to add ${isPlayer ? 'Player Character' : 'Character'}... This may take a moment.`);
+      alert(`Requesting to add ${isPlayer ? 'Player Character' : 'Character'} '${name || 'Auto-Detect'}'... This may take a moment.`);
       try {
         await window.RPGBridge.triggerCharacterGeneration(finalPrompt, isPlayer);
       } catch (err) {

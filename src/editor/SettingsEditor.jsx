@@ -6,34 +6,22 @@ export default function SettingsEditor({ onClose }) {
   const { settings, updateSettings, isChatConnected, trackerData } = useRPG();
   
   const [localUpdateMode, setLocalUpdateMode] = useState('merged');
+  const [localShowDeltaLog, setLocalShowDeltaLog] = useState(true);
 
   useEffect(() => {
     setLocalUpdateMode(settings.updateMode || 'merged');
+    setLocalShowDeltaLog(settings.showDeltaLog !== false);
   }, [settings]);
 
   const handleSave = () => {
     updateSettings({
       ...settings,
       updateMode: localUpdateMode,
-
+      showDeltaLog: localShowDeltaLog,
       maxBackupCount: 20 // 백업은 넉넉하게 20개로 고정하여 안정적인 O(1) 히스토리 롤백 복구를 보장합니다.
     });
     alert("Settings saved successfully.");
     onClose();
-  };
-
-  const handleConnect = () => {
-    if (window.RPGBridge && typeof window.RPGBridge.connectChat === 'function') {
-      window.RPGBridge.connectChat(trackerData);
-    }
-  };
-
-  const handleDisconnect = () => {
-    if (window.confirm("Are you sure you want to disconnect RPG Tracker from this chat? All tracker data for this specific chat will be removed.")) {
-      if (window.RPGBridge && typeof window.RPGBridge.disconnectChat === 'function') {
-        window.RPGBridge.disconnectChat();
-      }
-    }
   };
 
   return (
@@ -45,31 +33,6 @@ export default function SettingsEditor({ onClose }) {
         </header>
 
         <div className={styles.body}>
-          <div className={`${styles.section} ${styles.chatConnectionSection}`}>
-            <label className={styles.label}>Chat Connection</label>
-            <p className={styles.settingsDescLarge}>
-              Connect RPG Tracker to the current chat to start injecting prompts and tracking data.
-            </p>
-            <div className={styles.connectionStatusCard}>
-              <div className={styles.rowFlex}>
-                <div className={`${styles.statusDot} ${isChatConnected ? styles.statusDotConnected : styles.statusDotDisconnected}`}></div>
-                <span className={styles.statusText}>
-                  {isChatConnected ? 'Connected' : 'Disconnected'}
-                </span>
-              </div>
-              
-              {isChatConnected ? (
-                <button onClick={handleDisconnect} className={styles.disconnectBtn}>
-                  Disconnect
-                </button>
-              ) : (
-                <button onClick={handleConnect} className={styles.connectBtn}>
-                  Connect to Chat
-                </button>
-              )}
-            </div>
-          </div>
-
           <div className={styles.section} style={{ marginBottom: '12px' }}>
             <label className={styles.label}>Update Mode</label>
             <p className={styles.settingsDesc} style={{ marginBottom: '6px' }}>
@@ -84,6 +47,24 @@ export default function SettingsEditor({ onClose }) {
               <option value="merged">Merged (Update alongside chat messages)</option>
               <option value="separated">Separated (Manual background update)</option>
             </select>
+          </div>
+
+          <div className={styles.section} style={{ marginBottom: '12px', height: 'auto' }}>
+            <div className={styles.rowFlex} style={{ justifyContent: 'flex-start', gap: '8px' }}>
+              <input 
+                id="show_delta_log"
+                type="checkbox"
+                checked={localShowDeltaLog}
+                onChange={e => setLocalShowDeltaLog(e.target.checked)}
+                style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+              />
+              <label htmlFor="show_delta_log" className={styles.label} style={{ cursor: 'pointer', margin: 0, userSelect: 'none' }}>
+                Show Stat Change Log
+              </label>
+            </div>
+            <p className={styles.settingsDesc} style={{ marginTop: '4px', marginLeft: '24px' }}>
+              Show collapsing delta change log at the bottom of AI messages.
+            </p>
           </div>
         </div>
 

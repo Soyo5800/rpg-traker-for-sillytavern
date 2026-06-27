@@ -1,9 +1,10 @@
 import { getContext, extension_settings } from "../../../extensions.js";
-import { eventSource, event_types, saveSettingsDebounced, generateQuietPrompt, saveChat, updateMessageBlock, setExtensionPrompt, extension_prompt_types, extension_prompt_roles, getRequestHeaders } from "../../../../script.js";
+import { eventSource, event_types, saveSettingsDebounced, generateQuietPrompt, saveChat, saveChatConditional, updateMessageBlock, setExtensionPrompt, extension_prompt_types, extension_prompt_roles, getRequestHeaders } from "../../../../script.js";
 import { backupToMessage, rehydrateFromHistory, defensiveMerge, applyLLMPatch, sanitizeTrackerData } from "./src/core/JSONTracker.js";
 import { buildDefinitionPromptWrapper, buildStatusPromptWrapper } from "./src/core/ActivePrompt.js";
 import { DEFAULT_PROMPT_HEADER_MERGED, DEFAULT_PROMPT_FOOTER_MERGED, DEFAULT_PROMPT_HEADER_SEP, DEFAULT_PROMPT_FOOTER_SEP } from "./src/core/PromptSchema.js";
 import { parseResponse } from "./src/core/ResponseParser.js";
+import { injectAllDeltaLogs, setDeltaLog } from "./src/tracker/DeltaLogRenderer.js";
 
 import { SlashCommandParser } from "../../../slash-commands/SlashCommandParser.js";
 
@@ -14,8 +15,32 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const defaultSettings = {
     enabled: true,
     theme: "default",
-    updateMode: "merged"
+    updateMode: "merged",
+    showDeltaLog: true
 };
+
+const localStorageBackupKey = "rpg_tracker_settings_backup";
+
+/**
+ * Safe LocalStorage settings backup utilities
+ */
+function backupSettingsToLocalStorage() {
+    if (extension_settings[extensionName]) {
+        localStorage.setItem(localStorageBackupKey, JSON.stringify(extension_settings[extensionName]));
+    }
+}
+
+function restoreSettingsFromLocalStorage() {
+    try {
+        const backup = localStorage.getItem(localStorageBackupKey);
+        if (backup) {
+            return JSON.parse(backup);
+        }
+    } catch (e) {
+        console.warn("[RPG Tracker] Failed to restore settings from localStorage:", e);
+    }
+    return null;
+}
 
 /**
  * Synchronize and register RPG Tracker filters inside SillyTavern's built-in Regex extension
@@ -23,6 +48,25 @@ const defaultSettings = {
 function syncRpgTrackerRegex(enabled) {
     // Get third-party extension and built-in Regex configuration
     extension_settings.regex = extension_settings.regex || [];
+
+    // If disabled, completely clear all RPG Tracker regex filters from settings.json
+    if (!enabled) {
+        extension_settings.regex = extension_settings.regex.filter(s => {
+            return !(s.id && s.id.startsWith('rpg_tracker'));
+        });
+        saveSettingsDebounced();
+        return;
+    }
+
+    // 1. Clean up legacy/leftover RPG Tracker regex scripts that are not of the official 3 rules
+    const officialIds = ['rpg_tracker_json_stripper', 'rpg_tracker_delta_stripper', 'rpg_tracker_comment_stripper'];
+    extension_settings.regex = extension_settings.regex.filter(s => {
+        if (s.id && s.id.startsWith('rpg_tracker')) {
+            return officialIds.includes(s.id);
+        }
+        return true;
+    });
+
     let script = extension_settings.regex.find(s => s.id === 'rpg_tracker_json_stripper');
     
     if (!script) {
@@ -44,6 +88,28 @@ function syncRpgTrackerRegex(enabled) {
         // Fully remove depth limits to prevent context interference
         delete script.minDepth;
         delete script.maxDepth;
+    }
+
+    // Add Delta Log HTML-comment stripper (for cleaning up <!--RPG_DELTA: ... -->)
+    let deltaScript = extension_settings.regex.find(s => s.id === 'rpg_tracker_delta_stripper');
+    if (!deltaScript) {
+        deltaScript = {
+            id: 'rpg_tracker_delta_stripper',
+            scriptName: 'RPG Tracker Delta Stripper',
+            findRegex: '<!--RPG_DELTA:[\\s\\S]*?-->\\s*',
+            replaceString: '',
+            trimStrings: [],
+            placement: [1, 2], // 1: USER_INPUT, 2: AI_OUTPUT
+            disabled: !enabled,
+            promptOnly: true, // Filters only during prompt transmission (token send)
+            markdownOnly: false,
+            runOnEdit: true
+        };
+        extension_settings.regex.push(deltaScript);
+    } else {
+        deltaScript.disabled = !enabled;
+        delete deltaScript.minDepth;
+        delete deltaScript.maxDepth;
     }
 
     // Add HTML-comment style JSON stripper (for cleaning up blocks wrapped in <!--RPG_TRACKER ... -->)
@@ -94,8 +160,15 @@ function safeUpdateMessageBlock(index, messageObject) {
 
 async function loadSettings() {
     extension_settings[extensionName] = extension_settings[extensionName] || {};
+    
+    // If empty (e.g. newly loaded or cleared before), try restoring from localStorage
     if (Object.keys(extension_settings[extensionName]).length === 0) {
-        Object.assign(extension_settings[extensionName], defaultSettings);
+        const restored = restoreSettingsFromLocalStorage();
+        if (restored) {
+            Object.assign(extension_settings[extensionName], restored);
+        } else {
+            Object.assign(extension_settings[extensionName], defaultSettings);
+        }
     }
 
     const enabled = extension_settings[extensionName].enabled;
@@ -103,7 +176,7 @@ async function loadSettings() {
         .prop("checked", enabled)
         .trigger("input");
 
-    // Sync regex on initial load
+    // Sync regex on initial load (removes entirely if currently disabled)
     syncRpgTrackerRegex(enabled);
 }
 
@@ -111,14 +184,38 @@ function onEnabledInput(event) {
     const isChecked = Boolean($(event.target).prop("checked"));
 
     extension_settings[extensionName] = extension_settings[extensionName] || {};
-    extension_settings[extensionName].enabled = isChecked;
+    
+    if (isChecked) {
+        // Restore detailed settings from localStorage backup on turn-on
+        const restored = restoreSettingsFromLocalStorage();
+        if (restored) {
+            extension_settings[extensionName] = {
+                ...restored,
+                enabled: true
+            };
+        } else {
+            extension_settings[extensionName] = {
+                ...defaultSettings,
+                enabled: true
+            };
+        }
+    } else {
+        // Backup detailed settings to localStorage before clearing from settings.json
+        backupSettingsToLocalStorage();
+        
+        // Minimize settings object to just { enabled: false }
+        extension_settings[extensionName] = {
+            enabled: false
+        };
+    }
+    
     saveSettingsDebounced();
 
     if (window.RPGBridge && typeof window.RPGBridge.syncSettings === 'function') {
-        window.RPGBridge.syncSettings({ enabled: isChecked });
+        window.RPGBridge.syncSettings(extension_settings[extensionName]);
     }
 
-    // Sync regex active status on change
+    // Sync regex active status on change (removes entirely if false, injects if true)
     syncRpgTrackerRegex(isChecked);
 }
 
@@ -143,7 +240,9 @@ function establishBridgeConnection() {
                 const lastIndex = currentChat ? currentChat.length - 1 : -1;
                 
                 const safeSaveChat = () => {
-                    if (!context.groupId && typeof saveChat === 'function') {
+                    if (typeof saveChatConditional === 'function') {
+                        saveChatConditional();
+                    } else if (!context.groupId && typeof saveChat === 'function') {
                         saveChat();
                     }
                 };
@@ -167,7 +266,9 @@ function establishBridgeConnection() {
                         window.RPGBridge.saveChatData(currentTrackerData, 20);
                     }
                     
-                    if (!context.groupId && typeof saveChat === 'function') {
+                    if (typeof saveChatConditional === 'function') {
+                        saveChatConditional();
+                    } else if (!context.groupId && typeof saveChat === 'function') {
                         saveChat();
                     }
                     
@@ -186,15 +287,17 @@ function establishBridgeConnection() {
                     if (currentChat && currentChat.length > 0) {
                         for (let i = 0; i < currentChat.length; i++) {
                             const msg = currentChat[i];
-                            if (msg && msg.mes && (msg.mes.includes('<!--RPG_TRACKER:') || msg.mes.includes('<!--RPG_DATA:'))) {
+                            if (msg && msg.mes && (msg.mes.includes('<!--RPG_TRACKER:') || msg.mes.includes('<!--RPG_DATA:') || msg.mes.includes('<!--RPG_DELTA:'))) {
                                 msg.mes = msg.mes.replace(/<!--RPG_TRACKER:([\s\S]*?)-->/g, '').trim();
                                 msg.mes = msg.mes.replace(/<!--RPG_DATA:([\s\S]*?)-->/g, '').trim();
+                                msg.mes = msg.mes.replace(/<!--RPG_DELTA:([\s\S]*?)-->/g, '').trim();
                                 if (typeof updateMessageBlock === 'function') {
                                     safeUpdateMessageBlock(i, msg);
                                 }
                             }
                         }
-                        if (!context.groupId && typeof saveChat === 'function') saveChat();
+                        if (typeof saveChatConditional === 'function') saveChatConditional();
+                        else if (!context.groupId && typeof saveChat === 'function') saveChat();
                     }
 
                     if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
@@ -238,11 +341,34 @@ function establishBridgeConnection() {
                         console.log("[RPG Tracker] ✅ Character generated successfully.");
 
                         try {
-                            // 1. First append the system message log to the chat log
-                            const sysText = `[RPG Tracker] System has added a new character.\n<!--RPG_TRACKER:\n\`\`\`json\n${JSON.stringify(patch, null, 2)}\n\`\`\`\n-->`;
+                            // 1. First append the clean system message log to the chat log (No JSON)
+                            const sysText = `[RPG Tracker] System has added a new character. <!--RPG_DELTA:${JSON.stringify(patch)}-->`;
                             await SlashCommandParser.commands['sys'].callback({}, sysText);
                             
-                            // 2. Then save to ST context on the newly created message's index to ensure persistent O(1) rehydration
+                            // 2. Fetch the newly created system message and inject delta log using text matching to avoid sync issues
+                            const newContext = getContext();
+                            if (newContext && newContext.chat) {
+                                let lastSysMsgIdx = -1;
+                                for (let i = newContext.chat.length - 1; i >= 0; i--) {
+                                    if (newContext.chat[i] && typeof newContext.chat[i].mes === 'string' && newContext.chat[i].mes.includes('[RPG Tracker] System has added a new character')) {
+                                        lastSysMsgIdx = i;
+                                        break;
+                                    }
+                                }
+
+                                if (lastSysMsgIdx !== -1) {
+                                    const lastSysMsg = newContext.chat[lastSysMsgIdx];
+                                    setDeltaLog(lastSysMsg, patch);
+                                    safeUpdateMessageBlock(lastSysMsgIdx, lastSysMsg);
+                                }
+                            }
+                            if (typeof saveChatConditional === "function") {
+                                saveChatConditional();
+                            } else if (typeof saveChat === "function") {
+                                saveChat();
+                            }
+                            
+                            // 3. Then save to ST context on the newly created message's index to ensure persistent O(1) rehydration
                             if (typeof window.RPGBridge.saveChatData === 'function') {
                                 window.RPGBridge.saveChatData(updatedData, 20); 
                             }
@@ -303,11 +429,34 @@ function establishBridgeConnection() {
 
                         // Output the result as a system message in the chat
                         try {
-                            // 1. First append the system message log to the chat log
-                            const sysText = `[RPG Tracker] Status has been manually updated.\n<!--RPG_TRACKER:\n\`\`\`json\n${JSON.stringify(patch, null, 2)}\n\`\`\`\n-->`;
+                            // 1. First append the clean system message log to the chat log (No JSON)
+                            const sysText = `[RPG Tracker] Status has been manually updated. <!--RPG_DELTA:${JSON.stringify(patch)}-->`;
                             await SlashCommandParser.commands['sys'].callback({}, sysText);
                             
-                            // 2. Then save to ST context on the newly created message's index to ensure persistent O(1) rehydration
+                            // 2. Fetch the newly created system message and inject delta log using text matching to avoid sync issues
+                            const newContext = getContext();
+                            if (newContext && newContext.chat) {
+                                let lastSysMsgIdx = -1;
+                                for (let i = newContext.chat.length - 1; i >= 0; i--) {
+                                    if (newContext.chat[i] && typeof newContext.chat[i].mes === 'string' && newContext.chat[i].mes.includes('[RPG Tracker] Status has been manually updated')) {
+                                        lastSysMsgIdx = i;
+                                        break;
+                                    }
+                                }
+
+                                if (lastSysMsgIdx !== -1) {
+                                    const lastSysMsg = newContext.chat[lastSysMsgIdx];
+                                    setDeltaLog(lastSysMsg, patch);
+                                    safeUpdateMessageBlock(lastSysMsgIdx, lastSysMsg);
+                                }
+                            }
+                            if (typeof saveChatConditional === "function") {
+                                saveChatConditional();
+                            } else if (typeof saveChat === "function") {
+                                saveChat();
+                            }
+                            
+                            // 3. Then save to ST context on the newly created message's index to ensure persistent O(1) rehydration
                             if (typeof window.RPGBridge.saveChatData === 'function') {
                                 window.RPGBridge.saveChatData(updatedData, 20); 
                             }
@@ -356,9 +505,19 @@ function establishBridgeConnection() {
             // Sync logic: restore last state from chat -> merge and apply
             const syncFromHistoryOrMeta = () => {
                 const context = getContext();
-                let trackerData = null;
                 
-                if (context && Array.isArray(context.chat)) {
+                if (!context || !context.chatId) {
+                    if (typeof window.RPGBridge.resetToDefault === 'function') {
+                        window.RPGBridge.resetToDefault();
+                    }
+                    if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
+                        window.RPGBridge.setChatConnectionStatus(false);
+                    }
+                    return;
+                }
+
+                let trackerData = null;
+                if (Array.isArray(context.chat)) {
                     trackerData = rehydrateFromHistory(context.chat);
                 }
 
@@ -367,11 +526,13 @@ function establishBridgeConnection() {
                     if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
                         window.RPGBridge.setChatConnectionStatus(true);
                     }
+                    console.log("[RPG Tracker] Automatically rehydrated saved tracker data and connected.");
                 } else if (typeof window.RPGBridge.resetToDefault === 'function') {
                     window.RPGBridge.resetToDefault();
                     if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
-                        window.RPGBridge.setChatConnectionStatus(false);
+                        window.RPGBridge.setChatConnectionStatus(true);
                     }
+                    console.log("[RPG Tracker] No existing data found. Automatically initialized with default tracker and connected.");
                 }
             };
 
@@ -515,8 +676,12 @@ jQuery(async () => {
                 const { cleanedText, patch } = parseResponse(text);
                 
                 if (patch && Object.keys(patch).length > 0) {
-                    // Keep the JSON text in the latest message intact for LLM context
+                    // Update the message body to be completely clean of any JSON or comment block!
+                    lastMessage.mes = cleanedText;
                     
+                    // Store the patch in extra metadata (token-free!)
+                    setDeltaLog(lastMessage, patch);
+
                     // 1. Merge status and backup
                     const trackerData = window.RPGBridge?.currentTrackerData || rehydrateFromHistory(context.chat);
                     if (trackerData && Array.isArray(trackerData.characters)) {
@@ -535,10 +700,12 @@ jQuery(async () => {
                     
                     // Notify ST to re-render the modified message
                     if (typeof updateMessageBlock === 'function') {
-                        // updateMessageBlock expects (index, messageObject) usually, or (index, text) depending on ST version.
-                        // Usually updating lastMessage.mes natively works if we re-render chat. 
-                        // But since we edited lastMessage.mes = cleanedText above, we just pass the object.
                         safeUpdateMessageBlock(context.chat.length - 1, lastMessage);
+                    }
+                    if (typeof saveChatConditional === "function") {
+                        saveChatConditional();
+                    } else if (typeof saveChat === "function") {
+                        saveChat();
                     }
                 }
             }
@@ -550,17 +717,38 @@ jQuery(async () => {
         if (window.RPGBridge && typeof window.RPGBridge.triggerHistoryRollback === 'function') {
             window.RPGBridge.triggerHistoryRollback();
         }
+        setTimeout(() => injectAllDeltaLogs(extension_settings, extensionName, getContext), 100);
     });
 
     eventSource.on(event_types.MESSAGE_SWIPED, () => {
         if (window.RPGBridge && typeof window.RPGBridge.triggerHistoryRollback === 'function') {
             window.RPGBridge.triggerHistoryRollback();
         }
+        setTimeout(() => injectAllDeltaLogs(extension_settings, extensionName, getContext), 100);
     });
 
     eventSource.on(event_types.CHAT_CHANGED, () => {
         if (window.RPGBridge && typeof window.RPGBridge.syncFromHistoryOrMeta === 'function') {
             window.RPGBridge.syncFromHistoryOrMeta();
         }
+        setTimeout(() => injectAllDeltaLogs(extension_settings, extensionName, getContext), 100);
     });
+
+    // Setup MutationObserver and events to dynamically insert accordion-style change logs
+    startChatObserver();
+    setTimeout(() => injectAllDeltaLogs(extension_settings, extensionName, getContext), 500);
 });
+
+let chatObserver = null;
+function startChatObserver() {
+    if (chatObserver) return;
+    const chatContainer = document.getElementById('chat');
+    if (!chatContainer) {
+        setTimeout(startChatObserver, 500);
+        return;
+    }
+    chatObserver = new MutationObserver(() => {
+        injectAllDeltaLogs(extension_settings, extensionName, getContext);
+    });
+    chatObserver.observe(chatContainer, { childList: true, subtree: true });
+}

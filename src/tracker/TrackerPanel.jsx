@@ -53,6 +53,10 @@ export default function TrackerPanel() {
             <rect x="12" y="14.5" width="7" height="1.5" rx="0.75" />
           </svg>
           <span className={styles.headerTitle}>RPG Tracker</span>
+          <div 
+            className={`${styles.statusDot} ${isChatConnected ? styles.statusDotConnected : styles.statusDotDisconnected}`} 
+            title={isChatConnected ? "Connected to Chat" : "Disconnected"}
+          />
         </div>
         <div className={styles.editorShortcuts} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {settings.updateMode === 'separated' && (

@@ -69,14 +69,13 @@ function AutoGrowingTextArea({ value, onChange, placeholder }) {
 }
 
 export default function StatusComponent({ char, characters = [], activeTabs, onPatchCharacter, onPatchOtherCharacter, globalRelationSchema = [], onOpenEditor }) {
-  const featuresData = char.featuresData || {};
-  const profile = featuresData.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
+  const profile = char.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
   const relations = char.relations || {};
-  const inventory = featuresData.inventory || {
+  const inventory = char.inventory || {
     equipment: { right_hand: null, left_hand: null },
     storage: { backpack: [], pouch: [] }
   };
-  const quests = featuresData.quests || {
+  const quests = char.quests || {
     main: { name: '', desc: '' },
     sides: []
   };
@@ -107,13 +106,9 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
 
   const updateNestedField = (group, key, val) => {
     onPatchCharacter(c => {
-      const currentData = c.featuresData || {};
       return {
         ...c,
-        featuresData: {
-          ...currentData,
-          [group]: val
-        }
+        [group]: val
       };
     });
   };
@@ -460,16 +455,12 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
   // --- Quests Handler ---
   const handleUpdateMainQuest = (key, value) => {
     onPatchCharacter(c => {
-      const currentData = c.featuresData || {};
-      const currentQuests = currentData.quests || { main: { name: '', desc: '' }, sides: [] };
+      const currentQuests = c.quests || { main: { name: '', desc: '' }, sides: [] };
       return {
         ...c,
-        featuresData: {
-          ...currentData,
-          quests: {
-            ...currentQuests,
-            main: { ...currentQuests.main, [key]: value }
-          }
+        quests: {
+          ...currentQuests,
+          main: { ...currentQuests.main, [key]: value }
         }
       };
     });
@@ -477,17 +468,13 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
 
   const handleAddSideQuest = () => {
     onPatchCharacter(c => {
-      const currentData = c.featuresData || {};
-      const currentQuests = currentData.quests || { main: { name: '', desc: '' }, sides: [] };
+      const currentQuests = c.quests || { main: { name: '', desc: '' }, sides: [] };
       const currentSides = currentQuests.sides || [];
       return {
         ...c,
-        featuresData: {
-          ...currentData,
-          quests: {
-            ...currentQuests,
-            sides: [...currentSides, { id: `quest_${Date.now()}`, name: '', desc: '' }]
-          }
+        quests: {
+          ...currentQuests,
+          sides: [...currentSides, { id: `quest_${Date.now()}`, name: '', desc: '' }]
         }
       };
     });
@@ -495,8 +482,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
 
   const handleUpdateSideQuest = (id, key, value) => {
     onPatchCharacter(c => {
-      const currentData = c.featuresData || {};
-      const currentQuests = currentData.quests || { main: { name: '', desc: '' }, sides: [] };
+      const currentQuests = c.quests || { main: { name: '', desc: '' }, sides: [] };
       const currentSides = currentQuests.sides || [];
       const updatedSides = currentSides.map(q => {
         if (q.id === id) {
@@ -511,10 +497,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
       });
       return {
         ...c,
-        featuresData: {
-          ...currentData,
-          quests: { ...currentQuests, sides: updatedSides }
-        }
+        quests: { ...currentQuests, sides: updatedSides }
       };
     });
   };
@@ -524,17 +507,13 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
 
   const handleRemoveSideQuest = (id) => {
     onPatchCharacter(c => {
-      const currentData = c.featuresData || {};
-      const currentQuests = currentData.quests || { main: { name: '', desc: '' }, sides: [] };
+      const currentQuests = c.quests || { main: { name: '', desc: '' }, sides: [] };
       const currentSides = currentQuests.sides || [];
       return {
         ...c,
-        featuresData: {
-          ...currentData,
-          quests: {
-            ...currentQuests,
-            sides: currentSides.filter(q => q.id !== id)
-          }
+        quests: {
+          ...currentQuests,
+          sides: currentSides.filter(q => q.id !== id)
         }
       };
     });
@@ -551,16 +530,15 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
           </div>
           <div className={styles.appearanceGrid}>
             {Object.keys(profile).map((field) => {
-              const isLocked = featuresData.profileLocks?.[field] || false;
+              const isLocked = char.profileLocks?.[field] || false;
               return (
               <div key={field} className={styles.appearanceRow}>
                 <svg onClick={() => {
-                    const currentData = char.featuresData || {};
-                    const currentLocks = currentData.profileLocks || {};
+                    const currentLocks = char.profileLocks || {};
                     updateNestedField('profileLocks', null, { ...currentLocks, [field]: !isLocked });
                   }} viewBox="0 0 24 24" width="14" height="14" className={`${styles.lockIcon} ${isLocked ? styles.lockIconActive : ''}`}>
                   {isLocked ? (
-                    <path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
+                    <path fill="currentColor" d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2 v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
                   ) : (
                     <path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
                   )}
@@ -572,8 +550,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                   <AutoGrowingTextArea
                     value={profile[field] || ''}
                     onChange={val => {
-                      const currentData = char.featuresData || {};
-                      const currentProf = currentData.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
+                      const currentProf = char.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
                       updateNestedField('profile', null, { ...currentProf, [field]: val });
                     }}
                     placeholder={`Enter ${field}...`}
@@ -613,13 +590,13 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                 const isObj = typeof mVal === 'object' && mVal !== null;
                 return {
                   name: mName,
-                  value: isObj ? mVal.value : mVal,
-                  type: isObj ? mVal.type : 'integer',
-                  max: isObj ? mVal.max : 100
+                  value: Number(isObj ? mVal.value : mVal) || 0,
+                  min: isObj && mVal.min !== undefined ? mVal.min : -100,
+                  max: isObj && mVal.max !== undefined ? mVal.max : 100,
+                  colorNegative: isObj && mVal.colorNegative ? mVal.colorNegative : '#e74c3c',
+                  colorPositive: isObj && mVal.colorPositive ? mVal.colorPositive : '#2ecc71'
                 };
               });
-              const intMetrics = metricsList.filter(m => m.type === 'integer');
-              const stackMetrics = metricsList.filter(m => m.type === 'stacking');
 
               // [2] 상대 ➔ 나 수치 및 묘사 가공 (하이브리드 지원)
               let targetText = "";
@@ -637,13 +614,13 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                 const isObj = typeof mVal === 'object' && mVal !== null;
                 return {
                   name: mName,
-                  value: isObj ? mVal.value : mVal,
-                  type: isObj ? mVal.type : 'integer',
-                  max: isObj ? mVal.max : 100
+                  value: Number(isObj ? mVal.value : mVal) || 0,
+                  min: isObj && mVal.min !== undefined ? mVal.min : -100,
+                  max: isObj && mVal.max !== undefined ? mVal.max : 100,
+                  colorNegative: isObj && mVal.colorNegative ? mVal.colorNegative : '#e74c3c',
+                  colorPositive: isObj && mVal.colorPositive ? mVal.colorPositive : '#2ecc71'
                 };
               });
-              const targetIntMetrics = targetMetricsList.filter(m => m.type === 'integer');
-              const targetStackMetrics = targetMetricsList.filter(m => m.type === 'stacking');
 
               return (
                 <div key={targetName} className={styles.relationTargetCard}>
@@ -675,28 +652,38 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                       />
                     </div>
 
-                    {intMetrics.length > 0 && (
+                    {metricsList.length > 0 && (
                       <div className={styles.relationMetricsGrid}>
-                        {intMetrics.map((m) => (
-                          <div key={m.name} className={styles.metricRow}>
-                            <span className={styles.metricName}>{m.name}</span>
-                            <div className={styles.metricControl}>
-                              <input 
-                                type="number" 
-                                value={m.value}
-                                onChange={(e) => handleUpdateRelationField(targetName, m.name, Number(e.target.value))}
-                                className={styles.relationMetricInput}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                        {metricsList.map((m) => {
+                          const min = m.min;
+                          const max = m.max;
+                          const val = Number(m.value);
+                          let left = '0%';
+                          let width = '0%';
+                          let color = m.colorPositive;
 
-                    {stackMetrics.length > 0 && (
-                      <div className={styles.relationMetricsGrid}>
-                        {stackMetrics.map((m) => {
-                          const ratio = Math.min(100, Math.max(0, (Number(m.value) / (m.max || 1)) * 100));
+                          if (min < 0 && max > 0) {
+                            const totalRange = max - min;
+                            const zeroPosition = (Math.abs(min) / totalRange) * 100;
+                            
+                            if (val >= 0) {
+                              left = `${zeroPosition}%`;
+                              width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
+                              color = m.colorPositive;
+                            } else {
+                              const negWidth = (Math.abs(val) / totalRange) * 100;
+                              left = `${Math.max(0, zeroPosition - negWidth)}%`;
+                              width = `${Math.min(zeroPosition, negWidth)}%`;
+                              color = m.colorNegative;
+                            }
+                          } else {
+                            const totalRange = max - min || 1;
+                            const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
+                            left = '0%';
+                            width = `${ratio}%`;
+                            color = m.colorPositive;
+                          }
+
                           return (
                             <div key={m.name} className={styles.gaugeCard}>
                               <div className={styles.gaugeLabelRow}>
@@ -708,11 +695,21 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                                     onChange={(e) => handleUpdateRelationField(targetName, m.name, { ...m, value: Number(e.target.value) })}
                                     className={styles.relationGaugeInput}
                                   />
-                                  <span className={styles.gaugeMax}>/{m.max || 100}</span>
                                 </div>
                               </div>
-                              <div className={styles.gaugeTrack}>
-                                <div className={styles.gaugeFill} style={{ width: `${ratio}%`, backgroundColor: 'var(--rpg-highlight)' }} />
+                              <div className={styles.gaugeTrack} style={{ position: 'relative' }}>
+                                {min < 0 && max > 0 && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    left: `${(Math.abs(min) / (max - min)) * 100}%`,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: '1px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                                    zIndex: 2
+                                  }} />
+                                )}
+                                <div className={styles.gaugeFill} style={{ position: 'absolute', left, width, backgroundColor: color }} />
                               </div>
                             </div>
                           );
@@ -733,28 +730,38 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                       />
                     </div>
 
-                    {targetIntMetrics.length > 0 && (
+                    {targetMetricsList.length > 0 && (
                       <div className={styles.relationMetricsGrid}>
-                        {targetIntMetrics.map((m) => (
-                          <div key={m.name} className={styles.metricRow}>
-                            <span className={styles.metricName}>{m.name}</span>
-                            <div className={styles.metricControl}>
-                              <input 
-                                type="number" 
-                                value={m.value}
-                                onChange={(e) => handleUpdateTargetRelationField(targetName, m.name, Number(e.target.value))}
-                                className={styles.relationMetricInput}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                        {targetMetricsList.map((m) => {
+                          const min = m.min;
+                          const max = m.max;
+                          const val = Number(m.value);
+                          let left = '0%';
+                          let width = '0%';
+                          let color = m.colorPositive;
 
-                    {targetStackMetrics.length > 0 && (
-                      <div className={styles.relationMetricsGrid}>
-                        {targetStackMetrics.map((m) => {
-                          const ratio = Math.min(100, Math.max(0, (Number(m.value) / (m.max || 1)) * 100));
+                          if (min < 0 && max > 0) {
+                            const totalRange = max - min;
+                            const zeroPosition = (Math.abs(min) / totalRange) * 100;
+                            
+                            if (val >= 0) {
+                              left = `${zeroPosition}%`;
+                              width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
+                              color = m.colorPositive;
+                            } else {
+                              const negWidth = (Math.abs(val) / totalRange) * 100;
+                              left = `${Math.max(0, zeroPosition - negWidth)}%`;
+                              width = `${Math.min(zeroPosition, negWidth)}%`;
+                              color = m.colorNegative;
+                            }
+                          } else {
+                            const totalRange = max - min || 1;
+                            const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
+                            left = '0%';
+                            width = `${ratio}%`;
+                            color = m.colorPositive;
+                          }
+
                           return (
                             <div key={m.name} className={styles.gaugeCard}>
                               <div className={styles.gaugeLabelRow}>
@@ -766,11 +773,21 @@ export default function StatusComponent({ char, characters = [], activeTabs, onP
                                     onChange={(e) => handleUpdateTargetRelationField(targetName, m.name, { ...m, value: Number(e.target.value) })}
                                     className={styles.relationGaugeInput}
                                   />
-                                  <span className={styles.gaugeMax}>/{m.max || 100}</span>
                                 </div>
                               </div>
-                              <div className={styles.gaugeTrack}>
-                                <div className={styles.gaugeFill} style={{ width: `${ratio}%`, backgroundColor: 'var(--rpg-highlight)' }} />
+                              <div className={styles.gaugeTrack} style={{ position: 'relative' }}>
+                                {min < 0 && max > 0 && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    left: `${(Math.abs(min) / (max - min)) * 100}%`,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: '1px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                                    zIndex: 2
+                                  }} />
+                                )}
+                                <div className={styles.gaugeFill} style={{ position: 'absolute', left, width, backgroundColor: color }} />
                               </div>
                             </div>
                           );

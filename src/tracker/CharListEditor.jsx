@@ -6,9 +6,12 @@ import { DEFAULT_STATUS_SCHEMAS, DEFAULT_STATUS, getDefaultCharacters } from '..
 
 export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   const { trackerData, updateTrackerData, settings, updateSettings } = useRPG();
-  const characters = (trackerData.characters && trackerData.characters.length > 0)
-    ? trackerData.characters
-    : getDefaultCharacters();
+  const [localCharacters, setLocalCharacters] = useState(() => 
+    (trackerData.characters && trackerData.characters.length > 0)
+      ? JSON.parse(JSON.stringify(trackerData.characters))
+      : getDefaultCharacters()
+  );
+  const characters = localCharacters;
   const [showDropdown, setShowDropdown] = useState(false);
   
   const [currentPresetId, setCurrentPresetId] = useState(trackerData.currentPresetId || '');
@@ -31,10 +34,7 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   };
 
   const handleUpdateCharacters = (newChars) => {
-    updateTrackerData({
-      ...trackerData,
-      characters: newChars
-    });
+    setLocalCharacters(newChars);
   };
 
   const handleMove = (index, direction) => {
@@ -163,13 +163,7 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
       
       setCurrentPresetId(preset.id);
       setCurrentPresetName(preset.name);
-      
-      updateTrackerData({
-        ...trackerData,
-        currentPresetId: preset.id,
-        currentPresetName: preset.name,
-        characters: loadedChars
-      });
+      setLocalCharacters(loadedChars);
       setShowDropdown(false);
     }
   };
@@ -191,25 +185,40 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
         const defaultChars = getDefaultCharacters();
         setCurrentPresetId('');
         setCurrentPresetName('New Preset');
-        updateTrackerData({
-          ...trackerData,
-          currentPresetId: '',
-          currentPresetName: 'New Preset',
-          characters: defaultChars
-        });
+        setLocalCharacters(defaultChars);
       } else {
         const fallbackPreset = newPresets[0];
         const loadedChars = JSON.parse(JSON.stringify(fallbackPreset.data));
         setCurrentPresetId(fallbackPreset.id);
         setCurrentPresetName(fallbackPreset.name);
-        updateTrackerData({
-          ...trackerData,
-          currentPresetId: fallbackPreset.id,
-          currentPresetName: fallbackPreset.name,
-          characters: loadedChars
-        });
+        setLocalCharacters(loadedChars);
       }
     }
+  };
+
+  const handleGlobalSave = () => {
+    const names = characters.map(c => c.name.trim());
+    if (names.some(name => !name)) {
+      alert("Character name cannot be empty.");
+      return;
+    }
+
+    const hasDuplicates = names.some((name, index) => names.indexOf(name) !== index);
+    if (hasDuplicates) {
+      const duplicateName = names.find((name, index) => names.indexOf(name) !== index);
+      alert(`The character name "${duplicateName}" already exists. Duplicate names are not allowed.`);
+      return;
+    }
+
+    updateTrackerData({
+      ...trackerData,
+      currentPresetId,
+      currentPresetName,
+      characters: characters
+    });
+
+    alert("Character list saved successfully!");
+    onClose();
   };
 
   return (
@@ -321,6 +330,11 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
           ))}
           <button className={styles.addBtn} onClick={handleAddCharacter}>+ Add Character</button>
         </div>
+
+        <footer className={styles.footer}>
+          <button type="button" className={styles.saveBtn} onClick={handleGlobalSave}>Save</button>
+          <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancel</button>
+        </footer>
       </div>
     </div>
   );

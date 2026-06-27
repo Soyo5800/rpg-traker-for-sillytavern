@@ -262,3 +262,22 @@
     width: 85vw !important;
   }
 }
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 6px;
+  display: inline-block;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.statusDotConnected {
+  background-color: #2ed573;
+  box-shadow: 0 0 8px #2ed573;
+}
+
+.statusDotDisconnected {
+  background-color: #ff4757;
+  box-shadow: 0 0 8px #ff4757;
+}

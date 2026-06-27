@@ -61,6 +61,31 @@ function parseMetadata(rawVal) {
     return { value: rawVal, type: null, min: null, max: null };
 }
 
+// 기존 중첩 데이터를 안전하게 새 평탄화 스키마로 변환하는 함수
+export function migrateCharacterSchema(char) {
+  if (char && char.featuresData) {
+    const { profile, profileLocks, profileInjects, inventory, quests } = char.featuresData;
+    const migrated = {
+      ...char,
+      profile: profile || char.profile || { Race: '', Height: '', Appearance: '' },
+      profileLocks: profileLocks || char.profileLocks || { Race: false, Height: false, Appearance: false },
+      profileInjects: profileInjects || char.profileInjects || {},
+      inventory: inventory || char.inventory || {
+        equipIsLocked: false,
+        equipIsInject: true,
+        storageIsLocked: false,
+        storageIsInject: true,
+        equipment: { 'Right Hand': null, 'Left Hand': null },
+        storage: { 'Backpack': [] }
+      },
+      quests: quests || char.quests || { main: { name: '', desc: '' }, sides: [] }
+    };
+    delete migrated.featuresData; // 구 버전 데이터 제거
+    return migrated;
+  }
+  return char;
+}
+
 /**
  * Sanitize and Migrate Legacy/Corrupted RPG Tracker Data
  * - Cleans corrupted values like "100 (type: consumable, min: 0, max: 100)" back to pure numbers or text.
@@ -77,7 +102,11 @@ export function sanitizeTrackerData(trackerData) {
     const nextGlobalDefs = data.globalDefinitions ? { ...data.globalDefinitions } : null;
 
     if (Array.isArray(data.characters)) {
-        data.characters.forEach(char => {
+        data.characters.forEach((char, idx) => {
+            // Migrate character schema from legacy nested featuresData to flat schema
+            char = migrateCharacterSchema(char);
+            data.characters[idx] = char;
+
             // Migrate character ID to name-based ID for consistency and deduplication
             if (char.name && char.name.trim() !== '') {
                 const targetCharId = char.id === 'char_user' && char.name === 'New' ? 'char_user' : cleanIdString(char.name, 'char');
@@ -273,8 +302,8 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                 // Remove default values (start empty and overwrite with LLM patch)
                 newChar.statusSchema = [];
                 newChar.status = {};
-                newChar.featuresData.profile = {};
-                newChar.featuresData.profileLocks = {};
+                newChar.profile = {};
+                newChar.profileLocks = {};
                 newChar.relations = {};
                 
                 if (updatedData.characters.length === 1 && 
@@ -461,31 +490,30 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
 
             // 2. Profile 패치 (Race, Height, Appearance 등)
             if (updates.profile && typeof updates.profile === 'object') {
-                char.featuresData = char.featuresData || {};
-                char.featuresData.profileLocks = char.featuresData.profileLocks || {};
+                char.profileLocks = char.profileLocks || {};
 
                 if (updateType === 'replace') {
                     const nextProfile = {};
                     // Keep only locked profile values
-                    Object.entries(char.featuresData.profile || {}).forEach(([pKey, pVal]) => {
-                        if (char.featuresData.profileLocks[pKey] === true) {
+                    Object.entries(char.profile || {}).forEach(([pKey, pVal]) => {
+                        if (char.profileLocks[pKey] === true) {
                             nextProfile[pKey] = pVal;
                         }
                     });
                     // Overwrite with patch values
                     Object.entries(updates.profile).forEach(([pKey, pVal]) => {
-                        const isLocked = char.featuresData.profileLocks[pKey] === true;
+                        const isLocked = char.profileLocks[pKey] === true;
                         if (!isLocked && pVal !== undefined && pVal !== null) {
                             nextProfile[pKey] = String(pVal);
                         }
                     });
-                    char.featuresData.profile = nextProfile;
+                    char.profile = nextProfile;
                 } else {
-                    char.featuresData.profile = char.featuresData.profile || {};
+                    char.profile = char.profile || {};
                     Object.entries(updates.profile).forEach(([pKey, pVal]) => {
-                        const isLocked = char.featuresData.profileLocks[pKey] === true;
+                        const isLocked = char.profileLocks[pKey] === true;
                         if (!isLocked && pVal !== undefined && pVal !== null) {
-                            char.featuresData.profile[pKey] = String(pVal);
+                            char.profile[pKey] = String(pVal);
                         }
                     });
                 }
@@ -493,20 +521,19 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
 
             // 3. Inventory 패치 (Equipment, Storage)
             if (updates.inventory && typeof updates.inventory === 'object') {
-                char.featuresData = char.featuresData || {};
-                char.featuresData.inventory = char.featuresData.inventory || {};
+                char.inventory = char.inventory || {};
                 
                 // Equipment
                 if (updates.inventory.equipment && typeof updates.inventory.equipment === 'object') {
-                    const isEquipLocked = char.featuresData.inventory.equipIsLocked === true;
+                    const isEquipLocked = char.inventory.equipIsLocked === true;
                     if (!isEquipLocked) {
-                        char.featuresData.inventory.equipment = char.featuresData.inventory.equipment || {};
+                        char.inventory.equipment = char.inventory.equipment || {};
                         Object.entries(updates.inventory.equipment).forEach(([slot, itemVal]) => {
                             if (itemVal === 'Empty' || !itemVal) {
-                                char.featuresData.inventory.equipment[slot] = null;
+                                char.inventory.equipment[slot] = null;
                             } else {
                                 const itemName = typeof itemVal === 'object' ? (itemVal.name || 'Unknown') : String(itemVal);
-                                char.featuresData.inventory.equipment[slot] = { name: itemName };
+                                char.inventory.equipment[slot] = { name: itemName };
                             }
                         });
                     }
@@ -514,12 +541,12 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
 
                 // Storage
                 if (updates.inventory.storage && typeof updates.inventory.storage === 'object') {
-                    const isStorageLocked = char.featuresData.inventory.storageIsLocked === true;
+                    const isStorageLocked = char.inventory.storageIsLocked === true;
                     if (!isStorageLocked) {
-                        char.featuresData.inventory.storage = char.featuresData.inventory.storage || {};
+                        char.inventory.storage = char.inventory.storage || {};
                         Object.entries(updates.inventory.storage).forEach(([container, items]) => {
                             if (Array.isArray(items)) {
-                                char.featuresData.inventory.storage[container] = items.map(item => {
+                                char.inventory.storage[container] = items.map(item => {
                                     if (typeof item === 'string') {
                                         const qtyMatch = item.match(/^([\s\S]*?)x(\d+)$/);
                                         if (qtyMatch) {
@@ -539,21 +566,20 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
 
             // 4. Quests 패치
             if (updates.quests && typeof updates.quests === 'object') {
-                char.featuresData = char.featuresData || {};
-                char.featuresData.quests = char.featuresData.quests || {};
+                char.quests = char.quests || {};
                 
                 // Main Quest
                 if (updates.quests.main && typeof updates.quests.main === 'object') {
-                    char.featuresData.quests.main = char.featuresData.quests.main || {};
-                    if (!char.featuresData.quests.main.isLocked) {
-                        if (updates.quests.main.name !== undefined) char.featuresData.quests.main.name = String(updates.quests.main.name);
-                        if (updates.quests.main.description !== undefined) char.featuresData.quests.main.desc = String(updates.quests.main.description);
+                    char.quests.main = char.quests.main || {};
+                    if (!char.quests.main.isLocked) {
+                        if (updates.quests.main.name !== undefined) char.quests.main.name = String(updates.quests.main.name);
+                        if (updates.quests.main.description !== undefined) char.quests.main.desc = String(updates.quests.main.description);
                     }
                 }
                 
                 // Side Quests
                 if (Array.isArray(updates.quests.sideQuests)) {
-                    const existingSides = char.featuresData.quests.sides || [];
+                    const existingSides = char.quests.sides || [];
                     const lockedSides = existingSides.filter(q => q.isLocked);
                     
                     const parsedNewSides = updates.quests.sideQuests.map(sq => {
@@ -590,7 +616,7 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                         }
                     });
 
-                    char.featuresData.quests.sides = finalSides;
+                    char.quests.sides = finalSides;
                 }
             }
 
@@ -633,7 +659,7 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                                 const existingMetric = existingRelation.values[mName];
                                 const isObj = typeof existingMetric === 'object' && existingMetric !== null;
                                 if (isObj && !isNaN(parsedInt)) {
-                                    const minLimit = existingMetric.min !== undefined && existingMetric.min !== null ? existingMetric.min : 0;
+                                    const minLimit = existingMetric.min !== undefined && existingMetric.min !== null ? existingMetric.min : -100;
                                     const maxLimit = existingMetric.max !== undefined && existingMetric.max !== null ? existingMetric.max : 100;
                                     existingRelation.values[mName].value = Math.min(maxLimit, Math.max(minLimit, parsedInt));
                                 } else {
@@ -641,7 +667,7 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                                 }
                                 existingRelation.values[mName].type = existingRelation.values[mName].type || valType;
                             } else {
-                                existingRelation.values[mName] = { value: finalVal, type: valType };
+                                existingRelation.values[mName] = { value: finalVal, type: valType, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
                             }
                         });
                     }
@@ -665,7 +691,7 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                                 const existingMetric = existingRelation.targetValues[tmName];
                                 const isObj = typeof existingMetric === 'object' && existingMetric !== null;
                                 if (isObj && !isNaN(parsedInt)) {
-                                    const minLimit = existingMetric.min !== undefined && existingMetric.min !== null ? existingMetric.min : 0;
+                                    const minLimit = existingMetric.min !== undefined && existingMetric.min !== null ? existingMetric.min : -100;
                                     const maxLimit = existingMetric.max !== undefined && existingMetric.max !== null ? existingMetric.max : 100;
                                     existingRelation.targetValues[tmName].value = Math.min(maxLimit, Math.max(minLimit, parsedInt));
                                 } else {
@@ -673,7 +699,7 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
                                 }
                                 existingRelation.targetValues[tmName].type = existingRelation.targetValues[tmName].type || valType;
                             } else {
-                                existingRelation.targetValues[tmName] = { value: finalVal, type: valType };
+                                existingRelation.targetValues[tmName] = { value: finalVal, type: valType, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
                             }
                         });
                     }
@@ -750,15 +776,21 @@ export function defensiveMerge(masterSchema, backupData) {
                 // Merge characters individually to prevent missing internal schemas
                 merged.characters = backupData.characters.map(backupChar => {
                     const masterChar = masterSchema.characters.find(c => c.id === backupChar.id) || {};
+                    const cleanBackupChar = migrateCharacterSchema(backupChar);
+                    const cleanMasterChar = migrateCharacterSchema(masterChar);
                     return {
-                        ...masterChar,
-                        ...backupChar,
+                        ...cleanMasterChar,
+                        ...cleanBackupChar,
                         // Restore static schemas missing in backupChar
-                        statusSchema: backupChar.statusSchema || masterChar.statusSchema,
+                        statusSchema: cleanBackupChar.statusSchema || cleanMasterChar.statusSchema,
                         // Deep merge of state objects
-                        status: { ...(masterChar.status || {}), ...(backupChar.status || {}) },
-                        featuresData: { ...(masterChar.featuresData || {}), ...(backupChar.featuresData || {}) },
-                        relations: { ...(masterChar.relations || {}), ...(backupChar.relations || {}) }
+                        status: { ...(cleanMasterChar.status || {}), ...(cleanBackupChar.status || {}) },
+                        profile: { ...(cleanMasterChar.profile || {}), ...(cleanBackupChar.profile || {}) },
+                        profileLocks: { ...(cleanMasterChar.profileLocks || {}), ...(cleanBackupChar.profileLocks || {}) },
+                        profileInjects: { ...(cleanMasterChar.profileInjects || {}), ...(cleanBackupChar.profileInjects || {}) },
+                        inventory: { ...(cleanMasterChar.inventory || {}), ...(cleanBackupChar.inventory || {}) },
+                        quests: { ...(cleanMasterChar.quests || {}), ...(cleanBackupChar.quests || {}) },
+                        relations: { ...(cleanMasterChar.relations || {}), ...(cleanBackupChar.relations || {}) }
                     };
                 });
             } else if (typeof masterSchema[key] === 'object' && !Array.isArray(masterSchema[key])) {

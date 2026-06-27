@@ -81,34 +81,24 @@ export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
     charSchema.status = {
       "Status_Name_1": "new_value (type: consumable, min: 0, max: 100. e.g. HP - reduce on damage, increase on rest)",
       "Status_Name_2": "new_value (type: stacking, min: 0, max: 100. e.g. Fatigue - increase on strenuous actions)",
-      "Status_Name_3": "new_value (type: integer, min: 0, max: 100)",
+      "Status_Name_3": "new_value (type: integer, min: 0, max: 100. e.g. Strength, Agility, Intelligence and other rolling status parameters)",
       "Status_Name_4": "new_value (type: text. extremely short current condition)"
     };
   }
 
   if (ms.profile) {
-    charSchema.profile = { "Profile_Key": "new_value" };
+    charSchema.profile = { "Profile_Key": "new_value (type: text. strictly for non-numerical descriptions e.g. Race, Appearance, Personality. NEVER put numerical status parameters here)" };
   }
 
   if (ms.relations) {
-    const relType = trackerData.worldSchema?.relationsFieldType || 'integer';
-    if (relType === 'none') {
-      charSchema.relations = {
-        "Target Name": {
-          "description": "Brief summary of emotions/impressions toward Target Name",
-          "targetDescription": "Brief summary of how Target Name feels about this character (use ONLY for minor/one-time NPCs with no separate card)"
-        }
-      };
-    } else {
-      charSchema.relations = {
-        "Target Name": {
-          "description": "Brief summary of emotions/impressions toward Target Name",
-          "metrics": { "Metric_Name": `new_value (type: ${relType}. adjust dynamically by -15 to +15 based on interaction)` },
-          "targetDescription": "Brief summary of how Target Name feels about this character (use ONLY for minor/one-time NPCs with no separate card)",
-          "targetMetrics": { "Metric_Name": `new_value (type: ${relType}) (use ONLY for minor/one-time NPCs with no separate card)` }
-        }
-      };
-    }
+    charSchema.relations = {
+      "Target Name": {
+        "description": "Brief summary of emotions/impressions toward Target Name",
+        "metrics": { "Metric_Name": "new_value (type: integer. adjust dynamically by -15 to +15 based on interaction. can be negative for hostility, positive for friendliness)" },
+        "targetDescription": "Brief summary of how Target Name feels about this character (use ONLY for minor/one-time NPCs with no separate card)",
+        "targetMetrics": { "Metric_Name": "new_value (type: integer. adjust dynamically by -15 to +15. can be negative)" }
+      }
+    };
   }
 
   if (ms.inventory && hasActivePlayer) {
@@ -205,9 +195,9 @@ export function buildDynamicValuesPrompt(trackerData) {
 
       // 2. Profile
       if (ms.profile) {
-        const profile = char.featuresData?.profile || {};
-        const profileInjects = char.featuresData?.profileInjects || {};
-        const profileLocks = char.featuresData?.profileLocks || {};
+        const profile = char.profile || {};
+        const profileInjects = char.profileInjects || {};
+        const profileLocks = char.profileLocks || {};
         const profileObj = {};
         
         Object.keys(profile).forEach(key => {
@@ -273,7 +263,7 @@ export function buildDynamicValuesPrompt(trackerData) {
       if (char.activePlayer === true) {
         // Inventory
         if (ms.inventory) {
-          const inventory = char.featuresData?.inventory;
+          const inventory = char.inventory;
           if (inventory) {
             const equip = inventory.equipment || {};
             const storage = inventory.storage || {};
@@ -313,7 +303,7 @@ export function buildDynamicValuesPrompt(trackerData) {
 
         // Quests
         if (ms.quests) {
-          const quests = char.featuresData?.quests;
+          const quests = char.quests;
           if (quests) {
              const questObj = {
                main: {

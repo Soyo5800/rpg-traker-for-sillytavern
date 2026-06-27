@@ -267,3 +267,46 @@
   min-width: 36px;
   display: inline-block;
 }
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--rpg-border);
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.saveBtn {
+  background: var(--rpg-highlight-bg, rgba(52, 152, 219, 0.2));
+  border: 1px solid var(--rpg-highlight, #3498db);
+  color: var(--rpg-highlight, #3498db);
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveBtn:hover {
+  background: var(--rpg-highlight, #3498db);
+  color: #fff;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

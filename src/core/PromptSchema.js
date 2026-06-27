@@ -50,37 +50,43 @@ export const getDefaultCharacters = () => {
       activeInjection: true,
       statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
       status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
-      featuresData: {
-        profile: { Race: '', Height: '', Appearance: '' },
-        profileLocks: { Race: false, Height: false, Appearance: false },
-        inventory: {
-          equipIsLocked: false,
-          equipIsInject: true,
-          storageIsLocked: false,
-          storageIsInject: true,
-          equipment: { 'Right Hand': null, 'Left Hand': null },
-          storage: { 'Backpack': [] }
-        },
-        quests: {
-          main: { name: '', desc: '' },
-          sides: []
-        }
+      profile: { Race: '', Height: '', Appearance: '' },
+      profileLocks: { Race: false, Height: false, Appearance: false },
+      inventory: {
+        equipIsLocked: false,
+        equipIsInject: true,
+        storageIsLocked: false,
+        storageIsInject: true,
+        equipment: { 'Right Hand': null, 'Left Hand': null },
+        storage: { 'Backpack': [] }
+      },
+      quests: {
+        main: { name: '', desc: '' },
+        sides: []
       },
       relations: {
         'Target Example': {
           text: '',
           isLocked: false,
           isInject: true,
-          values: { 'Affection': { value: 0, type: 'integer' } }
+          values: { 'Affection': { value: 0, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' } }
         }
       }
     }
   ];
 };
 
-export const DEFAULT_ADD_CHAR_PROMPT = `Based on the chat log, create a profile for the character. Create suitable status, profile features, and relations (including 'targetDescription' to define what the target thinks about this character) that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER. Omit inventory and quests unless necessary.`;
+export const DEFAULT_ADD_CHAR_PROMPT = `Based on the chat log, create a profile for the character.
+CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-based descriptive profile features.
+1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Intelligence, Charisma, Dexterity, Observation, Domestic, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
+2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical, non-integer, descriptive characteristics (e.g., Race, Gender, Height, Appearance, Personality, Background, Trauma). Do NOT put any numeric/integer rolling status parameters inside 'profile'.
+Create suitable status, profile features, and relations (including 'targetDescription' to define what the target thinks about this character) that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER. Omit inventory and quests unless necessary.`;
 
-export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a profile for the player character. Create suitable status, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
+export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a profile for the player character.
+CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-based descriptive profile features.
+1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Intelligence, Charisma, Dexterity, Observation, Domestic, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
+2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical, non-integer, descriptive characteristics (e.g., Race, Gender, Height, Appearance, Personality, Background, Trauma). Do NOT put any numeric/integer rolling status parameters inside 'profile'.
+Create suitable status, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
 
 export const getInitialTrackerData = () => {
   return {
@@ -106,6 +112,7 @@ Strictly follow this layout:`;
 export const DEFAULT_PROMPT_FOOTER_MERGED = `[SYSTEM RULES & GUIDELINES]
 1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
 2. REASONING RULES (CRITICAL):
+   - STATUS VS PROFILE (CRITICAL): NEVER put numerical status parameters or game-mechanics values used for tests/rolls (such as Strength, Agility, Intelligence, Charisma, Nobility, Observation, Domestic, etc.) inside the 'profile' object. All such rolling status parameters MUST strictly be placed and managed in the 'status' object. The 'profile' object is EXCLUSIVELY reserved for text-based, non-numerical descriptive characteristics (e.g., Race, Gender, Height, Appearance, Background).
    - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
    - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
    - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
@@ -123,6 +130,7 @@ Strictly follow this layout:`;
 export const DEFAULT_PROMPT_FOOTER_SEP = `[SYSTEM RULES & GUIDELINES]
 1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
 2. REASONING RULES (CRITICAL):
+   - STATUS VS PROFILE (CRITICAL): NEVER put numerical status parameters or game-mechanics values used for tests/rolls (such as Strength, Agility, Intelligence, Charisma, Nobility, Observation, Domestic, etc.) inside the 'profile' object. All such rolling status parameters MUST strictly be placed and managed in the 'status' object. The 'profile' object is EXCLUSIVELY reserved for text-based, non-numerical descriptive characteristics (e.g., Race, Gender, Height, Appearance, Background).
    - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
    - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
    - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
