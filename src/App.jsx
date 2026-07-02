@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { RPGControlProvider, useRPG } from './core/RPGControl';
 import TrackerPanelToggle from './tracker/TrackerPanelToggle';
 import TrackerPanel from './tracker/TrackerPanel';
+import { ErrorBoundary } from './core/ErrorBoundary';
 
 function RPGTrackerContainer() {
   const { isEnabled, settings } = useRPG();
@@ -20,7 +21,7 @@ function RPGTrackerContainer() {
         rootElement.style.setProperty('position', 'fixed', 'important');
         rootElement.style.setProperty('top', '0', 'important');
         rootElement.style.setProperty('left', '0', 'important');
-        rootElement.style.setProperty('pointer-events', 'none', 'important');
+        rootElement.style.setProperty('pointer-events', 'auto', 'important');
       } else {
         rootElement.style.setProperty('display', 'none', 'important');
       }
@@ -31,10 +32,10 @@ function RPGTrackerContainer() {
     return null;
   }
 
-  // 💡 사용자가 명시적으로 테마를 'custom'으로 전환했는지 감지
+  // Detect if custom theme mode is active
   const isCustomTheme = settings.theme === 'custom';
 
-  // 🎨 테마 모드 스위칭 시스템 적용
+  // Apply visual theme variables
   const globalThemeStyles = {
     '--rpg-bg': isCustomTheme && settings.customColors?.bg
       ? settings.customColors.bg
@@ -59,12 +60,18 @@ function RPGTrackerContainer() {
 
   return (
     <div style={{ ...globalThemeStyles, pointerEvents: 'none', width: '100%', height: '100%' }}>
+      {/* Isolate floating toggle button */}
       <div style={{ pointerEvents: 'auto' }}>
-        <TrackerPanelToggle />
+        <ErrorBoundary>
+          <TrackerPanelToggle />
+        </ErrorBoundary>
       </div>
 
+      {/* Isolate main sidebar panel */}
       <div style={{ pointerEvents: 'auto' }}>
-        <TrackerPanel />
+        <ErrorBoundary>
+          <TrackerPanel />
+        </ErrorBoundary>
       </div>
     </div>
   );

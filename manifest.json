@@ -4,7 +4,7 @@
     "requires": [],
     "optional": [],
     "js": "index.js",
-    "author": "Cheyap",
-    "version": "1.0.0",
-    "description": "A lightweight extension that tracks, stores, and updates RPG stats for the user and active characters using state persistence."
+    "author": "Soyo",
+    "version": "1.1.0",
+    "description": "Extension that tracks, stores, and updates RPG status for the user and active characters using state persistence."
 }

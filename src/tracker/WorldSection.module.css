@@ -51,6 +51,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: 10px; /* 타이틀과의 살짝의 여백 */
 }
 
 .rowField {
@@ -69,12 +70,33 @@
   font-size: 12px;
   font-weight: bold;
   opacity: 0.6;
-  width: 70px;
+  width: 60px;
   flex-shrink: 0;
   color: var(--rpg-text);
 }
 
-.textInput {
+.lockBtn {
+  background: transparent;
+  border: none;
+  color: var(--rpg-text);
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.lockBtn:hover {
+  opacity: 1;
+  color: var(--rpg-highlight);
+}
+
+.stateTextarea {
   flex: 1;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--rpg-border);
@@ -85,6 +107,22 @@
   font-family: inherit;
   padding: 6px 10px;
   width: 100%;
+  min-height: 28px;
+  height: auto;
+  line-height: 1.4;
+  resize: none;
+  overflow-y: hidden;
+  display: block;
+}
+
+.stateTextarea:focus:not(:disabled) {
+  border-color: var(--rpg-highlight);
+}
+
+.stateTextarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* Events block */

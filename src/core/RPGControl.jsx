@@ -1,22 +1,26 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { defensiveMerge } from './JSONTracker';
+// src/core/RPGControl.jsx
+
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { defensiveMerge, reconstructTurnState } from './JSONTracker';
+import { getDefaultCharacters, DEFAULT_GUIDE_PROMPTS, getInitialTrackerData } from './PromptSchema';
+import { setNestedValue, deleteNestedValue } from './StateHelpers';
 
 const RPGContext = createContext(null);
 
 const DEFAULT_SETTINGS = {
   enabled: true,
   autoUpdate: true,
-  panelPosition: 'right',
-  theme: 'default', // 💡 Theme mode: 'default' (Follow ST) or 'custom' (User defined)
-  updateMode: 'merged', // 💡 API update mode: 'merged' (Inline with chat), 'separated' (Manual background)
+  panelPosition: 'left',
+  theme: 'default',
+  updateMode: 'merged',
   maxBackupCount: 4,
-
   showUserStats: true,
   showInfoBox: true,
   showCharacterThoughts: true,
   showInventory: true,
   showQuests: true,
-  customColors: { // 💡 Default guide colors when custom mode is active
+  presets: [],
+  customColors: {
     bg: '#1a1a2e',
     accent: '#4a7ba7',
     text: '#ffffff',
@@ -24,8 +28,6 @@ const DEFAULT_SETTINGS = {
     border: '#4a7ba7'
   }
 };
-
-import { getDefaultCharacters, DEFAULT_GUIDE_PROMPTS, getInitialTrackerData } from './PromptSchema';
 
 const getDefaultTrackerData = () => {
   return getInitialTrackerData();
@@ -43,11 +45,34 @@ export function RPGControlProvider({ children }) {
     }
   }, []);
 
-  const saveTrackerDataToST = useCallback((updatedTracker) => {
+  const saveTimeoutRef = useRef(null);
+  const pendingDataRef = useRef(null);
+
+  const executeSave = useCallback(() => {
+    if (!pendingDataRef.current) return;
+
     if (window.RPGBridge && typeof window.RPGBridge.saveChatData === 'function') {
-      window.RPGBridge.saveChatData(updatedTracker, settings.maxBackupCount);
+      window.RPGBridge.saveChatData(pendingDataRef.current, settings.maxBackupCount);
+      pendingDataRef.current = null;
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
     }
   }, [settings.maxBackupCount]);
+
+  const saveTrackerDataToST = useCallback((updatedTracker) => {
+    pendingDataRef.current = updatedTracker;
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      executeSave();
+    }, 500);
+  }, [executeSave]);
 
   const updateSettings = useCallback((newSettings) => {
     setSettings((prev) => {
@@ -65,6 +90,68 @@ export function RPGControlProvider({ children }) {
     });
   }, [saveTrackerDataToST]);
 
+  const patchCharacterField = useCallback((charId, pathArray, value) => {
+    setTrackerData(prev => {
+      const updatedChars = prev.characters.map(c => {
+        if (c.id === charId) {
+          return setNestedValue(c, pathArray, value);
+        }
+        return c;
+      });
+      const updatedData = { ...prev, characters: updatedChars };
+      saveTrackerDataToST(updatedData);
+      return updatedData;
+    });
+  }, [saveTrackerDataToST]);
+
+  const deleteCharacterField = useCallback((charId, pathArray) => {
+    setTrackerData(prev => {
+      const updatedChars = prev.characters.map(c => {
+        if (c.id === charId) {
+          return deleteNestedValue(c, pathArray);
+        }
+        return c;
+      });
+      const updatedData = { ...prev, characters: updatedChars };
+      saveTrackerDataToST(updatedData);
+      return updatedData;
+    });
+  }, [saveTrackerDataToST]);
+
+  const patchWorldField = useCallback((pathArray, value) => {
+    setTrackerData(prev => {
+      const updatedWorld = setNestedValue(prev.worldState || {}, pathArray, value);
+      const updatedData = { ...prev, worldState: updatedWorld };
+      saveTrackerDataToST(updatedData);
+      return updatedData;
+    });
+  }, [saveTrackerDataToST]);
+
+  const revertToOriginalTurnState = useCallback(async () => {
+    if (!window.RPGBridge) return;
+
+    if (window.confirm("Are you sure you want to revert manual edits and restore the original AI-generated status for this turn?")) {
+      try {
+        const stContext = window.SillyTavern?.getContext?.();
+        const chat = stContext?.chat;
+        if (!Array.isArray(chat) || chat.length === 0) return;
+
+        const originalState = await reconstructTurnState(chat, getDefaultTrackerData());
+        
+        if (originalState) {
+          setTrackerData(originalState);
+          if (window.RPGBridge && typeof window.RPGBridge.saveChatData === 'function') {
+            window.RPGBridge.saveChatData(originalState, settings.maxBackupCount);
+          }
+          alert("Restored to the original turn state successfully.");
+        }
+      } catch (e) {
+        console.error("[RPG Tracker] Reversion failed:", e);
+        alert("Failed to revert state.");
+      }
+    }
+  }, [settings.maxBackupCount]);
+
   useEffect(() => {
     if (window.RPGBridge) {
       window.RPGBridge.currentTrackerData = trackerData;
@@ -75,6 +162,11 @@ export function RPGControlProvider({ children }) {
     window.RPGBridge = {
       ...(window.RPGBridge || {}),
       currentTrackerData: trackerData,
+
+      flushSave: () => {
+        executeSave();
+      },
+
       syncSettings: (stSettings) => {
         if (stSettings) {
           setSettings((prev) => ({ ...prev, ...stSettings }));
@@ -107,11 +199,7 @@ export function RPGControlProvider({ children }) {
         if (window.RPGBridge && typeof window.RPGBridge.rehydrateFromHistory === 'function') {
           const recovered = window.RPGBridge.rehydrateFromHistory();
           setTrackerData((prev) => {
-            // Fully reset if no past backup exists (keep master schema & rules intact by wrapping over the default structure)
-            const baseData = prev; // Wait, actually we should use getDefaultTrackerData() but keep system config.
-            // Let's implement a better reset: 
             const defaultData = getDefaultTrackerData();
-            // We want to keep systemPrompt, globalDefinitions, addons from prev.
             const cleanBase = {
               ...defaultData,
               systemPromptHeader_merged: prev.systemPromptHeader_merged,
@@ -121,12 +209,7 @@ export function RPGControlProvider({ children }) {
               globalDefinitions: prev.globalDefinitions,
               addons: prev.addons
             };
-
-            if (recovered) {
-              return defensiveMerge(cleanBase, recovered);
-            } else {
-              return cleanBase;
-            }
+            return recovered ? defensiveMerge(cleanBase, recovered) : cleanBase;
           });
         }
       },
@@ -142,17 +225,15 @@ export function RPGControlProvider({ children }) {
           }
         }
       },
-      handleFullRequestUpdate: async () => { console.log("[RPG Tracker] Full Overwrite Update is deprecated and disabled."); },
+      handleFullRequestUpdate: async () => {
+        console.log("[RPG Tracker] Full Overwrite Update is deprecated.");
+      },
       resetToDefault: () => {
         setTrackerData(getDefaultTrackerData());
       }
     };
 
-    console.log('[RPG Tracker] 🧠 RPGControl Bridge is initialized and listening.');
-
-    return () => {
-      // Don't delete window.RPGBridge entirely, as it might break the native side connection
-    };
+    console.log('[RPG Tracker] RPGControl Bridge is initialized and listening.');
   }, []);
 
   const isEnabled = settings.enabled;
@@ -176,7 +257,11 @@ export function RPGControlProvider({ children }) {
     isChatConnected,
     updateSettings,
     updateTrackerData,
-    setIsGenerating
+    setIsGenerating,
+    patchCharacterField,
+    deleteCharacterField,
+    patchWorldField,
+    revertToOriginalTurnState
   };
 
   return (

@@ -72,7 +72,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 100%;
+  height: auto;
 }
 
 .label {
@@ -124,35 +124,11 @@
   opacity: 0.9;
 }
 
-/* Settings Editor Styles */
-.chatConnectionSection {
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 16px;
-}
-
 .settingsDesc {
   font-size: 11px;
   opacity: 0.6;
   margin-bottom: 8px;
   margin-top: -4px;
-}
-
-.settingsDescLarge {
-  font-size: 11px;
-  opacity: 0.6;
-  margin-bottom: 12px;
-  margin-top: -4px;
-}
-
-.connectionStatusCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid var(--rpg-border);
 }
 
 .rowFlex {
@@ -161,73 +137,134 @@
   gap: 8px;
 }
 
-.statusDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.statusDotConnected {
-  background: #2ecc71;
-  box-shadow: 0 0 5px #2ecc71;
-}
-
-.statusDotDisconnected {
-  background: #e74c3c;
-  box-shadow: 0 0 5px #e74c3c;
-}
-
-.statusText {
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.disconnectBtn {
-  padding: 6px 12px;
-  font-size: 11px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 4px;
+.checkboxLabel {
   cursor: pointer;
+  user-select: none;
+  font-size: 12.5px;
   font-weight: bold;
-}
-
-.disconnectBtn:hover {
-  opacity: 0.9;
-}
-
-.connectBtn {
-  padding: 6px 12px;
-  font-size: 11px;
-  background: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.connectBtn:hover {
-  opacity: 0.9;
+  color: var(--rpg-highlight);
 }
 
 .settingsSelect {
   width: 100%;
-  padding: 8px;
+  padding: 6px 10px;
   background: rgba(0, 0, 0, 0.2);
   color: inherit;
   border: 1px solid var(--rpg-border);
   border-radius: 4px;
   outline: none;
   font-family: inherit;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .settingsSelect:focus {
   border-color: var(--rpg-highlight);
 }
 
-.settingsRange {
+.colorPaletteGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--rpg-border);
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 4px;
+}
+
+.colorRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+}
+
+.colorLabel {
+  font-size: 11.5px;
+  font-weight: bold;
+  opacity: 0.85;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.colorPicker {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rpg-border);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.colorTextInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  outline: none;
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.colorTextInput:focus {
+  border-color: var(--rpg-highlight);
+}
+
+/* Custom Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--rpg-border);
+  transition: .2s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--rpg-text);
+  transition: .2s;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.switch input:checked + .slider {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--rpg-highlight);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(14px);
+  background-color: var(--rpg-highlight);
+  opacity: 1;
+}
+
+.switch input:disabled + .slider {
+  opacity: 0.3;
+  cursor: not-allowed;
 }

@@ -356,18 +356,18 @@ export function injectAllDeltaLogs(extension_settings, extensionName, getContext
     const context = getContext();
     if (!context || !Array.isArray(context.chat)) return;
 
-    // Clean up style tag if missing
     if ($('#rpg-delta-log-styles').length === 0) {
         $('head').append(deltaStyles);
     }
 
-    context.chat.forEach((msg, index) => {
-        if (!msg) return;
+    const startIndex = Math.max(0, context.chat.length - 10);
 
-        // 1. Prioritize data-id or mesId attribute across all potential message selectors to prevent DOM sequence desync
+    for (let index = startIndex; index < context.chat.length; index++) {
+        const msg = context.chat[index];
+        if (!msg) continue;
+
         let $msgEl = $(`#chat .mes[data-id="${index}"], #chat .mes_block[data-id="${index}"], #chat [data-id="${index}"], #chat [mesId="${index}"]`).first();
-        
-        // 2. Pure fallback sequence if ID is completely absent in DOM (safeguard)
+
         if ($msgEl.length === 0) {
             $msgEl = $('#chat').children('.mes, .sys_mes, .system_message, .mes_block').eq(index);
         }
@@ -379,31 +379,26 @@ export function injectAllDeltaLogs(extension_settings, extensionName, getContext
                 if ($msgEl.next('.rpg-delta-log-container').length > 0) {
                     $msgEl.next('.rpg-delta-log-container').remove();
                 }
-                return;
+                continue;
             }
 
-            // Skip if already has it to prevent multiple duplicates
             if ($msgEl.find('.rpg-delta-log-container').length > 0) {
-                return;
+                continue;
             }
 
-            // Clean up any rogue containers appended as siblings due to previous bugs
             if ($msgEl.next('.rpg-delta-log-container').length > 0) {
                 $msgEl.next('.rpg-delta-log-container').remove();
             }
 
             const deltaHtml = buildDeltaLogHtml(delta);
             if (deltaHtml) {
-                // 3. Robust target subcheck inside message box (supports system messages and raw logs)
                 let $target = $msgEl.find('.mes_text, .system_message_content, .text, .mes_block');
                 if ($target.length === 0) {
-                    // Fallback to appending inside msgEl container itself
                     $msgEl.append(deltaHtml);
                 } else {
-                    // Append INSIDE the text content container to stay naturally under the text and inside the box layout
                     $target.first().append(deltaHtml);
                 }
             }
         }
-    });
+    }
 }

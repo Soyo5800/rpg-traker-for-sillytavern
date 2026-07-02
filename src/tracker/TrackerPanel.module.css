@@ -24,8 +24,21 @@
   animation: slideIn 0.2s ease-out;
 }
 
+.panelContainer.right {
+  right: 0 !important;
+  border-left: 1px solid var(--rpg-border);
+  width: calc(50vw - var(--sheldWidth, 800px) / 2) !important;
+  min-width: 280px !important;
+  animation: slideInRight 0.2s ease-out;
+}
+
 @keyframes slideIn {
   from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
 
@@ -54,6 +67,12 @@
   border-left: none;
 }
 
+.collapseButton.right {
+  left: -21px;
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+
 .collapseButton:hover {
   background: rgba(255, 255, 255, 0.05);
 }
@@ -73,54 +92,89 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--rpg-border);
   flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.headerLeftArea {
+  display: flex;
+  align-items: center;
+}
+
+.headerRightArea {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.headerButtonRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .headerIcon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--rpg-text);
 }
 
 .headerTitle {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: bold;
 }
 
-.editorShortcuts {
-  display: flex;
-  gap: 10px;
-}
-
-.shortcutBtn {
-  background: transparent;
-  border: none;
+.headerBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  width: 85px;
+  height: 24px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: bold;
   cursor: pointer;
-  padding: 2px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--rpg-text);
-  opacity: 0.65;
-  transition: opacity 0.2s, color 0.2s;
+  gap: 4px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.shortcutBtn:hover {
-  opacity: 1;
+.headerBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--rpg-highlight);
   color: var(--rpg-highlight);
 }
 
-.shortcutIcon {
-  width: 15px;
-  height: 15px;
+.headerBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.headerBtnIcon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .scrollContainer {
@@ -261,6 +315,9 @@
   .panelContainer.left {
     width: 85vw !important;
   }
+  .panelContainer.right {
+    width: 85vw !important;
+  }
 }
 
 .statusDot {
@@ -280,4 +337,9 @@
 .statusDotDisconnected {
   background-color: #ff4757;
   box-shadow: 0 0 8px #ff4757;
+}
+
+.generatingLocked * {
+  pointer-events: none !important;
+  user-select: none !important;
 }

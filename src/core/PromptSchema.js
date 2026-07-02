@@ -29,7 +29,7 @@ export const DEFAULT_WORLD_SCHEMA = {
 };
 
 export const DEFAULT_GUIDE_PROMPTS = [
-  { id: 'status', name: 'Update Status', prompt: 'Update active status parameters (like HP, Fatigue, Lv, Condition, etc.) based on action outcomes, damage taken, or roleplay events in the chat.', enabled: true },
+  { id: 'status', name: 'Update Status', prompt: 'Update active status parameters based on action outcomes, damage taken, or roleplay events in the chat.', enabled: true },
   { id: 'profile', name: 'Update Profile', prompt: 'Dynamically generate, update, or remove unlocked profile fields and parameters based on character cards, user persona, or chat context.', enabled: true },
   { id: 'relations', name: 'Update Relations', prompt: 'Reflect the latest changes in emotions, relationship metrics, and impressions. If the target is a minor/one-time NPC (no separate character card exists), you can also update "targetDescription" (how they feel about this character) and "targetMetrics" (their metrics toward this character) directly within this relation.', enabled: true },
   { id: 'inventory', name: 'Update Inventory', prompt: 'If any items or equipment are acquired or lost, update the inventory and storage accordingly.', enabled: true },
@@ -78,20 +78,21 @@ export const getDefaultCharacters = () => {
 
 export const DEFAULT_ADD_CHAR_PROMPT = `Based on the chat log, create a profile for the character.
 CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-based descriptive profile features.
-1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Intelligence, Charisma, Dexterity, Observation, Domestic, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
-2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical, non-integer, descriptive characteristics (e.g., Race, Gender, Height, Appearance, Personality, Background, Trauma). Do NOT put any numeric/integer rolling status parameters inside 'profile'.
+1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Level, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
+2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical descriptions (e.g., Race, Gender, Height, Appearance, Personality, Background). Do NOT put any numeric/integer status parameters here.
 Create suitable status, profile features, and relations (including 'targetDescription' to define what the target thinks about this character) that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER. Omit inventory and quests unless necessary.`;
 
 export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a profile for the player character.
 CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-based descriptive profile features.
-1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Intelligence, Charisma, Dexterity, Observation, Domestic, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
-2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical, non-integer, descriptive characteristics (e.g., Race, Gender, Height, Appearance, Personality, Background, Trauma). Do NOT put any numeric/integer rolling status parameters inside 'profile'.
+1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Level, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
+2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical descriptions (e.g., Race, Gender, Height, Appearance, Personality, Background). Do NOT put any numeric/integer status parameters here.
 Create suitable status, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
 
 export const getInitialTrackerData = () => {
   return {
     characters: getDefaultCharacters(),
     worldState: JSON.parse(JSON.stringify(DEFAULT_WORLD_STATE)),
+    worldStateLocks: { date: false, time: false, location: false, weather: false },
     worldSchema: JSON.parse(JSON.stringify(DEFAULT_WORLD_SCHEMA)),
     guidePrompts: JSON.parse(JSON.stringify(DEFAULT_GUIDE_PROMPTS)),
     globalDefinitions: {},
@@ -110,32 +111,46 @@ At the VERY BEGINNING of your response, you MUST output a JSON code block wrappe
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_MERGED = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
+1. ROLE: Act as the Game Master. Analyze the latest chat log to logically update the RPG tracker.
 2. REASONING RULES (CRITICAL):
-   - STATUS VS PROFILE (CRITICAL): NEVER put numerical status parameters or game-mechanics values used for tests/rolls (such as Strength, Agility, Intelligence, Charisma, Nobility, Observation, Domestic, etc.) inside the 'profile' object. All such rolling status parameters MUST strictly be placed and managed in the 'status' object. The 'profile' object is EXCLUSIVELY reserved for text-based, non-numerical descriptive characteristics (e.g., Race, Gender, Height, Appearance, Background).
-   - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
-   - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
-   - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
-3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked status, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
-   - Quests & World Events: Freely add, complete, or update quests and events. Use consistent 'name' values to automatically merge or update existing ones and avoid duplication.
-
-4. LOCK PROTECTION: Absolutely DO NOT change, update, or delete any element listed in '_lockedFields'. Keep them exactly as they are.
-5. OPTIMIZATION: Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
-6. RESPONSE FLOW: Place the JSON HTML comment block at the VERY TOP. Write your normal roleplay response immediately after it. Do not prefix the JSON block with any commentary.`;
+   - STATUS vs PROFILE: STRICT SEPARATION.
+     > 'status': ONLY for numerical parameters or game-mechanics (type: consumable, stacking, integer).
+     > 'profile': EXCLUSIVELY for text-based descriptions (e.g., Race, Gender, Background). NEVER put numeric parameters here.
+   - Dynamic Value Scaling:
+     > Adjust status values proportionally based on the severity of narrative events and the parameter's min/max limits.
+     > Avoid abrupt or drastic jumps for minor incidents. Changes must be gradual and logical unless an extreme, game-changing event explicitly occurs.
+   - Text Parameters (type: text): Keep descriptions extremely concise (e.g., "Healthy", "Injured (Left Leg)").
+3. DYNAMIC ENTITIES:
+   - Minor NPCs: If no character card exists, update "targetDescription" and "targetMetrics" directly within their relation object.
+   - Quests & Events: Use consistent 'name' values to automatically merge updates and prevent duplication.
+4. LOCKS & OPTIMIZATION:
+   - Absolutely DO NOT change or delete any element listed in '_lockedFields'.
+   - Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
+5. OUTPUT FORMAT (STRICT):
+   - The HTML comment block (\`<!--RPG_TRACKER...\`) MUST be the VERY FIRST thing in your response.
+   - Absolutely NO conversational filler or prefixes before the JSON block.
+   - Write your normal roleplay response immediately AFTER the JSON block.`;
 
 export const DEFAULT_PROMPT_HEADER_SEP = `[RPG STATUS TRACKER SYSTEM]
 You MUST output ONLY a JSON code block wrapped inside an HTML comment with the 'RPG_TRACKER' identifier.
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_SEP = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logically deduct and update status parameters.
+1. ROLE: Act as the Game Master. Analyze the latest chat log to logically update the RPG tracker.
 2. REASONING RULES (CRITICAL):
-   - STATUS VS PROFILE (CRITICAL): NEVER put numerical status parameters or game-mechanics values used for tests/rolls (such as Strength, Agility, Intelligence, Charisma, Nobility, Observation, Domestic, etc.) inside the 'profile' object. All such rolling status parameters MUST strictly be placed and managed in the 'status' object. The 'profile' object is EXCLUSIVELY reserved for text-based, non-numerical descriptive characteristics (e.g., Race, Gender, Height, Appearance, Background).
-   - HP/Fatigue: Deduct HP on physical harm (-5 to -30). Increase Fatigue on strenuous actions (+5 to +20).
-   - Relations: Shift metrics (e.g., Affection) based on conversation tone (Friendly: +1 to +5, Hostile: -5 to -15). Never jump values abruptly unless extreme events occur.
-   - Condition/State: Keep text condition extremely concise (e.g., "Healthy", "Exhausted", "Injured (Left Leg)").
-3. DYNAMIC UPDATES & MINOR NPCS: Freely add, update, or remove unlocked status, profiles, and relations. If a target NPC has no separate character card, dynamically update "targetDescription" (what NPC thinks about this character) and "targetMetrics" directly within their relation object to reflect the interaction.
-   - Quests & World Events: Freely add, complete, or update quests and events. Use consistent 'name' values to automatically merge or update existing ones and avoid duplication.
-4. LOCK PROTECTION: Absolutely DO NOT change, update, or delete any element listed in '_lockedFields'. Keep them exactly as they are.
-5. OPTIMIZATION: Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
-6. OUTPUT LIMIT: Output ONLY the JSON block. Do not write any normal roleplay response or conversational text.`;
+   - STATUS vs PROFILE: STRICT SEPARATION.
+     > 'status': ONLY for numerical parameters or game-mechanics (type: consumable, stacking, integer).
+     > 'profile': EXCLUSIVELY for text-based descriptions (e.g., Race, Gender, Background). NEVER put numeric parameters here.
+   - Dynamic Value Scaling:
+     > Adjust status values proportionally based on the severity of narrative events and the parameter's min/max limits.
+     > Avoid abrupt or drastic jumps for minor incidents. Changes must be gradual and logical unless an extreme, game-changing event explicitly occurs.
+   - Text Parameters (type: text): Keep descriptions extremely concise (e.g., "Healthy", "Injured (Left Leg)").
+3. DYNAMIC ENTITIES:
+   - Minor NPCs: If no character card exists, update "targetDescription" and "targetMetrics" directly within their relation object.
+   - Quests & Events: Use consistent 'name' values to automatically merge updates and prevent duplication.
+4. LOCKS & OPTIMIZATION:
+   - Absolutely DO NOT change or delete any element listed in '_lockedFields'.
+   - Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
+5. OUTPUT LIMIT (STRICT):
+   - Output ONLY the JSON HTML comment block.
+   - Absolutely NO normal roleplay response, prefixes, conversational filler, or commentary is allowed.`;
