@@ -48,6 +48,7 @@ The core value of this extension is **eliminating the need to manually modify co
      * **Merged Mode:** Automatically injects the status schema and updates parameters in real-time during standard chat generation.
      * **Separated Mode (Recommended):** Injects your current tracker data into the prompt as read-only context so the LLM can reference it, but disables automatic updates. You must manually trigger parameter updates by clicking the **Update** button (Play icon) at the top of the sidebar.
      * **Isolated Mode:** Completely disables prompt injection during normal turns. Tracker updates are handled strictly on-demand by clicking the **Update** button (Play icon).
+<img src="https://github.com/Soyo5800/rpg-traker-for-sillytavern/blob/af0c34e7a0817e7086740ed2a7e55f6787a305ff/trackerguide1.png" width="100%" alt="trackerguide1">
 
 3. **Setup and Customize:**
 
@@ -61,6 +62,7 @@ The core value of this extension is **eliminating the need to manually modify co
    * **`Inject` Switch:** Controls whether this specific character's data is injected into the AI context. Turn off characters not currently present in the scene to save tokens.
    * **`Player` Switch:** Enables the **Inventory** and **Quests** tabs for this character. We recommend enabling this only for the active player character to avoid excessive token consumption.
    * **`Lock Icon` (🔒):** Located next to individual fields. When locked, the AI cannot modify or overwrite that field's value. Lock your configurations if you want to keep them static.
+   <img src="https://github.com/Soyo5800/rpg-traker-for-sillytavern/blob/af0c34e7a0817e7086740ed2a7e55f6787a305ff/trackerguide2.png" width="100%" alt="trackerguide2">
 
    ### 📊 Character Dashboard Tabs
    * **Status View (Default):** Displays customizable gauges (like HP or Fatigue), integers (like Level or core stats), and concise text boxes (like current temporary conditions).
@@ -70,6 +72,7 @@ The core value of this extension is **eliminating the need to manually modify co
      * *Editing:* Unlike other fields, Inventory must be edited through the interactive editor. Click **Open Editor** in the top-right of the tab or access it via the Gear Icon.
      * *Usage:* Fully interactive via drag-and-drop. You can create items inside storage containers and drag them onto equipment slots to equip them, or drag to reorder. (If you experience any drag-and-drop bugs on your platform, please submit feedback.)
    * **Quests View (Book Icon - Player Only):** Track your Main Quest and multiple Side Quests. Includes completion checkmarks and manual locks.
+   <img src="https://github.com/Soyo5800/rpg-traker-for-sillytavern/blob/af0c34e7a0817e7086740ed2a7e55f6787a305ff/trackerguide3.png" width="100%" alt="trackerguide3">
 
 4. **Chat Normally:** Enjoy your roleplay! The extension will run in the background. If you encounter any bugs, please leave your feedback.
 
@@ -88,6 +91,7 @@ If you want to attach a tracker to a specific message during your chat (designed
   * Click **`Edit JSON`** to directly inspect or manually customize the raw JSON payload.
   * Click **`Lock Data`** to validate and save your edits before attaching.
 * **`Attach Tracker` Button:** Saves the configuration and appends a hidden tag to the message text. This will display as a collapsible, clean metadata block labeled **Message Tracker** at the bottom of the chat message.
+<img src="https://github.com/Soyo5800/rpg-traker-for-sillytavern/blob/af0c34e7a0817e7086740ed2a7e55f6787a305ff/trackerguide4.png" width="100%" alt="trackerguide4">
 
 ---
 
