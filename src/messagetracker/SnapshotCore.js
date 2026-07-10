@@ -47,6 +47,9 @@ export function buildSnapshotPayload(targetData, selections, customNote) {
                 if (charSel.profile && char.profile && Object.keys(char.profile).length > 0) {
                     charData.profile = char.profile;
                 }
+                if (charSel.relations && char.relations && Object.keys(char.relations).length > 0) {
+                    charData.relations = char.relations;
+                }
                 if (charSel.inventory && char.inventory) {
                     charData.inventory = char.inventory;
                 }
@@ -65,7 +68,7 @@ export function buildSnapshotPayload(targetData, selections, customNote) {
         payload.chars = activeChars;
     }
 
-    // 3. 커스텀 노트 수집 (가장 마지막에 속하도록 순서 하단 이동)
+    // 3. 커스텀 노트 수집
     if (customNote && customNote.trim() !== "") {
         payload.note = customNote.trim();
     }
@@ -75,6 +78,5 @@ export function buildSnapshotPayload(targetData, selections, customNote) {
 
 export function generateSnapshotTag(payload) {
     if (!payload || Object.keys(payload).length === 0) return '';
-    // 마크다운 파서 및 DOMPurify 필터링에 구애받지 않고 화면에 완벽히 숨겨지도록 HTML 주석 사용
     return `\n\n<!-- <rpgmt>${JSON.stringify(payload)}</rpgmt> -->`;
 }

@@ -132,6 +132,33 @@ export const snapshotStyles = `
 </style>
 `;
 
+function formatSnapshotItem(item) {
+    if (!item) return '';
+    if (typeof item !== 'object') return String(item);
+
+    const type = item.type || 'general';
+    let formatted = item.name || 'Unknown';
+
+    if (type === 'currency') {
+        const qty = item.quantity !== undefined ? item.quantity : 0;
+        formatted += ` (${qty})`;
+    } else if (type === 'asset') {
+        const amount = item.assetValue?.amount || 0;
+        const currency = item.assetValue?.currencyName || 'Gold';
+        formatted += ` [Asset: ${amount} ${currency}]`;
+    } else {
+        if (item.quantity && item.quantity > 1) {
+            formatted += ` (x${item.quantity})`;
+        }
+    }
+
+    if (item.isContainer) {
+        formatted += ` [Container]`;
+    }
+
+    return formatted;
+}
+
 export function buildSnapshotHtml(payload) {
     if (!payload || Object.keys(payload).length === 0) return '';
 
@@ -211,7 +238,45 @@ export function buildSnapshotHtml(payload) {
                 }
             }
 
-            // C. Inventory (장비 및 소지품)
+            // C. Relations (관계 정보)
+            if (data.relations && Object.keys(data.relations).length > 0) {
+                let relationItems = [];
+                Object.entries(data.relations).forEach(([targetName, rData]) => {
+                    if (rData && typeof rData === 'object') {
+                        const metrics = rData.values || {};
+                        const metricsStr = Object.entries(metrics).map(([mName, mVal]) => {
+                            const val = typeof mVal === 'object' && mVal !== null ? mVal.value : mVal;
+                            return `${mName}: ${val}`;
+                        }).join(', ');
+                        
+                        const metricsPart = metricsStr ? `[${metricsStr}]` : '';
+                        const descPart = (rData.text && rData.text.trim() !== '') ? ` ${rData.text.trim()}` : '';
+                        
+                        if (metricsPart || descPart) {
+                            relationItems.push(`
+                                <li>
+                                    <span class="rpg-snapshot-key" style="opacity: 0.85;">➔ ${targetName}</span> 
+                                    <span class="rpg-snapshot-val">
+                                        ${metricsPart ? `<strong style="font-size: 0.9em; opacity: 0.95;">${metricsPart}</strong>` : ''} 
+                                        ${descPart}
+                                    </span>
+                                </li>
+                            `);
+                        }
+                    }
+                });
+
+                if (relationItems.length > 0) {
+                    charSectionsHtml += `
+                        <div class="rpg-snapshot-sub-group">
+                            <div class="rpg-snapshot-sub-title">Relations</div>
+                            <ul class="rpg-snapshot-list">${relationItems.join('')}</ul>
+                        </div>
+                    `;
+                }
+            }
+
+            // D. Inventory (장비 및 소지품)
             if (data.inventory) {
                 let invDetails = [];
                 
@@ -219,8 +284,8 @@ export function buildSnapshotHtml(payload) {
                 if (data.inventory.equipment && Object.keys(data.inventory.equipment).length > 0) {
                     Object.entries(data.inventory.equipment).forEach(([slot, item]) => {
                         if (item) {
-                            const itemName = typeof item === 'object' ? item.name : String(item);
-                            invDetails.push(`<li><span class="rpg-snapshot-key">[${slot}]</span> <span class="rpg-snapshot-val">${itemName}</span></li>`);
+                            const itemText = formatSnapshotItem(item);
+                            invDetails.push(`<li><span class="rpg-snapshot-key">[${slot}]</span> <span class="rpg-snapshot-val">${itemText}</span></li>`);
                         }
                     });
                 }
@@ -229,13 +294,7 @@ export function buildSnapshotHtml(payload) {
                 if (data.inventory.storage && Object.keys(data.inventory.storage).length > 0) {
                     Object.entries(data.inventory.storage).forEach(([container, items]) => {
                         if (Array.isArray(items) && items.length > 0) {
-                            const itemNames = items.map(i => {
-                                if (typeof i === 'object') {
-                                    const qty = i.quantity > 1 ? ` (x${i.quantity})` : '';
-                                    return `${i.name}${qty}`;
-                                }
-                                return String(i);
-                            }).join(', ');
+                            const itemNames = items.map(i => formatSnapshotItem(i)).join(', ');
                             invDetails.push(`<li><span class="rpg-snapshot-key">${container}:</span> <span class="rpg-snapshot-val">${itemNames}</span></li>`);
                         }
                     });
@@ -251,7 +310,7 @@ export function buildSnapshotHtml(payload) {
                 }
             }
 
-            // D. Quests (진행 중인 퀘스트)
+            // E. Quests (진행 중인 퀘스트)
             if (data.quests) {
                 let questItems = [];
                 if (data.quests.main && data.quests.main.name) {
@@ -288,7 +347,7 @@ export function buildSnapshotHtml(payload) {
         });
     }
 
-    // 3. Custom Note 렌더링 (가장 하단에 이모티콘 없이 깔끔한 배너로 표시)
+    // 3. Custom Note 렌더링
     if (payload.note) {
         contentHtml += `<div class="rpg-snapshot-note">Note: ${payload.note}</div>`;
     }
@@ -319,11 +378,9 @@ export function buildSnapshotHtml(payload) {
     `;
 }
 
-// DeltaLogRenderer와 동일하게 DOM이 아닌 SillyTavern의 메모리 메시지 배열에서 원본을 매칭하는 파서
 export function getMessageTrackerPayload(msg) {
     if (!msg || typeof msg.mes !== 'string') return null;
 
-    // 주석 처리된 rpgmt, 비주석 구형 rpgmt를 대소문자 가리지 않고 매칭
     const rpgmtRegex = /(?:<!--\s*)?(?:<|&lt;)rpgmt(?:>|&gt;)([\s\S]*?)(?:<|&lt;)\/rpgmt(?:>|&gt;)(?:\s*-->)?/i;
     const match = msg.mes.match(rpgmtRegex);
     if (match && match[1]) {
@@ -343,7 +400,6 @@ export function getMessageTrackerPayload(msg) {
         }
     }
 
-    // div 태그 형식의 마이그레이션 백업 대응
     const divRegex = /(?:<!--\s*)?<div\s+class="rpgmt-data">([\s\S]*?)<\/div>(?:\s*-->)?/i;
     const divMatch = msg.mes.match(divRegex);
     if (divMatch && divMatch[1]) {
@@ -394,7 +450,6 @@ export function renderMessageTrackers(getContext) {
                 continue;
             }
 
-            // 이미 화면에 렌더링된 컴포넌트가 있다면 중복 주입 방지를 위해 생략
             if ($msgEl.find('.rpg-snapshot-container').length > 0) {
                 continue;
             }
@@ -405,7 +460,6 @@ export function renderMessageTrackers(getContext) {
                 if ($target.length === 0) {
                     $msgEl.append(trackerHtml);
                 } else {
-                    // 혹시라도 DOM 상에 불필요한 태그 파편 텍스트 노드가 남아있다면 안전하게 소거
                     $target.contents().each(function() {
                         if (this.nodeType === Node.TEXT_NODE && /rpgmt/i.test(this.nodeValue)) {
                             this.nodeValue = '';

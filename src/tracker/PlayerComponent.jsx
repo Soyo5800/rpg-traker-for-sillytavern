@@ -1,4 +1,3 @@
-// src/tracker/PlayerComponent.jsx
 import React from 'react';
 import styles from './PlayerComponent.module.css';
 import { LockIcon, CheckIcon } from '../Icons';
@@ -10,21 +9,30 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
 
   const inventory = char.inventory || {
     equipment: { right_hand: null, left_hand: null },
-    storage: { backpack: [], pouch: [] }
+    storage: { backpack: [], pouch: [] },
+    storageLocks: {}
   };
   const quests = char.quests || {
     main: { name: '', desc: '' },
     sides: []
   };
 
-  // --- Quests Handler ---
   const handleUpdateMainQuest = (key, value) => {
     patchCharacterField(char.id, ['quests', 'main', key], value);
   };
 
   const handleAddSideQuest = () => {
     const currentSides = quests.sides || [];
-    patchCharacterField(char.id, ['quests', 'sides'], [...currentSides, { id: `quest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`, name: '', desc: '', isCompleted: false, isLocked: false }]);
+    patchCharacterField(char.id, ['quests', 'sides'], [
+      ...currentSides,
+      {
+        id: `quest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        name: '',
+        desc: '',
+        isCompleted: false,
+        isLocked: false
+      }
+    ]);
   };
 
   const handleUpdateSideQuest = (id, key, value) => {
@@ -42,7 +50,6 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
 
   return (
     <div className={styles.tabContentStack}>
-      {/* C. INVENTORY TAB */}
       {activeTabs.inventory && (
         <div className={styles.inlineTabContent}>
           <div className={styles.inlineHeaderLabelRow}>
@@ -59,6 +66,7 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
           </div>
 
           <div className={styles.sidebarInventoryGrid}>
+            
             <div className={styles.sidebarSection}>
               <div className={styles.sidebarSectionHeader}>
                 <div className={styles.sidebarSectionTitleRow}>
@@ -89,7 +97,12 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
                       {slotKey.charAt(0).toUpperCase() + slotKey.slice(1).replace('_', ' ')}
                     </span>
                     <div className={styles.itemInfoStack}>
-                      <span className={styles.itemSidebarText}>{item ? item.name : 'Empty'}</span>
+                      <span className={styles.itemSidebarText}>
+                        {item ? item.name : 'Empty'}
+                        {item && item.isContainer && (
+                          <span className={styles.containerBadge}>Container</span>
+                        )}
+                      </span>
                       {item && item.desc && (
                         <span className={styles.itemSidebarDescText}>
                           {item.desc}
@@ -104,12 +117,7 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
             <div className={styles.sidebarSection}>
               <div className={styles.sidebarSectionHeader}>
                 <div className={styles.sidebarSectionTitleRow}>
-                  <LockIcon
-                    isLocked={inventory.storageIsLocked}
-                    onClick={() => patchCharacterField(char.id, ['inventory', 'storageIsLocked'], !inventory.storageIsLocked)}
-                    className={`${styles.lockIcon} ${inventory.storageIsLocked ? styles.lockIconActive : ''}`}
-                  />
-                  <span className={styles.sidebarSectionTitle}>Storage</span>
+                  <span className={styles.sidebarSectionTitle}>Storage Containers</span>
                 </div>
                 <label className={styles.switchRow} title="Toggle Prompt Injection">
                   <span>Inject</span>
@@ -127,24 +135,53 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
               <div className={styles.sideBySideRow}>
                 {Object.entries(inventory.storage || {}).map(([storageKey, items]) => {
                   const itemList = Array.isArray(items) ? items : [];
+                  const isContainerLocked = inventory.storageLocks?.[storageKey] || false;
                   return (
                     <div key={storageKey} className={styles.sidebarStorageSlot}>
-                      <span className={styles.slotSmallLabel}>
-                        {storageKey.charAt(0).toUpperCase() + storageKey.slice(1)} ({itemList.length})
-                      </span>
+                      <div className={styles.sidebarStorageHeaderRow}>
+                        <span className={styles.slotSmallLabel} style={{ margin: 0 }}>
+                          {storageKey.charAt(0).toUpperCase() + storageKey.slice(1)} ({itemList.length})
+                        </span>
+                        <LockIcon
+                          isLocked={isContainerLocked}
+                          onClick={() => patchCharacterField(char.id, ['inventory', 'storageLocks', storageKey], !isContainerLocked)}
+                          className={`${styles.lockIcon} ${isContainerLocked ? styles.lockIconActive : ''}`}
+                          size={11}
+                        />
+                      </div>
                       <div className={styles.sidebarStorageList}>
-                        {itemList.map((item, idx) => (
-                          <div key={item.id || idx} className={styles.storageItemBlock} title={item.desc || ''}>
-                            <span className={styles.itemSidebarText}>
-                              • {item.name || '(Unnamed)'} {item.quantity > 1 ? `(${item.quantity})` : ''}
-                            </span>
-                            {item.desc && (
-                              <span className={styles.itemSidebarDescTextIndented}>
-                                {item.desc}
-                              </span>
-                            )}
-                          </div>
-                        ))}
+                        {itemList.map((item, idx) => {
+                          const itemType = item.type || 'general';
+                          return (
+                            <div key={item.id || idx} className={`${styles.storageItemBlock} ${styles[itemType]}`} title={item.desc || ''}>
+                              <div className={styles.itemMainLine}>
+                                <span className={styles.itemBullet}>&bull;</span>
+                                <span className={styles.itemSidebarText}>
+                                  {item.name || '(Unnamed)'}
+                                </span>
+                                
+                                {itemType === 'general' && item.quantity > 1 && (
+                                  <span className={styles.qtyBadge}>x{item.quantity}</span>
+                                )}
+                                {itemType === 'currency' && (
+                                  <span className={styles.currencyBadge}>
+                                    {item.quantity !== undefined ? item.quantity : 0}
+                                  </span>
+                                )}
+                                {itemType === 'asset' && (
+                                  <span className={styles.assetBadge}>
+                                    {item.assetValue?.amount || 0} {item.assetValue?.currencyName || 'Gold'}
+                                  </span>
+                                )}
+                              </div>
+                              {itemType !== 'currency' && item.desc && (
+                                <span className={styles.itemSidebarDescTextIndented}>
+                                  {item.desc}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                         {itemList.length === 0 && <span className={styles.emptyTextIndicator}>No items</span>}
                       </div>
                     </div>
@@ -152,11 +189,11 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
                 })}
               </div>
             </div>
+
           </div>
         </div>
       )}
 
-      {/* D. QUESTS TAB */}
       {activeTabs.quests && (
         <div className={styles.inlineTabContent}>
           <div className={styles.inlineHeaderLabelRow}>
@@ -210,7 +247,7 @@ export default function PlayerComponent({ char, activeTabs, onOpenEditor }) {
                   <div className={styles.questSideHeaderRow}>
                     <span className={styles.questSideIndex}>Side Quest {idx + 1}</span>
                     <button type="button" className={styles.questSideRemoveBtn} onClick={() => handleRemoveSideQuest(q.id)}>
-                      ×
+                      &times;
                     </button>
                   </div>
                   <div className={styles.questHeaderRow}>

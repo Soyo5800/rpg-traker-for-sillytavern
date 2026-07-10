@@ -1,8 +1,5 @@
 // src/core/ActivePrompt.js
 
-/**
- * [1-2] 정의 프롬프트 최종 문자열 생성
- */
 export function buildStaticDefinitionsPrompt(trackerData) {
   const globalDefs = trackerData.globalDefinitions || {};
   const lines = [];
@@ -31,13 +28,10 @@ export function buildStaticDefinitionsPrompt(trackerData) {
   if (lines.length === 0) return '';
 
   return `\n### RPG TRACKER - STATUS DEFINITIONS\n` +
-         `The following parameters govern active characters. Interpret behaviors based on these guidelines:\n` +
-         `${lines.join('\n')}\n`;
+    `The following parameters govern active characters. Interpret behaviors based on these guidelines:\n` +
+    `${lines.join('\n')}\n`;
 }
 
-/**
- * 마스터 스위치 상태를 가져오는 헬퍼 함수
- */
 export function getMasterSwitches(guidePrompts = []) {
   const isEnabled = (id, def = true) => {
     const found = guidePrompts.find(g => g.id === id);
@@ -58,17 +52,13 @@ export function getMasterSwitches(guidePrompts = []) {
   };
 }
 
-/**
- * 동적 JSON 스키마 예시 생성
- */
 export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
   const guidePrompts = trackerData.guidePrompts || [];
   const characters = trackerData.characters || [];
   const ms = getMasterSwitches(guidePrompts);
 
-  // forcePlayer가 명시적으로 불리언으로 주어지면 그에 맞게 hasActivePlayer를 결정하고, 그렇지 않으면 기본 탐색 방식을 따름
-  const hasActivePlayer = forcePlayer !== null 
-    ? forcePlayer 
+  const hasActivePlayer = forcePlayer !== null
+    ? forcePlayer
     : characters.some(char => char.isActive !== false && char.activeInjection !== false && char.activePlayer === true);
 
   const charSchema = {};
@@ -103,15 +93,24 @@ export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
 
   if (ms.inventory && hasActivePlayer) {
     charSchema.inventory = {
-      "equipment": { "Slot": "Item Name" },
-      "storage": { "Container": [ "Item Name" ] }
+      "equipment": {
+        "Slot": { "id": "item_id", "type": "general", "name": "Item Name", "desc": "Description" },
+        "Back": { "id": "container_backpack", "type": "general", "name": "Leather Backpack", "isContainer": true, "storageKey": "Backpack" }
+      },
+      "storage": {
+        "Container": [
+          { "id": "item_id", "type": "general", "name": "Health Potion", "quantity": 5, "desc": "Restores 50 HP" },
+          { "id": "item_id", "type": "currency", "name": "Gold", "quantity": 150 },
+          { "id": "item_id", "type": "asset", "name": "Small Cabin", "assetValue": { "amount": 1200, "currencyName": "Gold" }, "desc": "A quiet wooden house" }
+        ]
+      }
     };
   }
 
   if (ms.quests && hasActivePlayer) {
     charSchema.quests = {
       "main": { "name": "Quest Name", "description": "Details", "status": "ACTIVE (or COMPLETED)" },
-      "sideQuests": [ { "name": "Side Quest", "description": "Details", "status": "ACTIVE (or COMPLETED)" } ]
+      "sideQuests": [{ "name": "Side Quest", "description": "Details", "status": "ACTIVE (or COMPLETED)" }]
     };
   }
 
@@ -135,39 +134,58 @@ export function getDynamicSchemaExample(trackerData, forcePlayer = null) {
   return `\n<!--RPG_TRACKER\n\`\`\`json\n${JSON.stringify(fullSchema, null, 2)}\n\`\`\`\n-->\n`;
 }
 
-/**
- * [2] 동적 상태값 생성
- * - 체크가 켜진 캐릭터의 실시간 수치, 프로필, 관계 데이터를 JSON 형식으로 가공하여 전송합니다.
- * - 마스터 스위치 상태를 우선하여 필터링합니다.
- */
 export function buildDynamicValuesPrompt(trackerData) {
   const characters = trackerData.characters || [];
   const ms = getMasterSwitches(trackerData.guidePrompts || []);
   const activeData = {};
 
-  // World State
   const worldFields = {};
   if (trackerData.worldState) {
     const ws = trackerData.worldState;
-    if (ms.world_date) worldFields["date"] = ws.date || "";
-    if (ms.world_time) worldFields["time"] = ws.time || "";
-    if (ms.world_weather) worldFields["weather"] = ws.weather || "";
-    if (ms.world_location) worldFields["location"] = ws.location || "";
+    const wSchema = trackerData.worldSchema || {};
+    if (ms.world_date) {
+      worldFields["date"] = (ws.date && String(ws.date).trim() !== '')
+        ? ws.date
+        : `<new_value (type: text. format: ${wSchema.dateCustom || 'yyyy-mm-dd'})>`;
+    }
+    if (ms.world_time) {
+      worldFields["time"] = (ws.time && String(ws.time).trim() !== '')
+        ? ws.time
+        : `<new_value (type: text. format: ${wSchema.timeCustom || '14:30'})>`;
+    }
+    if (ms.world_weather) {
+      worldFields["weather"] = (ws.weather && String(ws.weather).trim() !== '')
+        ? ws.weather
+        : `<new_value (type: text. format: ${wSchema.weatherCustom || 'Clear/Cloudy...'})>`;
+    }
+    if (ms.world_location) {
+      worldFields["location"] = (ws.location && String(ws.location).trim() !== '')
+        ? ws.location
+        : `<new_value (type: text. format: ${wSchema.locationCustom || 'Current Location'})>`;
+    }
     if (ms.world_events) {
-      worldFields["events"] = Array.isArray(ws.events) ? ws.events.map(e => typeof e === 'string' ? { name: '', desc: e } : { name: e.name || '', desc: e.desc || '' }).slice(-5) : [];
+      const eventsList = Array.isArray(ws.events) ? ws.events : [];
+      if (eventsList.length > 0) {
+        worldFields["events"] = eventsList.map(e => typeof e === 'string' ? { name: '', desc: e } : { name: e.name || '', desc: e.desc || '' });
+      } else {
+        worldFields["events"] = [
+          { name: "<new_value (type: text. Event name)>", desc: "<new_value (type: text. Event description)>" }
+        ];
+      }
     }
   }
-  
+
   if (Object.keys(worldFields).length > 0) {
     activeData["World"] = worldFields;
   }
+
+  const existingCharNames = characters.map(c => c.name?.trim());
 
   characters.forEach((char) => {
     if (char.isActive !== false && char.activeInjection !== false) {
       const charInfo = {};
       const lockedFields = [];
 
-      // 1. Stats
       if (ms.status) {
         const schemas = char.statusSchema || [];
         const statusMap = char.status || {};
@@ -176,16 +194,17 @@ export function buildDynamicValuesPrompt(trackerData) {
         schemas.forEach((schema) => {
           if (schema.isInject !== false) {
             const value = statusMap[schema.id];
-            const displayVal = value !== undefined 
-              ? value 
-              : (['stacking', 'consumable'].includes(schema.type) ? (schema.max || 100) : 0);
-            
             const key = schema.name || schema.id;
-            statusObj[key] = displayVal;
 
-            if (schema.isLocked) {
-              lockedFields.push(`status.${key}`);
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              statusObj[key] = value;
+            } else {
+              const minLimit = schema.min !== undefined ? schema.min : 0;
+              const maxLimit = schema.max !== undefined ? schema.max : 100;
+              statusObj[key] = `<new_value (type: ${schema.type || 'integer'}, min: ${minLimit}, max: ${maxLimit})>`;
             }
+
+            if (schema.isLocked) lockedFields.push(`status.${key}`);
           }
         });
         if (Object.keys(statusObj).length > 0) {
@@ -193,19 +212,21 @@ export function buildDynamicValuesPrompt(trackerData) {
         }
       }
 
-      // 2. Profile
       if (ms.profile) {
         const profile = char.profile || {};
         const profileInjects = char.profileInjects || {};
         const profileLocks = char.profileLocks || {};
         const profileObj = {};
-        
+
         Object.keys(profile).forEach(key => {
           if (profileInjects[key] !== false) {
-            profileObj[key] = profile[key];
-            if (profileLocks[key]) {
-              lockedFields.push(`profile.${key}`);
+            const value = profile[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              profileObj[key] = value;
+            } else {
+              profileObj[key] = `<new_value (type: text. Describe ${key})>`;
             }
+            if (profileLocks[key]) lockedFields.push(`profile.${key}`);
           }
         });
         if (Object.keys(profileObj).length > 0) {
@@ -213,35 +234,53 @@ export function buildDynamicValuesPrompt(trackerData) {
         }
       }
 
-      // 3. Relations
       if (ms.relations) {
         const relations = char.relations || {};
         const relationsObj = {};
-        const existingCharNames = characters.map(c => c.name?.trim());
+
         Object.entries(relations).forEach(([targetName, rData]) => {
           if (rData.isInject !== false) {
             const metrics = {};
             if (rData.values) {
               Object.entries(rData.values).forEach(([mName, mVal]) => {
                 const isObj = typeof mVal === 'object' && mVal !== null;
-                metrics[mName] = isObj ? mVal.value : mVal;
+                const val = isObj ? mVal.value : mVal;
+                const minLimit = isObj && mVal.min !== undefined ? mVal.min : -100;
+                const maxLimit = isObj && mVal.max !== undefined ? mVal.max : 100;
+
+                if (val !== undefined && val !== null && String(val).trim() !== '') {
+                  metrics[mName] = val;
+                } else {
+                  metrics[mName] = `<new_value (type: integer, min: ${minLimit}, max: ${maxLimit})>`;
+                }
               });
             }
+
             relationsObj[targetName] = {
               metrics,
-              description: rData.text || ""
+              description: (rData.text && rData.text.trim() !== '')
+                ? rData.text
+                : `<new_value (type: text. Emotions/impressions toward ${targetName})>`
             };
 
-            // 상대방 캐릭터가 실존하지 않는 경우 독립 쌍방 데이터(targetText, targetValues)를 추가로 인젝션해 줍니다.
             if (!existingCharNames.includes(targetName?.trim())) {
-              if (rData.targetText) {
-                relationsObj[targetName].targetDescription = rData.targetText;
-              }
+              relationsObj[targetName].targetDescription = (rData.targetText && rData.targetText.trim() !== '')
+                ? rData.targetText
+                : `<new_value (type: text. How ${targetName} feels about this character)>`;
+
               if (rData.targetValues) {
                 const targetMetrics = {};
                 Object.entries(rData.targetValues).forEach(([tmName, tmVal]) => {
                   const isObj = typeof tmVal === 'object' && tmVal !== null;
-                  targetMetrics[tmName] = isObj ? tmVal.value : tmVal;
+                  const val = isObj ? tmVal.value : tmVal;
+                  const minLimit = isObj && tmVal.min !== undefined ? tmVal.min : -100;
+                  const maxLimit = isObj && tmVal.max !== undefined ? tmVal.max : 100;
+
+                  if (val !== undefined && val !== null && String(val).trim() !== '') {
+                    targetMetrics[tmName] = val;
+                  } else {
+                    targetMetrics[tmName] = `<new_value (type: integer, min: ${minLimit}, max: ${maxLimit})>`;
+                  }
                 });
                 if (Object.keys(targetMetrics).length > 0) {
                   relationsObj[targetName].targetMetrics = targetMetrics;
@@ -249,9 +288,7 @@ export function buildDynamicValuesPrompt(trackerData) {
               }
             }
 
-            if (rData.isLocked) {
-              lockedFields.push(`relations.${targetName}`);
-            }
+            if (rData.isLocked) lockedFields.push(`relations.${targetName}`);
           }
         });
         if (Object.keys(relationsObj).length > 0) {
@@ -259,75 +296,110 @@ export function buildDynamicValuesPrompt(trackerData) {
         }
       }
 
-      // 4. Inventory & Quests (Only for activePlayer and if Master Switches are ON)
       if (char.activePlayer === true) {
-        // Inventory
-        if (ms.inventory) {
-          const inventory = char.inventory;
-          if (inventory) {
-            const equip = inventory.equipment || {};
-            const storage = inventory.storage || {};
-            const invObj = {};
-            
-            if (inventory.equipIsInject !== false) {
-              const equipObj = {};
-              Object.entries(equip).forEach(([slot, item]) => {
-                if (item) {
-                  equipObj[slot] = item.desc ? `${item.name} (${item.desc})` : item.name;
+        if (ms.inventory && char.inventory) {
+          const inv = char.inventory;
+          const invObj = {};
+
+          if (inv.equipIsInject !== false) {
+            const equipObj = {};
+            Object.entries(inv.equipment || {}).forEach(([slot, item]) => {
+              if (item && item.name && String(item.name).trim() !== '') {
+                const itemType = item.type || 'general';
+                const base = { id: item.id, type: itemType, name: item.name };
+
+                if (itemType === 'currency') {
+                  base.quantity = item.quantity !== undefined ? item.quantity : 0;
+                } else if (itemType === 'asset') {
+                  base.assetValue = item.assetValue || { amount: 0, currencyName: "Gold" };
+                  base.desc = item.desc || '';
                 } else {
-                  equipObj[slot] = 'Empty';
+                  base.quantity = item.quantity !== undefined ? item.quantity : 1;
+                  base.desc = item.desc || '';
                 }
-              });
-              invObj.equipment = equipObj;
-              if (inventory.equipIsLocked) lockedFields.push(`inventory.equipment`);
-            }
 
-            if (inventory.storageIsInject !== false) {
-              const storageObj = {};
-              Object.entries(storage).forEach(([container, items]) => {
-                storageObj[container] = (Array.isArray(items) ? items : []).map(i => {
-                  const qtyStr = i.quantity > 1 ? `x${i.quantity}` : '';
-                  const descStr = (i.desc || i.description) ? ` (${i.desc || i.description})` : '';
-                  return `${i.name}${qtyStr}${descStr}`;
+                if (item.isContainer) {
+                  base.isContainer = true;
+                  base.storageKey = item.storageKey;
+                }
+                equipObj[slot] = base;
+              } else {
+                equipObj[slot] = "Empty";
+              }
+              if (inv.equipmentLocks?.[slot] === true) {
+                lockedFields.push(`inventory.equipment.${slot}`);
+              }
+            });
+            invObj.equipment = equipObj;
+            if (inv.equipIsLocked) lockedFields.push(`inventory.equipment`);
+          }
+
+          if (inv.storageIsInject !== false) {
+            const storageObj = {};
+            Object.entries(inv.storage || {}).forEach(([container, items]) => {
+              const itemList = Array.isArray(items) ? items : [];
+              if (itemList.length > 0) {
+                storageObj[container] = itemList.map(i => {
+                  const itemType = i.type || 'general';
+                  const base = { id: i.id, type: itemType, name: i.name };
+
+                  if (itemType === 'currency') {
+                    base.quantity = i.quantity || 0;
+                  } else if (itemType === 'asset') {
+                    base.assetValue = i.assetValue || { amount: 0, currencyName: "Gold" };
+                    base.desc = i.desc || '';
+                  } else {
+                    base.quantity = i.quantity || 1;
+                    base.desc = i.desc || '';
+                  }
+                  return base;
                 });
-              });
-              invObj.storage = storageObj;
-              if (inventory.storageIsLocked) lockedFields.push(`inventory.storage`);
-            }
+              } else {
+                storageObj[container] = [];
+              }
 
-            if (Object.keys(invObj).length > 0) {
-              charInfo.inventory = invObj;
-            }
+              if (inv.storageLocks?.[container] === true) {
+                lockedFields.push(`inventory.storage.${container}`);
+              }
+            });
+            invObj.storage = storageObj;
+            if (inv.storageIsLocked) lockedFields.push(`inventory.storage`);
+          }
+
+          if (Object.keys(invObj).length > 0) {
+            charInfo.inventory = invObj;
           }
         }
 
-        // Quests
-        if (ms.quests) {
-          const quests = char.quests;
-          if (quests) {
-             const questObj = {
-               main: {
-                 name: quests.main?.name || '',
-                 description: quests.main?.desc || '',
-                 status: quests.main?.isCompleted ? 'COMPLETED' : 'ACTIVE'
-               },
-               sideQuests: (quests.sides || []).map(q => ({ 
-                 name: q.name, 
-                 description: q.desc || '',
-                 status: q.isCompleted ? 'COMPLETED' : 'ACTIVE'
-               }))
-             };
-             charInfo.quests = questObj;
-             
-             if (quests.main?.isLocked) {
-               lockedFields.push('quests.main');
-             }
-             (quests.sides || []).forEach((q, qIdx) => {
-               if (q.isLocked) {
-                 lockedFields.push(`quests.sideQuests.${qIdx}`);
-               }
-             });
-          }
+        if (ms.quests && char.quests) {
+          const q = char.quests;
+          const qObj = {};
+
+          const mainName = q.main?.name?.trim();
+          qObj.main = {
+            name: mainName ? mainName : `<new_value (type: text. Active main quest name)>`,
+            description: q.main?.desc?.trim() ? q.main.desc : `<new_value (type: text. Quest details)>`,
+            status: mainName ? (q.main?.isCompleted ? 'COMPLETED' : 'ACTIVE') : `<new_value (type: text. "ACTIVE" or "COMPLETED")>`
+          };
+          if (q.main?.isLocked) lockedFields.push('quests.main');
+
+          const sideQuestsList = Array.isArray(q.sides) ? q.sides : [];
+          qObj.sideQuests = sideQuestsList.length > 0 ? sideQuestsList.map((sq, qIdx) => {
+            if (sq.isLocked) lockedFields.push(`quests.sideQuests.${qIdx}`);
+            return {
+              name: sq.name,
+              description: sq.desc || '',
+              status: sq.isCompleted ? 'COMPLETED' : 'ACTIVE'
+            };
+          }) : [
+            {
+              name: `<new_value (type: text. Side quest name)>`,
+              description: `<new_value (type: text. Side quest details)>`,
+              status: `<new_value (type: text. "ACTIVE" or "COMPLETED")>`
+            }
+          ];
+
+          charInfo.quests = qObj;
         }
       }
 
@@ -346,31 +418,23 @@ export function buildDynamicValuesPrompt(trackerData) {
   return `\n[RPG Live Status]\n\`\`\`json\n${JSON.stringify(activeData, null, 2)}\n\`\`\`\n`;
 }
 
-/**
- * [3] 최종 시스템/정의 프롬프트 생성 (STORY_STRING 주입용)
- */
 export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', footerPrompt = '', forcePlayer = null) {
   const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
-  
-  // 커스텀 가이드 프롬프트 & 애드온 프롬프트 처리
+
   const guidePromptsData = trackerData.guidePrompts || [];
   const activeGuides = guidePromptsData.filter(g => g.enabled && g.prompt && g.prompt.trim() !== '').map(g => `- ${g.prompt.trim()}`);
-  
+
   const addons = trackerData.addons || {};
   if (addons.cyoa) activeGuides.push("- CYOA Mode: Act as an interactive adventure where you present choices to the player at the end of each response.");
   if (addons.weather) activeGuides.push("- Dynamic Weather: Include weather changes and environmental descriptions.");
   if (addons.worldEvents) activeGuides.push("- World Events: Generate random world events that affect the current situation.");
-  
-  const addonSection = activeGuides.length > 0 
-    ? `\n### SPECIAL INSTRUCTIONS / ACTIVE ADD-ONS\n${activeGuides.join('\n')}\n` 
-    : '';
 
-  // 동적 스키마 생성
-  const schemaBlock = getDynamicSchemaExample(trackerData, forcePlayer);
+  const addonSection = activeGuides.length > 0
+    ? `\n### SPECIAL INSTRUCTIONS / ACTIVE ADD-ONS\n${activeGuides.join('\n')}\n`
+    : '';
 
   const finalPrompt = [
     headerPrompt,
-    schemaBlock,
     footerPrompt,
     addonSection,
     staticDefs
@@ -379,9 +443,6 @@ export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', foo
   return finalPrompt;
 }
 
-/**
- * [4] 최종 상태 프롬프트 생성 (IN_CHAT 주입용)
- */
 export function buildStatusPromptWrapper(trackerData) {
   const dynamicVals = buildDynamicValuesPrompt(trackerData);
   return dynamicVals;

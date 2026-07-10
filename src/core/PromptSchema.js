@@ -57,6 +57,8 @@ export const getDefaultCharacters = () => {
         equipIsInject: true,
         storageIsLocked: false,
         storageIsInject: true,
+        equipmentLocks: {}, // 슬롯 단위의 미세 제어 잠금
+        storageLocks: {},   // 컨테이너 단위의 미세 제어 잠금
         equipment: { 'Right Hand': null, 'Left Hand': null },
         storage: { 'Backpack': [] }
       },
@@ -86,7 +88,12 @@ export const DEFAULT_ADD_PLAYER_CHAR_PROMPT = `Based on the chat log, create a p
 CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-based descriptive profile features.
 1. 'status': Put ALL numeric/integer status parameters and variables used for rolls, mechanics, or tests (e.g., Strength, Agility, Level, etc.) inside the 'status' object. Formatted as "value (type: integer, min: 0, max: 100)".
 2. 'profile': Keep 'profile' EXCLUSIVELY for text-based, non-numerical descriptions (e.g., Race, Gender, Height, Appearance, Personality, Background). Do NOT put any numeric/integer status parameters here.
-Create suitable status, profile features, relations (including 'targetDescription' to define what the target thinks about this character), starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
+3. 'inventory': Generate starting items. Differentiate item types:
+   - "general": Standard items with 'quantity' and 'desc'.
+   - "currency": Wealth items (e.g. Gold) with only 'quantity' (amount) and no desc.
+   - "asset": Valuable properties (e.g. House) with 'assetValue' (object containing amount and currencyName) and 'desc'.
+   Any storage container equipped in an equipment slot must have 'isContainer: true' and a matching 'storageKey' referring to the storage key.
+Create suitable status, profile features, relations, starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
 
 export const getInitialTrackerData = () => {
   return {
@@ -112,21 +119,21 @@ At the VERY BEGINNING of your response, you MUST output a JSON code block wrappe
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_MERGED = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logically update the RPG tracker.
+1. ROLE & HYBRID FORMAT: Act as the Game Master. The provided JSON block serves as both the CURRENT STATE and the REQUIRED SCHEMA.
+   - Values containing "<new_value...>" are blank placeholders. You MUST generate and fill in appropriate new data matching the format/type requirements.
+   - Fields containing actual values are the active state. Do NOT output placeholder instructions for these; update their values logically based on narrative events.
 2. REASONING RULES (CRITICAL):
    - STATUS vs PROFILE: STRICT SEPARATION.
      > 'status': ONLY for numerical parameters or game-mechanics (type: consumable, stacking, integer).
-     > 'profile': EXCLUSIVELY for text-based descriptions (e.g., Race, Gender, Background). NEVER put numeric parameters here.
-   - Dynamic Value Scaling:
-     > Adjust status values proportionally based on the severity of narrative events and the parameter's min/max limits.
-     > Avoid abrupt or drastic jumps for minor incidents. Changes must be gradual and logical unless an extreme, game-changing event explicitly occurs.
+     > 'profile': EXCLUSIVELY for text-based descriptions. NEVER put numeric parameters here.
    - Text Parameters (type: text): Keep descriptions extremely concise (e.g., "Healthy", "Injured (Left Leg)").
 3. DYNAMIC ENTITIES:
-   - Minor NPCs: If no character card exists, update "targetDescription" and "targetMetrics" directly within their relation object.
-   - Quests & Events: Use consistent 'name' values to automatically merge updates and prevent duplication.
+   - Minor NPCs: If no separate card exists, update "targetDescription" and "targetMetrics" directly within their relation object.
+   - Quests & Events: Use consistent 'name' values to automatically merge updates. Use status "COMPLETED" or "ACTIVE".
+   - Inventory: Diligently reflect item gains, losses, and equipment changes. Support standard items ("type": "general"), monetary units ("type": "currency"), and valuable properties ("type": "asset").
 4. LOCKS & OPTIMIZATION:
    - Absolutely DO NOT change or delete any element listed in '_lockedFields'.
-   - Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
+   - If there are NO updates for a section (like 'inventory', 'quests', or a specific character), completely OMIT that section from the JSON. Do NOT output empty objects like "inventory": {}.
 5. OUTPUT FORMAT (STRICT):
    - The HTML comment block (\`<!--RPG_TRACKER...\`) MUST be the VERY FIRST thing in your response.
    - Absolutely NO conversational filler or prefixes before the JSON block.
@@ -137,22 +144,17 @@ You MUST output ONLY a JSON code block wrapped inside an HTML comment with the '
 Strictly follow this layout:`;
 
 export const DEFAULT_PROMPT_FOOTER_SEP = `[SYSTEM RULES & GUIDELINES]
-1. ROLE: Act as the Game Master. Analyze the latest chat log to logically update the RPG tracker.
+1. ROLE & HYBRID FORMAT: Act as the Game Master. The provided JSON represents both the CURRENT STATE and the REQUIRED SCHEMA.
+   - Values with "<new_value...>" are placeholders. You MUST generate and fill in valid data replacing the placeholder entirely.
+   - Fields with actual data represent the active state; update them logically if context dictates, maintaining their data format.
 2. REASONING RULES (CRITICAL):
    - STATUS vs PROFILE: STRICT SEPARATION.
-     > 'status': ONLY for numerical parameters or game-mechanics (type: consumable, stacking, integer).
-     > 'profile': EXCLUSIVELY for text-based descriptions (e.g., Race, Gender, Background). NEVER put numeric parameters here.
-   - Dynamic Value Scaling:
-     > Adjust status values proportionally based on the severity of narrative events and the parameter's min/max limits.
-     > Avoid abrupt or drastic jumps for minor incidents. Changes must be gradual and logical unless an extreme, game-changing event explicitly occurs.
-   - Text Parameters (type: text): Keep descriptions extremely concise (e.g., "Healthy", "Injured (Left Leg)").
-3. DYNAMIC ENTITIES:
-   - Minor NPCs: If no character card exists, update "targetDescription" and "targetMetrics" directly within their relation object.
-   - Quests & Events: Use consistent 'name' values to automatically merge updates and prevent duplication.
-4. LOCKS & OPTIMIZATION:
+     > 'status': ONLY numerical parameters.
+     > 'profile': ONLY text descriptions.
+3. LOCKS & OPTIMIZATION:
    - Absolutely DO NOT change or delete any element listed in '_lockedFields'.
-   - Omit entire sections (like 'inventory' or 'quests') if absolutely NO updates occurred.
-5. OUTPUT LIMIT (STRICT):
+   - Omit entire sections if absolutely NO updates occurred.
+4. OUTPUT LIMIT (STRICT):
    - Output ONLY the JSON HTML comment block.
    - Absolutely NO normal roleplay response, prefixes, conversational filler, or commentary is allowed.`;
 

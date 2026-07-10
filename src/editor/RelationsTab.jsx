@@ -10,6 +10,7 @@ export default function RelationsTab({
   const [relationMin, setRelationMin] = useState(-100);
   const [relationMax, setRelationMax] = useState(100);
 
+  // [1] 내 관점 수정 핸들러 (내 데이터를 갱신)
   const handleUpdateRelations = (targetName, action, data) => {
     setLocalCharacters(localCharacters.map(c => {
       if (c.id !== charId) return c;
@@ -32,64 +33,120 @@ export default function RelationsTab({
         : { text: '', targetText: '', isLocked: false, isInject: true, values: {}, targetValues: {} };
 
       if (action === 'updateField') {
-        if (data.field === 'text') {
-          targetData.text = data.value;
-        } else if (data.field === 'targetText') {
-          targetData.targetText = data.value;
-        } else {
-          const old = targetData.values[data.field];
-          if (typeof old === 'object' && old !== null) {
-            targetData.values[data.field] = { ...old, value: data.value };
-          } else {
-            targetData.values[data.field] = { value: data.value, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
-          }
-        }
-      } else if (action === 'updateTargetMetricField') {
-        targetData.targetValues = targetData.targetValues || {};
-        const old = targetData.targetValues[data.field];
+        targetData.text = data.value;
+      } else if (action === 'updateMetricValue') {
+        const old = targetData.values[data.field];
         if (typeof old === 'object' && old !== null) {
-          targetData.targetValues[data.field] = { ...old, value: data.value };
+          targetData.values[data.field] = { ...old, value: data.value };
         } else {
-          targetData.targetValues[data.field] = { value: data.value, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
+          targetData.values[data.field] = { value: data.value, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
         }
       } else if (action === 'updateMetricConfig') {
         const mKey = data.metric;
         const old = targetData.values[mKey];
         const currentObj = typeof old === 'object' && old !== null ? old : { value: old || 0, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
         targetData.values[mKey] = { ...currentObj, ...data.config };
-      } else if (action === 'updateTargetMetricConfig') {
-        targetData.targetValues = targetData.targetValues || {};
-        const mKey = data.metric;
-        const old = targetData.targetValues[mKey];
-        const currentObj = typeof old === 'object' && old !== null ? old : { value: old || 0, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
-        targetData.targetValues[mKey] = { ...currentObj, ...data.config };
       } else if (action === 'renameMetric') {
         const nextValues = { ...targetData.values };
         nextValues[data.newKey] = nextValues[data.oldKey];
         delete nextValues[data.oldKey];
         targetData.values = nextValues;
-      } else if (action === 'renameTargetMetric') {
-        targetData.targetValues = targetData.targetValues || {};
-        const nextValues = { ...targetData.targetValues };
-        nextValues[data.newKey] = nextValues[data.oldKey];
-        delete nextValues[data.oldKey];
-        targetData.targetValues = nextValues;
       } else if (action === 'removeMetric') {
         const nextValues = { ...targetData.values };
         delete nextValues[data.metric];
         targetData.values = nextValues;
-      } else if (action === 'removeTargetMetric') {
-        targetData.targetValues = targetData.targetValues || {};
-        const nextValues = { ...targetData.targetValues };
-        delete nextValues[data.metric];
-        targetData.targetValues = nextValues;
       } else if (action === 'addMetric') {
         targetData.values = { ...(targetData.values || {}), [data.metric]: { value: 0, min: relationMin, max: relationMax, colorNegative: '#e74c3c', colorPositive: '#2ecc71' } };
-      } else if (action === 'addTargetMetric') {
-        targetData.targetValues = { ...(targetData.targetValues || {}), [data.metric]: { value: 0, min: relationMin, max: relationMax, colorNegative: '#e74c3c', colorPositive: '#2ecc71' } };
       }
       nextRelations[targetName] = targetData;
       return { ...c, relations: nextRelations };
+    }));
+  };
+
+  // [2] 상대방 관점 수정 핸들러 (실제 상대 캐릭터 카드 혹은 나의 targetText 갱신)
+  const handleUpdateTargetRelation = (targetName, action, data) => {
+    const targetCharObj = localCharacters.find(c => (c.name || '').trim().toLowerCase() === targetName.trim().toLowerCase());
+    const myName = targetChar.name || 'New Character';
+
+    setLocalCharacters(localCharacters.map(c => {
+      // 케이스 A: 상대방이 실존하는 캐릭터인 경우 -> 상대방 캐릭터 카드의 관계 객체에 직접 기록
+      if (targetCharObj && c.id === targetCharObj.id) {
+        const nextRelations = { ...(c.relations || {}) };
+        const myDataInTarget = nextRelations[myName] 
+          ? JSON.parse(JSON.stringify(nextRelations[myName])) 
+          : { text: '', isLocked: false, isInject: true, values: {} };
+
+        if (action === 'updateField') {
+          myDataInTarget.text = data.value;
+        } else if (action === 'updateMetricValue') {
+          const old = myDataInTarget.values[data.field];
+          if (typeof old === 'object' && old !== null) {
+            myDataInTarget.values[data.field] = { ...old, value: data.value };
+          } else {
+            myDataInTarget.values[data.field] = { value: data.value, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
+          }
+        } else if (action === 'updateMetricConfig') {
+          const old = myDataInTarget.values[data.metric];
+          const currentObj = typeof old === 'object' && old !== null ? old : { value: old || 0, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
+          myDataInTarget.values[data.metric] = { ...currentObj, ...data.config };
+        } else if (action === 'renameMetric') {
+          const nextValues = { ...myDataInTarget.values };
+          nextValues[data.newKey] = nextValues[data.oldKey];
+          delete nextValues[data.oldKey];
+          myDataInTarget.values = nextValues;
+        } else if (action === 'removeMetric') {
+          const nextValues = { ...myDataInTarget.values };
+          delete nextValues[data.metric];
+          myDataInTarget.values = nextValues;
+        } else if (action === 'addMetric') {
+          myDataInTarget.values = { ...(myDataInTarget.values || {}), [data.metric]: { value: 0, min: relationMin, max: relationMax, colorNegative: '#e74c3c', colorPositive: '#2ecc71' } };
+        }
+        nextRelations[myName] = myDataInTarget;
+        return { ...c, relations: nextRelations };
+      }
+
+      // 케이스 B: 상대가 카드가 없는 가상의 단역 NPC인 경우 -> 내 카드에 임시 예비 저장 (targetText/targetValues)
+      if (!targetCharObj && c.id === charId) {
+        const nextRelations = { ...(c.relations || {}) };
+        const targetData = nextRelations[targetName] 
+          ? JSON.parse(JSON.stringify(nextRelations[targetName])) 
+          : { text: '', targetText: '', isLocked: false, isInject: true, values: {}, targetValues: {} };
+
+        if (action === 'updateField') {
+          targetData.targetText = data.value;
+        } else if (action === 'updateMetricValue') {
+          targetData.targetValues = targetData.targetValues || {};
+          const old = targetData.targetValues[data.field];
+          if (typeof old === 'object' && old !== null) {
+            targetData.targetValues[data.field] = { ...old, value: data.value };
+          } else {
+            targetData.targetValues[data.field] = { value: data.value, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
+          }
+        } else if (action === 'updateMetricConfig') {
+          targetData.targetValues = targetData.targetValues || {};
+          const mKey = data.metric;
+          const old = targetData.targetValues[mKey];
+          const currentObj = typeof old === 'object' && old !== null ? old : { value: old || 0, min: -100, max: 100, colorNegative: '#e74c3c', colorPositive: '#2ecc71' };
+          targetData.targetValues[mKey] = { ...currentObj, ...data.config };
+        } else if (action === 'renameMetric') {
+          targetData.targetValues = targetData.targetValues || {};
+          const nextValues = { ...targetData.targetValues };
+          nextValues[data.newKey] = nextValues[data.oldKey];
+          delete nextValues[data.oldKey];
+          targetData.targetValues = nextValues;
+        } else if (action === 'removeMetric') {
+          targetData.targetValues = targetData.targetValues || {};
+          const nextValues = { ...targetData.targetValues };
+          delete nextValues[data.metric];
+          targetData.targetValues = nextValues;
+        } else if (action === 'addMetric') {
+          targetData.targetValues = { ...(targetData.targetValues || {}), [data.metric]: { value: 0, min: relationMin, max: relationMax, colorNegative: '#e74c3c', colorPositive: '#2ecc71' } };
+        }
+        nextRelations[targetName] = targetData;
+        return { ...c, relations: nextRelations };
+      }
+
+      return c;
     }));
   };
 
@@ -161,9 +218,22 @@ export default function RelationsTab({
         <p className={styles.emptySectionText}>No relations recorded.</p>
       ) : (
         relationsList.map(([targetName, data], rIdx) => {
-          const isExpanded = expandedIds[`relation_${targetName}`] !== false;
+          // 초기 진입 시 기본적으로 모두 접혀있도록(falsy 평가 시 collapsed 처리) 수정
+          const isExpanded = !!expandedIds[`relation_${targetName}`];
           const existingCharNames = localCharacters.map(c => c.name?.trim().toLowerCase());
           const isRealCharacter = existingCharNames.includes(targetName?.trim().toLowerCase());
+
+          let targetText = "";
+          let targetMetricsSource = {};
+          if (isRealCharacter) {
+            const targetCharObj = localCharacters.find(c => c.name?.trim().toLowerCase() === targetName.trim().toLowerCase());
+            const counterRelation = targetCharObj?.relations?.[targetChar.name || 'New Character'] || {};
+            targetText = counterRelation.text || "";
+            targetMetricsSource = counterRelation.values || {};
+          } else {
+            targetText = data.targetText || "";
+            targetMetricsSource = data.targetValues || {};
+          }
 
           return (
             <div key={targetName} className={styles.relationCard}>
@@ -171,7 +241,7 @@ export default function RelationsTab({
                 <button
                   type="button"
                   className={`${styles.accordionToggleBtn} ${isExpanded ? styles.activeToggle : ''}`}
-                  onClick={() => setExpandedIds(prev => ({ ...prev, [`relation_${targetName}`]: prev[`relation_${targetName}`] === false ? true : false }))}
+                  onClick={() => setExpandedIds(prev => ({ ...prev, [`relation_${targetName}`]: !prev[`relation_${targetName}`] }))}
                 >
                   ▶
                 </button>
@@ -198,7 +268,7 @@ export default function RelationsTab({
                 <div className={styles.flexItemLine}>
                   <button type="button" className={`${styles.sortBtn} ${styles.miniSortBtn}`} disabled={rIdx === 0} onClick={() => handleReorderRelation(targetName, 'up')}>▲</button>
                   <button type="button" className={`${styles.sortBtn} ${styles.miniSortBtn}`} disabled={rIdx === totalRelations - 1} onClick={() => handleReorderRelation(targetName, 'down')}>▼</button>
-                  {isRealCharacter && <span className={styles.syncBadge}>Real Character (Synced)</span>}
+                  {isRealCharacter && <span className={styles.syncBadge}>Synced</span>}
                   <label className={styles.switchRow} title="Toggle Prompt Injection">
                     <span>Inject</span>
                     <div className={styles.switchLabel}>
@@ -221,6 +291,7 @@ export default function RelationsTab({
 
               {isExpanded && (
                 <>
+                  {/* 주체 ➔ 대상 수정 영역 */}
                   <div className={styles.sectionWrapper} style={{ borderLeft: '3px solid var(--rpg-text)', marginBottom: '10px' }}>
                     <div className={styles.sectionHeaderLine}>
                       <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-text)' }}>{targetChar.name} ➔ {targetName}</span>
@@ -236,7 +307,7 @@ export default function RelationsTab({
                     <textarea
                       value={data.text || ''}
                       placeholder={`How ${targetChar.name} feels about ${targetName}...`}
-                      onChange={e => handleUpdateRelations(targetName, 'updateField', { field: 'text', value: e.target.value })}
+                      onChange={e => handleUpdateRelations(targetName, 'updateField', { value: e.target.value })}
                       className={styles.descTextarea}
                     />
 
@@ -276,26 +347,27 @@ export default function RelationsTab({
                     })}
                   </div>
 
+                  {/* 대상 ➔ 주체 수정 영역 */}
                   <div className={styles.sectionWrapper} style={{ borderLeft: '3px solid var(--rpg-text)' }}>
                     <div className={styles.sectionHeaderLine}>
                       <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--rpg-text)' }}>{targetName} ➔ {targetChar.name}</span>
                       <button className={styles.addQuickFieldBtn} onClick={() => {
-                        const existingTargetMetrics = Object.keys(data.targetValues || {});
+                        const existingTargetMetrics = Object.keys(targetMetricsSource || {});
                         let mName = 'NewMetric';
                         let counter = 1;
                         while (existingTargetMetrics.includes(mName)) { mName = `NewMetric_${counter++}`; }
-                        handleUpdateRelations(targetName, 'addTargetMetric', { metric: mName });
+                        handleUpdateTargetRelation(targetName, 'addMetric', { metric: mName });
                       }}>+ Add Metric</button>
                     </div>
 
                     <textarea
-                      value={data.targetText || ''}
+                      value={targetText}
                       placeholder={`How ${targetName} feels about ${targetChar.name}...`}
-                      onChange={e => handleUpdateRelations(targetName, 'updateField', { field: 'targetText', value: e.target.value })}
+                      onChange={e => handleUpdateTargetRelation(targetName, 'updateField', { value: e.target.value })}
                       className={styles.descTextarea}
                     />
 
-                    {Object.entries(data.targetValues || {}).map(([tmName, tmVal]) => {
+                    {Object.entries(targetMetricsSource || {}).map(([tmName, tmVal]) => {
                       const isObj = typeof tmVal === 'object' && tmVal !== null;
                       const tmMin = isObj && tmVal.min !== undefined ? tmVal.min : -100;
                       const tmMax = isObj && tmVal.max !== undefined ? tmVal.max : 100;
@@ -311,21 +383,21 @@ export default function RelationsTab({
                               const trimmed = e.target.value.trim();
                               if (!trimmed) { e.target.value = tmName; return; }
                               const cleanId = trimmed.replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
-                              const newId = cleanId || `NewMetric_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+                              const newId = cleanId || `NewMetric_${Date.now()}`;
                               if (newId !== tmName) {
-                                if ((data.targetValues || {})[newId] !== undefined) { alert(`Metric "${trimmed}" exists.`); e.target.value = tmName; return; }
-                                handleUpdateRelations(targetName, 'renameTargetMetric', { oldKey: tmName, newKey: newId });
+                                if ((targetMetricsSource || {})[newId] !== undefined) { alert(`Metric "${trimmed}" exists.`); e.target.value = tmName; return; }
+                                handleUpdateTargetRelation(targetName, 'renameMetric', { oldKey: tmName, newKey: newId });
                               }
                             }}
                             className={styles.metricNameInput}
                           />
                           <div className={styles.flexItemLine}>
-                            <div className={styles.flexCenterGroupSmall}><span className={styles.metricLimitLabel}>Min:</span><input type="number" value={tmMin} onChange={e => handleUpdateRelations(targetName, 'updateTargetMetricConfig', { metric: tmName, config: { min: Number(e.target.value) } })} className={styles.metricLimitInput} /></div>
-                            <div className={styles.flexCenterGroupSmall}><span className={styles.metricLimitLabel}>Max:</span><input type="number" value={tmMax} onChange={e => handleUpdateRelations(targetName, 'updateTargetMetricConfig', { metric: tmName, config: { max: Number(e.target.value) } })} className={styles.metricLimitInput} /></div>
-                            <div className={styles.flexCenterGroupSmall} title="Negative Color"><span className={styles.metricLimitLabel}>Col(-):</span><input type="color" value={tmColorNegative} onChange={e => handleUpdateRelations(targetName, 'updateTargetMetricConfig', { metric: tmName, config: { colorNegative: e.target.value } })} className={styles.colorPickerInput} /></div>
-                            <div className={styles.flexCenterGroupSmall} title="Positive Color"><span className={styles.metricLimitLabel}>Col(+):</span><input type="color" value={tmColorPositive} onChange={e => handleUpdateRelations(targetName, 'updateTargetMetricConfig', { metric: tmName, config: { colorPositive: e.target.value } })} className={styles.colorPickerInput} /></div>
+                            <div className={styles.flexCenterGroupSmall}><span className={styles.metricLimitLabel}>Min:</span><input type="number" value={tmMin} onChange={e => handleUpdateTargetRelation(targetName, 'updateMetricValue', { field: tmName, value: Number(e.target.value) })} className={styles.metricLimitInput} /></div>
+                            <div className={styles.flexCenterGroupSmall}><span className={styles.metricLimitLabel}>Max:</span><input type="number" value={tmMax} onChange={e => handleUpdateTargetRelation(targetName, 'updateMetricValue', { field: tmName, value: Number(e.target.value) })} className={styles.metricLimitInput} /></div>
+                            <div className={styles.flexCenterGroupSmall} title="Negative Color"><span className={styles.metricLimitLabel}>Col(-):</span><input type="color" value={tmColorNegative} onChange={e => handleUpdateTargetRelation(targetName, 'updateMetricConfig', { metric: tmName, config: { colorNegative: e.target.value } })} className={styles.colorPickerInput} /></div>
+                            <div className={styles.flexCenterGroupSmall} title="Positive Color"><span className={styles.metricLimitLabel}>Col(+):</span><input type="color" value={tmColorPositive} onChange={e => handleUpdateTargetRelation(targetName, 'updateMetricConfig', { metric: tmName, config: { colorPositive: e.target.value } })} className={styles.colorPickerInput} /></div>
                           </div>
-                          <button type="button" className={styles.removeInlineBtn} onClick={() => handleUpdateRelations(targetName, 'removeTargetMetric', { metric: tmName })}>X</button>
+                          <button type="button" className={styles.removeInlineBtn} onClick={() => handleUpdateTargetRelation(targetName, 'removeMetric', { metric: tmName })}>X</button>
                         </div>
                       );
                     })}

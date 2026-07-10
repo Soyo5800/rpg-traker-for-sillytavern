@@ -52,6 +52,8 @@ export function migrateCharacterSchema(char) {
                 equipIsInject: true,
                 storageIsLocked: false,
                 storageIsInject: true,
+                equipmentLocks: {},
+                storageLocks: {},
                 equipment: { 'Right Hand': null, 'Left Hand': null },
                 storage: { 'Backpack': [] }
             },
@@ -60,6 +62,17 @@ export function migrateCharacterSchema(char) {
         delete migrated.featuresData;
         return migrated;
     }
+
+    // 구버전 세이브 파일 로딩 시 인벤토리 하위의 미세 제어 자물쇠 객체 부재 대응
+    if (char && char.inventory) {
+        if (!char.inventory.equipmentLocks) {
+            char.inventory.equipmentLocks = {};
+        }
+        if (!char.inventory.storageLocks) {
+            char.inventory.storageLocks = {};
+        }
+    }
+
     return char;
 }
 

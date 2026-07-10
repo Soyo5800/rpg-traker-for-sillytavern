@@ -140,6 +140,20 @@
   overflow-wrap: break-word;
 }
 
+.containerBadge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-highlight);
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
 .itemSidebarDescText {
   font-size: 9px;
   opacity: 0.5;
@@ -152,6 +166,13 @@
   padding-left: 8px;
 }
 
+.sidebarStorageHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
 .sidebarStorageList {
   display: flex;
   flex-direction: column;
@@ -162,6 +183,51 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 4px;
+}
+
+.itemMainLine {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.itemBullet {
+  opacity: 0.5;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.qtyBadge {
+  font-size: 10px;
+  color: var(--rpg-text);
+  opacity: 0.6;
+  font-weight: bold;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.currencyBadge {
+  font-size: 10px;
+  color: var(--rpg-highlight);
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--rpg-border);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.assetBadge {
+  font-size: 10px;
+  color: var(--rpg-text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed var(--rpg-border);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .emptyTextIndicator {
@@ -240,7 +306,7 @@
 .questSideRemoveBtn {
   background: transparent;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 14px;
   cursor: pointer;
   padding: 0 4px;

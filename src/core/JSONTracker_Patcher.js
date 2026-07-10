@@ -1,19 +1,19 @@
-// src/core/JSONTracker_Patcher.js
-
 import { getDefaultCharacters } from './PromptSchema.js';
 import { sanitizeTrackerData, cleanIdString, generateUniqueId, parseMetadata } from './JSONTracker_Migrator.js';
 
-/**
- * Merge world state variables and events
- */
+function isPlaceholderValue(val) {
+    if (typeof val === 'string' && val.includes('<new_value')) return true;
+    return false;
+}
+
 function mergeWorldState(currentWorldState, updates, worldStateLocks) {
     const worldState = currentWorldState || { date: '', time: '', location: '', weather: '', events: [] };
     const locks = worldStateLocks || {};
 
-    if (updates.date !== undefined && !locks.date) worldState.date = String(updates.date);
-    if (updates.time !== undefined && !locks.time) worldState.time = String(updates.time);
-    if (updates.location !== undefined && !locks.location) worldState.location = String(updates.location);
-    if (updates.weather !== undefined && !locks.weather) worldState.weather = String(updates.weather);
+    if (updates.date !== undefined && !locks.date && !isPlaceholderValue(updates.date)) worldState.date = String(updates.date);
+    if (updates.time !== undefined && !locks.time && !isPlaceholderValue(updates.time)) worldState.time = String(updates.time);
+    if (updates.location !== undefined && !locks.location && !isPlaceholderValue(updates.location)) worldState.location = String(updates.location);
+    if (updates.weather !== undefined && !locks.weather && !isPlaceholderValue(updates.weather)) worldState.weather = String(updates.weather);
 
     if (Array.isArray(updates.events)) {
         const existingEvents = worldState.events || [];
@@ -27,6 +27,7 @@ function mergeWorldState(currentWorldState, updates, worldStateLocks) {
                 desc = e.desc || '';
             }
             if (!name && !desc) return null;
+            if (isPlaceholderValue(name) || isPlaceholderValue(desc)) return null;
             const id = cleanIdString(name, 'event');
             return { id, name, desc };
         }).filter(Boolean);
@@ -48,9 +49,6 @@ function mergeWorldState(currentWorldState, updates, worldStateLocks) {
     return worldState;
 }
 
-/**
- * Retrieve an existing character or initialize a new instance if missing
- */
 function getOrCreateCharacter(charactersArray, charName, isPlayer, updates) {
     const cleanCharId = cleanIdString(charName, 'char');
     let charIndex = charactersArray.findIndex(c => c.id === cleanCharId || c.name?.trim().toLowerCase() === charName.trim().toLowerCase());
@@ -84,9 +82,6 @@ function getOrCreateCharacter(charactersArray, charName, isPlayer, updates) {
     return char;
 }
 
-/**
- * Merge character status parameters and adjust bounds
- */
 function mergeCharacterStatus(char, statusUpdates, updateType) {
     const statusSchema = char.statusSchema || [];
     const currentStatus = char.status || {};
@@ -96,6 +91,8 @@ function mergeCharacterStatus(char, statusUpdates, updateType) {
         const nextStatus = {};
 
         Object.entries(statusUpdates).forEach(([patchKey, rawPatchVal]) => {
+            if (isPlaceholderValue(rawPatchVal)) return;
+
             const metaInfo = parseMetadata(rawPatchVal);
             const patchVal = metaInfo.value;
             const parsedType = metaInfo.type;
@@ -165,6 +162,8 @@ function mergeCharacterStatus(char, statusUpdates, updateType) {
         });
 
         Object.entries(statusUpdates).forEach(([patchKey, rawPatchVal]) => {
+            if (isPlaceholderValue(rawPatchVal)) return;
+
             const metaInfo = parseMetadata(rawPatchVal);
             const patchVal = metaInfo.value;
             const parsedType = metaInfo.type;
@@ -191,7 +190,8 @@ function mergeCharacterStatus(char, statusUpdates, updateType) {
                     newStatus[targetId] = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
                 }
             } else {
-                const newId = patchKey.trim() || generateUniqueId('status');
+                const cleanId = patchKey.trim().replace(/[^\p{L}\p{N}_]/gu, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+                const newId = cleanId ? `status_${cleanId}` : generateUniqueId('status');
                 let newType = parsedType || 'text';
                 let finalVal = patchVal !== null && patchVal !== undefined ? String(patchVal) : '';
 
@@ -217,9 +217,6 @@ function mergeCharacterStatus(char, statusUpdates, updateType) {
     }
 }
 
-/**
- * Merge character profile descriptive fields
- */
 function mergeCharacterProfile(char, profileUpdates, updateType) {
     char.profileLocks = char.profileLocks || {};
 
@@ -240,6 +237,7 @@ function mergeCharacterProfile(char, profileUpdates, updateType) {
             if (char.profileLocks[pKey] === true) nextProfile[pKey] = pVal;
         });
         Object.entries(profileUpdates).forEach(([pKey, pVal]) => {
+            if (isPlaceholderValue(pVal)) return;
             if (!char.profileLocks[pKey] && pVal !== undefined && pVal !== null) {
                 nextProfile[pKey] = safeStringify(pVal);
             }
@@ -248,6 +246,7 @@ function mergeCharacterProfile(char, profileUpdates, updateType) {
     } else {
         char.profile = char.profile || {};
         Object.entries(profileUpdates).forEach(([pKey, pVal]) => {
+            if (isPlaceholderValue(pVal)) return;
             if (!char.profileLocks[pKey] && pVal !== undefined && pVal !== null) {
                 char.profile[pKey] = safeStringify(pVal);
             }
@@ -255,98 +254,154 @@ function mergeCharacterProfile(char, profileUpdates, updateType) {
     }
 }
 
-/**
- * Update equipment slots and backpack/container items
- */
 function mergeCharacterInventory(char, inventoryUpdates) {
     char.inventory = char.inventory || {};
+    char.inventory.equipmentLocks = char.inventory.equipmentLocks || {};
+    char.inventory.storageLocks = char.inventory.storageLocks || {};
 
     if (inventoryUpdates.equipment && typeof inventoryUpdates.equipment === 'object') {
-        if (!char.inventory.equipIsLocked) {
-            char.inventory.equipment = char.inventory.equipment || {};
-            Object.entries(inventoryUpdates.equipment).forEach(([slot, itemVal]) => {
-                if (itemVal === 'Empty' || !itemVal) {
-                    char.inventory.equipment[slot] = null;
+        char.inventory.equipment = char.inventory.equipment || {};
+        Object.entries(inventoryUpdates.equipment).forEach(([slot, itemVal]) => {
+            if (isPlaceholderValue(itemVal)) return;
+
+            const isSlotLocked = char.inventory.equipIsLocked || char.inventory.equipmentLocks[slot] === true;
+            if (isSlotLocked) return;
+
+            if (itemVal === 'Empty' || !itemVal) {
+                char.inventory.equipment[slot] = null;
+            } else {
+                const isObj = typeof itemVal === 'object' && itemVal !== null;
+                const itemType = isObj ? (itemVal.type || 'general') : 'general';
+                const baseItem = {
+                    id: (isObj && itemVal.id) || `item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                    name: isObj ? (itemVal.name || 'Unknown') : String(itemVal),
+                    type: itemType,
+                    desc: isObj ? (itemVal.desc || itemVal.description || '') : ''
+                };
+
+                if (itemType === 'currency') {
+                    baseItem.quantity = isObj && itemVal.quantity !== undefined ? itemVal.quantity : 0;
+                    delete baseItem.desc;
+                } else if (itemType === 'asset') {
+                    baseItem.assetValue = isObj && itemVal.assetValue ? itemVal.assetValue : { amount: 0, currencyName: 'Gold' };
                 } else {
-                    const isObj = typeof itemVal === 'object' && itemVal !== null;
-                    char.inventory.equipment[slot] = {
-                        id: (isObj && itemVal.id) || `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-                        name: isObj ? (itemVal.name || 'Unknown') : String(itemVal),
-                        desc: isObj ? (itemVal.desc || itemVal.description || '') : ''
-                    };
+                    baseItem.quantity = isObj && itemVal.quantity !== undefined ? itemVal.quantity : 1;
                 }
-            });
-        }
+
+                if (isObj && itemVal.isContainer) {
+                    baseItem.isContainer = true;
+                    baseItem.storageKey = itemVal.storageKey;
+                }
+                char.inventory.equipment[slot] = baseItem;
+            }
+        });
     }
 
     if (inventoryUpdates.storage && typeof inventoryUpdates.storage === 'object') {
-        if (!char.inventory.storageIsLocked) {
-            char.inventory.storage = char.inventory.storage || {};
-            Object.entries(inventoryUpdates.storage).forEach(([container, items]) => {
-                if (Array.isArray(items)) {
-                    char.inventory.storage[container] = items.map(item => {
-                        if (typeof item === 'string') {
-                            const qtyMatch = item.match(/^([\s\S]*?)x(\d+)$/);
-                            return qtyMatch
-                                ? { id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, name: qtyMatch[1].trim(), quantity: parseInt(qtyMatch[2], 10) || 1, desc: '' }
-                                : { id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, name: item, quantity: 1, desc: '' };
-                        } else if (item && typeof item === 'object') {
-                            return {
-                                id: item.id || `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-                                name: item.name || 'Unknown',
-                                quantity: item.quantity || 1,
-                                desc: item.desc || item.description || ''
-                            };
+        char.inventory.storage = char.inventory.storage || {};
+        Object.entries(inventoryUpdates.storage).forEach(([container, items]) => {
+            const isContainerLocked = char.inventory.storageIsLocked || char.inventory.storageLocks[container] === true;
+            if (isContainerLocked) return;
+
+            if (Array.isArray(items)) {
+                char.inventory.storage[container] = items.map(item => {
+                    if (isPlaceholderValue(item)) return null;
+
+                    if (typeof item === 'string') {
+                        const qtyMatch = item.match(/^([\s\S]*?)\s*x\s*(\d+)$/);
+                        return qtyMatch
+                            ? { id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, name: qtyMatch[1].trim(), quantity: parseInt(qtyMatch[2], 10) || 1, desc: '', type: 'general' }
+                            : { id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, name: item, quantity: 1, desc: '', type: 'general' };
+                    } else if (item && typeof item === 'object') {
+                        const itemType = item.type || 'general';
+                        const baseItem = {
+                            id: item.id || `item_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                            name: item.name || 'Unknown',
+                            type: itemType
+                        };
+
+                        if (itemType === 'currency') {
+                            baseItem.quantity = item.quantity !== undefined ? item.quantity : 1;
+                        } else if (itemType === 'asset') {
+                            baseItem.assetValue = item.assetValue || { amount: 0, currencyName: 'Gold' };
+                            baseItem.desc = item.desc || item.description || '';
+                        } else {
+                            baseItem.quantity = item.quantity !== undefined ? item.quantity : 1;
+                            baseItem.desc = item.desc || item.description || '';
                         }
-                        return null;
-                    }).filter(Boolean);
-                }
-            });
-        }
+                        return baseItem;
+                    }
+                    return null;
+                }).filter(Boolean);
+            }
+        });
     }
 }
 
-/**
- * Sync active quest progress parameters
- */
 function mergeCharacterQuests(char, questUpdates) {
     char.quests = char.quests || {};
 
     if (questUpdates.main && typeof questUpdates.main === 'object') {
         char.quests.main = char.quests.main || {};
         if (!char.quests.main.isLocked) {
-            if (questUpdates.main.name !== undefined) char.quests.main.name = String(questUpdates.main.name);
-            if (questUpdates.main.description !== undefined) char.quests.main.desc = String(questUpdates.main.description);
+            if (questUpdates.main.name !== undefined && !isPlaceholderValue(questUpdates.main.name)) {
+                char.quests.main.name = String(questUpdates.main.name);
+            }
+            if (questUpdates.main.description !== undefined && !isPlaceholderValue(questUpdates.main.description)) {
+                char.quests.main.desc = String(questUpdates.main.description);
+            }
+            if (questUpdates.main.status !== undefined && !isPlaceholderValue(questUpdates.main.status)) {
+                char.quests.main.isCompleted = (questUpdates.main.status === 'COMPLETED');
+            } else if (questUpdates.main.isCompleted !== undefined) {
+                char.quests.main.isCompleted = Boolean(questUpdates.main.isCompleted);
+            }
         }
     }
 
     if (Array.isArray(questUpdates.sideQuests)) {
         const existingSides = char.quests.sides || [];
-        const lockedSides = existingSides.filter(q => q.isLocked);
-        const parsedNewSides = questUpdates.sideQuests.map(sq => {
+        const nextSides = [...existingSides];
+
+        questUpdates.sideQuests.forEach(sq => {
+            if (isPlaceholderValue(sq)) return;
             let qName = 'Unknown', qDesc = '', isCompleted = false;
-            if (typeof sq === 'string') { qName = sq; }
-            else if (sq && typeof sq === 'object') {
+            if (typeof sq === 'string') {
+                qName = sq;
+            } else if (sq && typeof sq === 'object') {
                 qName = sq.name || 'Unknown';
-                qDesc = sq.description || '';
+                qDesc = sq.description || sq.desc || '';
                 isCompleted = sq.status === 'COMPLETED' || sq.isCompleted === true;
             }
-            return { id: cleanIdString(qName, 'quest'), name: qName, desc: qDesc, isCompleted, isLocked: false };
-        }).filter(Boolean);
 
-        const finalSides = [...lockedSides];
-        parsedNewSides.forEach(newQ => {
-            if (!lockedSides.some(lockedQ => (newQ.id && lockedQ.id === newQ.id) || lockedQ.name.trim().toLowerCase() === newQ.name.trim().toLowerCase())) {
-                finalSides.push(newQ);
+            if (isPlaceholderValue(qName) || isPlaceholderValue(qDesc)) return;
+
+            const cleanId = cleanIdString(qName, 'quest');
+            const matchedIdx = nextSides.findIndex(q =>
+                (q.id && q.id === cleanId) ||
+                (q.name && q.name.trim().toLowerCase() === qName.trim().toLowerCase())
+            );
+
+            if (matchedIdx !== -1) {
+                if (!nextSides[matchedIdx].isLocked) {
+                    nextSides[matchedIdx].name = qName;
+                    if (qDesc) nextSides[matchedIdx].desc = qDesc;
+                    nextSides[matchedIdx].isCompleted = isCompleted;
+                }
+            } else {
+                nextSides.push({
+                    id: cleanId,
+                    name: qName,
+                    desc: qDesc,
+                    isCompleted,
+                    isLocked: false
+                });
             }
         });
-        char.quests.sides = finalSides;
+
+        char.quests.sides = nextSides;
     }
 }
 
-/**
- * Handle relation structures, description text and numerical metric bars
- */
 function mergeCharacterRelations(char, relationUpdates, updateType) {
     if (updateType === 'replace') {
         const nextRelations = {};
@@ -359,16 +414,19 @@ function mergeCharacterRelations(char, relationUpdates, updateType) {
     }
 
     Object.entries(relationUpdates).forEach(([targetName, rData]) => {
-        if (!rData || typeof rData !== 'object') return;
+        if (!rData || typeof rData !== 'object' || isPlaceholderValue(targetName)) return;
 
         const existingRelation = char.relations[targetName] || { text: '', isLocked: false, isInject: true, values: {} };
         if (existingRelation.isLocked) return;
 
-        if (rData.description !== undefined) existingRelation.text = String(rData.description);
+        if (rData.description !== undefined && !isPlaceholderValue(rData.description)) {
+            existingRelation.text = String(rData.description);
+        }
 
         if (rData.metrics && typeof rData.metrics === 'object') {
             existingRelation.values = existingRelation.values || {};
             Object.entries(rData.metrics).forEach(([mName, rawMVal]) => {
+                if (isPlaceholderValue(rawMVal)) return;
                 const metaInfo = parseMetadata(rawMVal);
                 const parsedInt = parseInt(metaInfo.value, 10);
                 const finalVal = !isNaN(parsedInt) ? parsedInt : String(metaInfo.value);
@@ -391,11 +449,14 @@ function mergeCharacterRelations(char, relationUpdates, updateType) {
             });
         }
 
-        if (rData.targetDescription !== undefined) existingRelation.targetText = String(rData.targetDescription);
+        if (rData.targetDescription !== undefined && !isPlaceholderValue(rData.targetDescription)) {
+            existingRelation.targetText = String(rData.targetDescription);
+        }
 
         if (rData.targetMetrics && typeof rData.targetMetrics === 'object') {
             existingRelation.targetValues = existingRelation.targetValues || {};
             Object.entries(rData.targetMetrics).forEach(([tmName, rawMVal]) => {
+                if (isPlaceholderValue(rawMVal)) return;
                 const metaInfo = parseMetadata(rawMVal);
                 const parsedInt = parseInt(metaInfo.value, 10);
                 const finalVal = !isNaN(parsedInt) ? parsedInt : String(metaInfo.value);
@@ -422,49 +483,39 @@ function mergeCharacterRelations(char, relationUpdates, updateType) {
     });
 }
 
-/**
- * Enforce cross relation structures symmetrically between matching character sheets
- */
 export function syncCrossRelations(characters) {
-    characters.forEach(char => {
-        if (!char.relations) return;
+    if (!Array.isArray(characters)) return;
 
-        Object.entries(char.relations).forEach(([targetName, rData]) => {
-            const targetChar = characters.find(c => c.name?.trim().toLowerCase() === targetName.trim().toLowerCase());
+    const charMap = new Map(characters.map(c => [c.name?.trim().toLowerCase(), c]));
+
+    const truthMap = new Map();
+    for (const char of characters) {
+        if (!char.relations) continue;
+        for (const [targetName, rData] of Object.entries(char.relations)) {
+            const key = `${char.name?.trim().toLowerCase()}->${targetName.trim().toLowerCase()}`;
+            truthMap.set(key, {
+                text: rData.text || '',
+                values: rData.values || {}
+            });
+        }
+    }
+
+    for (const char of characters) {
+        if (!char.relations) continue;
+        for (const [targetName, rData] of Object.entries(char.relations)) {
+            const targetChar = charMap.get(targetName.trim().toLowerCase());
             if (targetChar) {
-                targetChar.relations = targetChar.relations || {};
-                if (!targetChar.relations[char.name]) {
-                    targetChar.relations[char.name] = { text: '', isLocked: false, isInject: true, values: {} };
-                }
-                const targetRel = targetChar.relations[char.name];
-
-                if (rData.targetText !== undefined) targetRel.text = rData.targetText;
-
-                if (rData.targetValues) {
-                    targetRel.values = targetRel.values || {};
-                    Object.entries(rData.targetValues).forEach(([mName, mVal]) => {
-                        const mValue = typeof mVal === 'object' && mVal !== null ? mVal.value : mVal;
-                        const mType = typeof mVal === 'object' && mVal !== null ? mVal.type : 'integer';
-
-                        if (targetRel.values[mName]) {
-                            if (typeof targetRel.values[mName] === 'object' && targetRel.values[mName] !== null) {
-                                targetRel.values[mName].value = mValue;
-                            } else {
-                                targetRel.values[mName] = { value: mValue, type: mType };
-                            }
-                        } else {
-                            targetRel.values[mName] = { value: mValue, type: mType };
-                        }
-                    });
+                const counterKey = `${targetName.trim().toLowerCase()}->${char.name?.trim().toLowerCase()}`;
+                const counterTruth = truthMap.get(counterKey);
+                if (counterTruth) {
+                    rData.targetText = counterTruth.text;
+                    rData.targetValues = counterTruth.values;
                 }
             }
-        });
-    });
+        }
+    }
 }
 
-/**
- * Orchestrator: Parse, process and apply incoming LLM patch data to global state
- */
 export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType = 'patch', mutateInPlace = false) {
     if (!patch || typeof patch !== 'object') return trackerData;
 
@@ -477,6 +528,11 @@ export function applyLLMPatch(trackerData, patch, isPlayer = false, updateType =
 
             if (charName.toLowerCase() === 'world') {
                 updatedData.worldState = mergeWorldState(updatedData.worldState, updates, updatedData.worldStateLocks);
+                return;
+            }
+
+            const existingChar = updatedData.characters.find(c => c.name?.trim().toLowerCase() === charName.trim().toLowerCase());
+            if (existingChar && existingChar.activeInjection === false) {
                 return;
             }
 

@@ -1,4 +1,3 @@
-// src/messagetracker/SnapshotModal.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './SnapshotModal.module.css';
@@ -18,12 +17,11 @@ export default function SnapshotModal() {
 
   const targetData = snapshotModalData?.historicalData || trackerData;
 
-  // 양방향 바인딩: 모달 개방 시 전달받은 기존 스냅샷 데이터를 체크박스 상태로 복원
   useEffect(() => {
     if (snapshotModalData?.isOpen && targetData.characters) {
       const initChars = {};
       targetData.characters.forEach(c => {
-        initChars[c.id] = { selected: false, status: false, profile: false, inventory: false, quests: false };
+        initChars[c.id] = { selected: false, status: false, profile: false, relations: false, inventory: false, quests: false };
       });
 
       let initWorld = { selected: false, date: true, time: true, weather: true, location: true, events: false };
@@ -50,6 +48,7 @@ export default function SnapshotModal() {
                 selected: true,
                 status: !!cData.status,
                 profile: !!cData.profile,
+                relations: !!cData.relations,
                 inventory: !!cData.inventory,
                 quests: !!cData.quests
               };
@@ -80,12 +79,11 @@ export default function SnapshotModal() {
     if (window.RPGBridge) window.RPGBridge.closeSnapshotModal();
   };
 
-  // 원클릭 일괄 체크 해제 핸들러
   const handleDeselectAll = () => {
     const resetChars = {};
     if (targetData.characters) {
       targetData.characters.forEach(c => {
-        resetChars[c.id] = { selected: false, status: false, profile: false, inventory: false, quests: false };
+        resetChars[c.id] = { selected: false, status: false, profile: false, relations: false, inventory: false, quests: false };
       });
     }
 
@@ -111,14 +109,14 @@ export default function SnapshotModal() {
 
   const handleCharToggle = (charId, field, checked) => {
     setSelections(prev => {
-      const charSel = prev.chars[charId] || { selected: false, status: false, profile: false, inventory: false, quests: false };
+      const charSel = prev.chars[charId] || { selected: false, status: false, profile: false, relations: false, inventory: false, quests: false };
 
       if (field === 'selected' && checked) {
         return {
           ...prev,
           chars: {
             ...prev.chars,
-            [charId]: { ...charSel, selected: true, status: true, profile: true }
+            [charId]: { ...charSel, selected: true, status: true, profile: true, relations: true }
           }
         };
       }
@@ -150,7 +148,6 @@ export default function SnapshotModal() {
 
     if (!targetMsg) return;
 
-    // 주석 형태를 포함해 기존에 들어가 있던 rpgmt 마크다운 영역 전체를 탐지하는 정규식
     const rpgmtRegex = /(?:\n\n)?(?:<!--\s*)?(?:(?:<|&lt;)rpgmt(?:>|&gt;)|<div class="rpgmt-data">)[\s\S]*?(?:(?:<|&lt;)\/rpgmt(?:>|&gt;)|<\/div>)(?:\s*-->)?/gi;
 
     if (Object.keys(finalPayload).length === 0) {
@@ -164,7 +161,6 @@ export default function SnapshotModal() {
       }
     }
 
-    // 히스토리 정보 동기화 처리
     let swipeId = targetMsg.swipe_id || 0;
     if (targetMsg.swipes && targetMsg.swipes.length > 0 && typeof targetMsg.mes === 'string') {
       const foundIdx = targetMsg.swipes.findIndex(s => s === targetMsg.mes);
@@ -183,6 +179,9 @@ export default function SnapshotModal() {
           if (charObj) {
             if (cEdits.status) Object.assign(charObj.status, cEdits.status);
             if (cEdits.profile) Object.assign(charObj.profile, cEdits.profile);
+            if (cEdits.relations) {
+              charObj.relations = { ...(charObj.relations || {}), ...cEdits.relations };
+            }
             if (cEdits.inventory) {
               charObj.inventory = {
                 ...charObj.inventory,
@@ -237,7 +236,6 @@ export default function SnapshotModal() {
           </div>
 
           <div className={styles.section}>
-            {/* 타이틀 영역 정렬 조율 및 해제 버튼 연동 */}
             <div className={styles.sectionTitleRow}>
               <div className={styles.sectionTitle}>Entities & Options</div>
               <button
@@ -311,8 +309,8 @@ export default function SnapshotModal() {
             {targetData.characters?.map(char => {
               const charSel = selections.chars[char.id] || {};
               return (
-                <div key={char.id} className={styles.charRow}>
-                  <label className={styles.checkboxItem}>
+                <div key={char.id} className={styles.charRow} style={{ alignItems: 'flex-start' }}>
+                  <label className={styles.checkboxItem} style={{ marginTop: '4px' }}>
                     <input
                       type="checkbox"
                       checked={charSel.selected || false}
@@ -321,23 +319,28 @@ export default function SnapshotModal() {
                     <span className={styles.charNameLabel}>{char.name}</span>
                   </label>
 
-                  <div className={`${styles.charOptions} ${charSel.selected ? styles.activeOps : styles.disabledOps}`}>
-                    <label className={styles.checkboxItem}>
-                      <input type="checkbox" disabled={!charSel.selected} checked={charSel.status || false} onChange={e => handleCharToggle(char.id, 'status', e.target.checked)} /> Status
-                    </label>
-                    <label className={styles.checkboxItem}>
-                      <input type="checkbox" disabled={!charSel.selected} checked={charSel.profile || false} onChange={e => handleCharToggle(char.id, 'profile', e.target.checked)} /> Profile
-                    </label>
+                  <div className={`${styles.charOptionsColumn} ${charSel.selected ? styles.activeOps : styles.disabledOps}`}>
+                    <div className={styles.charOptionsRow}>
+                      <label className={styles.checkboxItem}>
+                        <input type="checkbox" disabled={!charSel.selected} checked={charSel.status || false} onChange={e => handleCharToggle(char.id, 'status', e.target.checked)} /> Status
+                      </label>
+                      <label className={styles.checkboxItem}>
+                        <input type="checkbox" disabled={!charSel.selected} checked={charSel.profile || false} onChange={e => handleCharToggle(char.id, 'profile', e.target.checked)} /> Profile
+                      </label>
+                      <label className={styles.checkboxItem}>
+                        <input type="checkbox" disabled={!charSel.selected} checked={charSel.relations || false} onChange={e => handleCharToggle(char.id, 'relations', e.target.checked)} /> Relations
+                      </label>
+                    </div>
 
                     {char.activePlayer && (
-                      <>
+                      <div className={styles.charOptionsRow} style={{ marginTop: '6px' }}>
                         <label className={styles.checkboxItem}>
                           <input type="checkbox" disabled={!charSel.selected} checked={charSel.inventory || false} onChange={e => handleCharToggle(char.id, 'inventory', e.target.checked)} /> Inventory
                         </label>
                         <label className={styles.checkboxItem}>
                           <input type="checkbox" disabled={!charSel.selected} checked={charSel.quests || false} onChange={e => handleCharToggle(char.id, 'quests', e.target.checked)} /> Quests
                         </label>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

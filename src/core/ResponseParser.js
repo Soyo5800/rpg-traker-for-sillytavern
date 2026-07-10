@@ -1,6 +1,21 @@
 // src/core/ResponseParser.js
 
 /**
+ * HTML 특수 엔티티 문자를 안전하게 원본 기호로 디코딩
+ */
+function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
+/**
  * 미완성되거나 중간에 끊긴 JSON 문자열을 보정하여 최대한 파싱 가능한 구조로.
  * 열린 따옴표, 중괄호, 대괄호를 역순으로 매칭하여 안전하게 닫아줌.
  */
@@ -75,15 +90,18 @@ export function repairJson(jsonStr) {
 export function parseResponse(text) {
   if (!text) return { cleanedText: '', patch: null };
 
+  // 번역 플러그인 또는 가상 프록시가 이스케이프한 HTML 기호를 사전에 완벽 해제
+  const decodedText = decodeHtmlEntities(text);
+
   const jsonBlockRegex = /^(?:\s*<!--(?:RPG_TRACKER)?\s*)?```(?:json|markdown)?\s*\n?(\{[\s\S]*?(?:"status"|"statusSchema"|"stats"|"profile"|"inventory"|"quests"|"Character Name"|"World")[\s\S]*?\})\s*\n?```(?:\s*-->)?/i;
-  const match = text.match(jsonBlockRegex);
+  const match = decodedText.match(jsonBlockRegex);
 
   if (match && match[1]) {
     try {
       // JSON 파싱 직전 자가 복구 수행
       const repairedString = repairJson(match[1]);
       const patch = JSON.parse(repairedString);
-      const cleanedText = text.replace(match[0], '').trim();
+      const cleanedText = decodedText.replace(match[0], '').trim();
       return { cleanedText, patch };
     } catch (e) {
       console.error("[RPG Tracker] Failed to parse JSON patch from response:", e);
@@ -92,14 +110,14 @@ export function parseResponse(text) {
   }
 
   const rawJsonRegex = /^(?:\s*<!--(?:RPG_TRACKER)?\s*)?(\{[\s\S]*?\})(?:\s*-->)?(?=\n|$)/;
-  const rawMatch = text.match(rawJsonRegex);
+  const rawMatch = decodedText.match(rawJsonRegex);
   
   if (rawMatch && rawMatch[1]) {
     try {
         // 단독 객체 형태의 백업 주석 블록에도 동일 복구 적용
         const repairedString = repairJson(rawMatch[1]);
         const patch = JSON.parse(repairedString);
-        const cleanedText = text.replace(rawMatch[0], '').trim();
+        const cleanedText = decodedText.replace(rawMatch[0], '').trim();
         return { cleanedText, patch };
     } catch (e) {
         // 파싱 실패 시 원본 텍스트 반환 처리

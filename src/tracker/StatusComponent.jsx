@@ -1,4 +1,3 @@
-// src/tracker/StatusComponent.jsx
 import React from 'react';
 import styles from './StatusComponent.module.css';
 import { LockIcon } from '../Icons';
@@ -11,84 +10,9 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
   const profile = char.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
   const relations = char.relations || {};
 
-  // --- Relations Actions ---
-  const handleUpdateRelationField = (targetName, field, value) => {
-    const targetData = relations[targetName] || { text: '', values: {} };
-
-    if (field === 'text') {
-      patchCharacterField(char.id, ['relations', targetName, 'text'], value);
-    } else {
-      const isObj = typeof value === 'object' && value !== null;
-      const targetValObj = targetData.values[field];
-      const isTargetObj = typeof targetValObj === 'object' && targetValObj !== null;
-
-      let newVal = isObj ? value.value : value;
-      let mMin = isObj && value.min !== undefined ? value.min : (isTargetObj && targetValObj.min !== undefined ? targetValObj.min : -100);
-      let mMax = isObj && value.max !== undefined ? value.max : (isTargetObj && targetValObj.max !== undefined ? targetValObj.max : 100);
-
-      const clampedVal = Math.min(mMax, Math.max(mMin, Number(newVal)));
-      
-      const finalValue = (isTargetObj || isObj) 
-        ? { ...(isTargetObj ? targetValObj : {}), ...(isObj ? value : {}), value: clampedVal }
-        : clampedVal;
-
-      patchCharacterField(char.id, ['relations', targetName, 'values', field], finalValue);
-    }
-  };
-
-  const handleUpdateTargetRelationField = (targetName, field, value) => {
-    const targetChar = characters.find(c => (c.name || '').trim() === targetName.trim());
-    const myName = char.name || 'New Character';
-
-    if (targetChar) {
-      const targetData = targetChar.relations?.[myName] || { text: '', values: {} };
-      
-      if (field === 'text') {
-        patchCharacterField(targetChar.id, ['relations', myName, 'text'], value);
-      } else {
-        const isObj = typeof value === 'object' && value !== null;
-        const targetValObj = targetData.values?.[field];
-        const isTargetObj = typeof targetValObj === 'object' && targetValObj !== null;
-
-        let newVal = isObj ? value.value : value;
-        let mMin = isObj && value.min !== undefined ? value.min : (isTargetObj && targetValObj.min !== undefined ? targetValObj.min : -100);
-        let mMax = isObj && value.max !== undefined ? value.max : (isTargetObj && targetValObj.max !== undefined ? targetValObj.max : 100);
-        const clampedVal = Math.min(mMax, Math.max(mMin, Number(newVal)));
-
-        const finalValue = (isTargetObj || isObj)
-          ? { ...(isTargetObj ? targetValObj : {}), ...(isObj ? value : {}), value: clampedVal }
-          : clampedVal;
-
-        patchCharacterField(targetChar.id, ['relations', myName, 'values', field], finalValue);
-      }
-    } else {
-      const targetData = relations[targetName] || { targetText: '', targetValues: {} };
-
-      if (field === 'text') {
-        patchCharacterField(char.id, ['relations', targetName, 'targetText'], value);
-      } else {
-        const isObj = typeof value === 'object' && value !== null;
-        const targetValObj = targetData.targetValues?.[field];
-        const isTargetObj = typeof targetValObj === 'object' && targetValObj !== null;
-
-        let newVal = isObj ? value.value : value;
-        let mMin = isObj && value.min !== undefined ? value.min : (isTargetObj && targetValObj.min !== undefined ? targetValObj.min : -100);
-        let mMax = isObj && value.max !== undefined ? value.max : (isTargetObj && targetValObj.max !== undefined ? targetValObj.max : 100);
-        const clampedVal = Math.min(mMax, Math.max(mMin, Number(newVal)));
-
-        const finalValue = (isTargetObj || isObj)
-          ? { ...(isTargetObj ? targetValObj : {}), ...(isObj ? value : {}), value: clampedVal }
-          : clampedVal;
-
-        patchCharacterField(char.id, ['relations', targetName, 'targetValues', field], finalValue);
-      }
-    }
-  };
-
   return (
     <div className={styles.tabContentStack}>
 
-      {/* A. PROFILE TAB */}
       {activeTabs.profile && (
         <div className={styles.inlineTabContent}>
           <div className={styles.inlineHeaderLabelRow}>
@@ -122,7 +46,6 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
         </div>
       )}
 
-      {/* B. RELATIONS TAB */}
       {activeTabs.relations && (
         <div className={styles.inlineTabContent}>
           <div className={styles.inlineHeaderLabelRow}>
@@ -182,7 +105,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                 <div key={targetName} className={styles.relationTargetCard}>
                   <div className={styles.relationTargetHeader}>
                     <strong className={styles.targetNameText}>
-                      {targetName} {isTargetExist ? '🔗' : ''}
+                      {targetName} {isTargetExist ? '(Synced)' : ''}
                     </strong>
                     <div className={styles.flexCenterGap}>
                       <LockIcon
@@ -193,15 +116,12 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                     </div>
                   </div>
 
-                  <div className={styles.relationSectionGroupBlue}>
-                    <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} ➔ {targetName}</span>
+                  <div className={styles.relationSectionMyPerspective}>
+                    <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} to {targetName}</span>
                     <div className={styles.relationDescriptionArea}>
-                      <AutoGrowingTextArea
-                        className={styles.textBlockInput}
-                        value={data.text || ''}
-                        onChange={val => handleUpdateRelationField(targetName, 'text', val)}
-                        placeholder={`Describe feelings about ${targetName}...`}
-                      />
+                      <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
+                        {data.text || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
+                      </div>
                     </div>
                     {metricsList.length > 0 && (
                       <div className={styles.relationMetricsGrid}>
@@ -239,12 +159,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                               <div className={styles.gaugeLabelRow}>
                                 <span className={styles.gaugeName}>{m.name}</span>
                                 <div className={styles.gaugeValues}>
-                                  <input
-                                    type="number"
-                                    value={m.value}
-                                    onChange={(e) => handleUpdateRelationField(targetName, m.name, { ...m, value: Number(e.target.value) })}
-                                    className={styles.relationGaugeInput}
-                                  />
+                                  <span className={styles.readOnlyNumberValue}>{m.value}</span>
                                 </div>
                               </div>
                               <div className={styles.gaugeTrackWrapper}>
@@ -260,15 +175,12 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                     )}
                   </div>
 
-                  <div className={styles.relationSectionGroupRed}>
-                    <span className={styles.relationSectionSubTitle}>{targetName} ➔ {char.name || 'Character'}</span>
+                  <div className={styles.relationSectionTargetPerspective}>
+                    <span className={styles.relationSectionSubTitle}>{targetName} to {char.name || 'Character'}</span>
                     <div className={styles.relationDescriptionArea}>
-                      <AutoGrowingTextArea
-                        className={styles.textBlockInput}
-                        value={targetText}
-                        onChange={val => handleUpdateTargetRelationField(targetName, 'text', val)}
-                        placeholder={`${targetName}'s thoughts...`}
-                      />
+                      <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
+                        {targetText || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
+                      </div>
                     </div>
                     {targetMetricsList.length > 0 && (
                       <div className={styles.relationMetricsGrid}>
@@ -306,12 +218,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                               <div className={styles.gaugeLabelRow}>
                                 <span className={styles.gaugeName}>{m.name}</span>
                                 <div className={styles.gaugeValues}>
-                                  <input
-                                    type="number"
-                                    value={m.value}
-                                    onChange={(e) => handleUpdateTargetRelationField(targetName, m.name, { ...m, value: Number(e.target.value) })}
-                                    className={styles.relationGaugeInput}
-                                  />
+                                  <span className={styles.readOnlyNumberValue}>{m.value}</span>
                                 </div>
                               </div>
                               <div className={styles.gaugeTrackWrapper}>

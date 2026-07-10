@@ -1,5 +1,3 @@
-/* src/messagetracker/SnapshotModal.module.css */
-
 .overlay {
   position: fixed; 
   top: 0; 
@@ -96,7 +94,6 @@
   color: var(--rpg-highlight); 
 }
 
-/* 원클릭 선택 해제 버튼 정렬 및 쏠림 보정 */
 .deselectAllBtn {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--rpg-border);
@@ -122,7 +119,6 @@
   color: #ff6b6b;
 }
 
-/* 캐릭터 및 월드 상태 정렬 레이아웃 */
 .charRow {
   display: flex;
   align-items: center;
@@ -151,15 +147,21 @@
   color: var(--rpg-text);
 }
 
-.charOptions {
+.charOptionsColumn {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: opacity 0.2s;
+  flex-direction: column;
   flex: 1;
+  transition: opacity 0.2s;
+  gap: 2px;
 }
 
-/* 월드 정렬 컨테이너 */
+.charOptionsRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
 .worldOptionsContainer {
   display: flex;
   flex-direction: column;
@@ -214,7 +216,6 @@
   cursor: not-allowed; 
 }
 
-/* 뷰 모드 및 잠금 토글 버튼 쏠림 정밀 보정 */
 .viewBtn {
   background: rgba(255, 255, 255, 0.05); 
   border: 1px solid var(--rpg-border);
@@ -255,7 +256,6 @@
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
 }
 
-/* 고정식 JSON 에디터 스타일 */
 .jsonEditor {
   width: 100%; 
   height: 160px; 
@@ -279,7 +279,6 @@
   box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 
-/* 하단 푸터 바 및 버튼 레이아웃 완전 교정 */
 .footer {
   display: flex; 
   justify-content: flex-end; 

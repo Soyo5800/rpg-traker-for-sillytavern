@@ -130,7 +130,7 @@
   gap: 8px;
 }
 
-.relationSectionGroupBlue {
+.relationSectionMyPerspective {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -139,7 +139,7 @@
   padding: 0;
 }
 
-.relationSectionGroupRed {
+.relationSectionTargetPerspective {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -252,7 +252,7 @@
   min-height: 28px;
   height: auto;
   line-height: 1.4;
-  resize: vertical;
+  resize: none; /* 수동 드래그 크기 조절 완전 잠금 */
   outline: none;
   overflow-y: hidden;
   display: block;
@@ -271,4 +271,34 @@ input[type=number]::-webkit-inner-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+/* 읽기 전용 텍스트 및 숫자형 블록 전용 스타일 */
+.readOnlyBlock {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  cursor: default;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  resize: none !important; /* 드래그를 통한 인위적 확장 제한 */
+}
+
+.readOnlyNumberValue {
+  display: inline-block;
+  min-width: 25px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--rpg-text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: center;
+  padding: 1px 5px;
+  font-weight: bold;
+}
+
+.emptyPlaceholderInline {
+  font-style: italic;
+  opacity: 0.4;
+  font-size: 11px;
 }

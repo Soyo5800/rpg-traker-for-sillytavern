@@ -1,4 +1,5 @@
 // src/editor/PromptEditor.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './PromptEditor.module.css';
@@ -17,7 +18,7 @@ import { getDynamicSchemaExample } from '../core/ActivePrompt';
 
 export default function PromptEditor({ onClose }) {
   const { trackerData, updateTrackerData, isChatConnected } = useRPG();
-  const [activeTab, setActiveTab] = useState('system'); // 'system', 'addons', 'definitions'
+  const [activeTab, setActiveTab] = useState('system');
 
   const [localMergedHeader, setLocalMergedHeader] = useState('');
   const [localMergedFooter, setLocalMergedFooter] = useState('');
@@ -37,7 +38,6 @@ export default function PromptEditor({ onClose }) {
   const [isEditAddChar, setIsEditAddChar] = useState(false);
   const [isEditAddPlayerChar, setIsEditAddPlayerChar] = useState(false);
 
-  // 시스템 프롬프트 에디터 아코디언 기본 상태를 전부 닫힘(false)으로 수정
   const [isMergedOpen, setIsMergedOpen] = useState(false);
   const [isReadOnlyOpen, setIsReadOnlyOpen] = useState(false);
   const [isSepOpen, setIsSepOpen] = useState(false);
@@ -347,7 +347,7 @@ export default function PromptEditor({ onClose }) {
                       onChange={e => setLocalMergedHeader(e.target.value)}
                       readOnly={!isEditMerged}
                     />
-                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Schema Block will be injected here]</div>
+                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Hybrid State & Schema JSON will be injected here]</div>
                     <textarea
                       className={styles.textarea}
                       style={{ minHeight: '140px', opacity: isEditMerged ? 1 : 0.7 }}
@@ -380,7 +380,7 @@ export default function PromptEditor({ onClose }) {
                       onChange={e => setLocalReadOnlyPrompt(e.target.value)}
                       readOnly={!isEditReadOnly}
                     />
-                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Live RPG Status & Static Definitions will be appended here]</div>
+                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Live RPG Status (Values only) will be appended here]</div>
                   </div>
                 )}
               </div>
@@ -406,7 +406,7 @@ export default function PromptEditor({ onClose }) {
                       onChange={e => setLocalSepHeader(e.target.value)}
                       readOnly={!isEditSep}
                     />
-                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Schema Block will be injected here]</div>
+                    <div style={{ fontSize: '11px', textAlign: 'center', opacity: 0.5, color: 'var(--rpg-text)' }}>[Hybrid State & Schema JSON will be injected here]</div>
                     <textarea
                       className={styles.textarea}
                       style={{ minHeight: '140px', opacity: isEditSep ? 1 : 0.7 }}

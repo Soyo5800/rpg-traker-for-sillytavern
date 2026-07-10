@@ -1,4 +1,3 @@
-// src/editor/StatusEditor.jsx
 import React, { useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './StatusEditor.module.css';

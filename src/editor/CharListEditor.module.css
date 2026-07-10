@@ -138,7 +138,6 @@
   flex-direction: column;
 }
 
-/* 개별 프리셋 컨테이너 행 - Flex 정렬로 수직 중앙 정렬 배치 */
 .presetDropdownItem {
   display: flex;
   align-items: center;
@@ -151,7 +150,6 @@
   border-bottom: none;
 }
 
-/* 프리셋 로드 영역 (클릭 범위 분리) */
 .presetDropdownItemLoadArea {
   display: flex;
   align-items: center;
@@ -182,7 +180,6 @@
   flex-shrink: 0;
 }
 
-/* 개별 프리셋 다이렉트 삭제를 위한 전용 우측 버튼 스타일링 */
 .presetItemDeleteBtn {
   background: transparent;
   border: none;
@@ -191,7 +188,7 @@
   font-weight: bold;
   cursor: pointer;
   width: 32px;
-  height: 38px; /* 행 높이와 완전히 일치하도록 통일 */
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;

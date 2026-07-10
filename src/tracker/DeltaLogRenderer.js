@@ -65,10 +65,7 @@ export const deltaStyles = `
     border-radius: 6px;
     background: var(--rpg-bg, rgba(0,0,0,0.2));
     font-family: inherit;
-    
-    /* 실리터번 글자 크기 설정을 유연하게 상속 (기존 12px 대체) */
     font-size: 0.95em; 
-    
     width: calc(100% - 40px);
     max-width: calc(100% - 40px);
     box-sizing: border-box;
@@ -98,7 +95,7 @@ export const deltaStyles = `
 }
 .rpg-delta-header-icon::after {
     content: '▼';
-    font-size: 0.75em; /* em 단위 조절 */
+    font-size: 0.75em; 
     opacity: 0.7;
     transition: transform 0.15s;
     display: inline-block;
@@ -121,10 +118,7 @@ export const deltaStyles = `
 .rpg-delta-char-header {
     font-weight: bold;
     color: var(--rpg-highlight, var(--rpg-text, inherit));
-    
-    /* 비례 확장 적용 (기존 12.5px 대체) */
     font-size: 1.05em; 
-    
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -139,9 +133,7 @@ export const deltaStyles = `
     gap: 3px;
 }
 .rpg-delta-section-title {
-    /* 하위 헤더 상대크기 축소 정의 (기존 11px 대체) */
     font-size: 0.9em; 
-    
     text-transform: uppercase;
     opacity: 0.5;
     font-weight: bold;
@@ -153,14 +145,17 @@ export const deltaStyles = `
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
 .rpg-delta-list li {
     padding-left: 6px;
+    line-height: 1.4;
 }
 .rpg-delta-key {
     opacity: 0.8;
     color: var(--rpg-text, inherit);
+    font-weight: bold;
+    margin-right: 4px;
 }
 .rpg-delta-val {
     color: var(--rpg-highlight, var(--rpg-text, inherit));
@@ -168,6 +163,33 @@ export const deltaStyles = `
 }
 </style>
 `;
+
+function formatDeltaItem(item) {
+    if (!item) return '';
+    if (typeof item !== 'object') return String(item);
+
+    const type = item.type || 'general';
+    let formatted = item.name || 'Unknown';
+
+    if (type === 'currency') {
+        const qty = item.quantity !== undefined ? item.quantity : 0;
+        formatted += ` (${qty})`;
+    } else if (type === 'asset') {
+        const amount = item.assetValue?.amount || 0;
+        const currency = item.assetValue?.currencyName || 'Gold';
+        formatted += ` [Asset: ${amount} ${currency}]`;
+    } else {
+        if (item.quantity && item.quantity > 1) {
+            formatted += ` (x${item.quantity})`;
+        }
+    }
+
+    if (item.isContainer) {
+        formatted += ` [Container]`;
+    }
+
+    return formatted;
+}
 
 export function buildDeltaLogHtml(delta) {
     let contentHtml = '';
@@ -220,15 +242,35 @@ export function buildDeltaLogHtml(delta) {
             const items = [];
             if (updates.inventory.equipment && typeof updates.inventory.equipment === 'object') {
                 Object.entries(updates.inventory.equipment).forEach(([slot, val]) => {
-                    const name = val && typeof val === 'object' ? (val.name || 'Empty') : String(val);
-                    items.push(`<li><span class="rpg-delta-key">Equip [${slot}]:</span> <span class="rpg-delta-val">${name}</span></li>`);
+                    if (val === null || val === undefined) {
+                        items.push(`<li><span class="rpg-delta-key">Equip [${slot}]:</span> <span class="rpg-delta-val">Empty</span></li>`);
+                    } else if (typeof val === 'string') {
+                        items.push(`<li><span class="rpg-delta-key">Equip [${slot}]:</span> <span class="rpg-delta-val">${val}</span></li>`);
+                    } else if (typeof val === 'object') {
+                        const itemText = formatDeltaItem(val);
+                        const desc = val.desc || val.description ? ` (${val.desc || val.description})` : '';
+                        items.push(`<li><span class="rpg-delta-key">Equip [${slot}]:</span> <span class="rpg-delta-val">${itemText}${desc}</span></li>`);
+                    }
                 });
             }
             if (updates.inventory.storage && typeof updates.inventory.storage === 'object') {
                 Object.entries(updates.inventory.storage).forEach(([container, arr]) => {
                     if (Array.isArray(arr)) {
-                        const itemsStr = arr.map(i => typeof i === 'string' ? i : `${i.name} (x${i.quantity})`).join(', ');
-                        items.push(`<li><span class="rpg-delta-key">Storage [${container}]:</span> <span class="rpg-delta-val">${itemsStr || 'Empty'}</span></li>`);
+                        const itemsStr = arr.map(i => {
+                            if (typeof i === 'string') return i;
+                            if (i && typeof i === 'object') {
+                                let text = formatDeltaItem(i);
+                                if (i.desc || i.description) text += ` - ${i.desc || i.description}`;
+                                return text;
+                            }
+                            return '';
+                        }).filter(Boolean).join('<br/>&nbsp;&nbsp;');
+                        
+                        if (itemsStr) {
+                            items.push(`<li><span class="rpg-delta-key">Storage [${container}]:</span> <br/>&nbsp;&nbsp;<span class="rpg-delta-val">${itemsStr}</span></li>`);
+                        } else {
+                            items.push(`<li><span class="rpg-delta-key">Storage [${container}]:</span> <span class="rpg-delta-val">Empty</span></li>`);
+                        }
                     }
                 });
             }
@@ -246,13 +288,25 @@ export function buildDeltaLogHtml(delta) {
             const items = [];
             if (updates.quests.main) {
                 const q = updates.quests.main;
-                items.push(`<li><span class="rpg-delta-key">Main Quest:</span> <span class="rpg-delta-val">${q.name || q}</span></li>`);
+                if (typeof q === 'string') {
+                    items.push(`<li><span class="rpg-delta-key">Main Quest:</span> <span class="rpg-delta-val">${q}</span></li>`);
+                } else if (typeof q === 'object' && q !== null) {
+                    const status = q.status || (q.isCompleted ? 'COMPLETED' : 'ACTIVE');
+                    const name = q.name || 'Unknown';
+                    const desc = q.description || q.desc ? `<br/>&nbsp;&nbsp;↳ <span style="opacity:0.8; font-size:0.9em;">${q.description || q.desc}</span>` : '';
+                    items.push(`<li><span class="rpg-delta-key">Main Quest [${status}]:</span> <span class="rpg-delta-val">${name}${desc}</span></li>`);
+                }
             }
             if (Array.isArray(updates.quests.sideQuests)) {
-                updates.quests.sideQuests.forEach(sq => {
-                    const name = typeof sq === 'string' ? sq : (sq.name || 'Unknown');
-                    const status = sq.status || (sq.isCompleted ? 'COMPLETED' : 'ACTIVE');
-                    items.push(`<li><span class="rpg-delta-key">Side Quest [${status}]:</span> <span class="rpg-delta-val">${name}</span></li>`);
+                updates.quests.sideQuests.forEach((sq, idx) => {
+                    if (typeof sq === 'string') {
+                        items.push(`<li><span class="rpg-delta-key">Side Quest ${idx + 1}:</span> <span class="rpg-delta-val">${sq}</span></li>`);
+                    } else if (typeof sq === 'object' && sq !== null) {
+                        const status = sq.status || (sq.isCompleted ? 'COMPLETED' : 'ACTIVE');
+                        const name = sq.name || 'Unknown';
+                        const desc = sq.description || sq.desc ? `<br/>&nbsp;&nbsp;↳ <span style="opacity:0.8; font-size:0.9em;">${sq.description || sq.desc}</span>` : '';
+                        items.push(`<li><span class="rpg-delta-key">Side Quest ${idx + 1} [${status}]:</span> <span class="rpg-delta-val">${name}${desc}</span></li>`);
+                    }
                 });
             }
             if (items.length > 0) {
@@ -270,13 +324,28 @@ export function buildDeltaLogHtml(delta) {
             Object.entries(updates.relations).forEach(([target, rData]) => {
                 if (rData && typeof rData === 'object') {
                     if (rData.description) {
-                        items.push(`<li><span class="rpg-delta-key">Relation with ${target}:</span> <span class="rpg-delta-val">${rData.description}</span></li>`);
+                        items.push(`<li><span class="rpg-delta-key">➔ ${target}:</span> <span class="rpg-delta-val">${rData.description}</span></li>`);
                     }
                     if (rData.metrics && typeof rData.metrics === 'object') {
-                        Object.entries(rData.metrics).forEach(([mName, mVal]) => {
+                        const metricStrs = Object.entries(rData.metrics).map(([mName, mVal]) => {
                             const val = typeof mVal === 'object' && mVal !== null ? mVal.value : mVal;
-                            items.push(`<li><span class="rpg-delta-key">${target} [${mName}]:</span> <span class="rpg-delta-val">${val}</span></li>`);
-                        });
+                            return `${mName}: ${val}`;
+                        }).join(', ');
+                        if (metricStrs) {
+                            items.push(`<li><span class="rpg-delta-key">➔ ${target} (Metrics):</span> <span class="rpg-delta-val">${metricStrs}</span></li>`);
+                        }
+                    }
+                    if (rData.targetDescription) {
+                        items.push(`<li><span class="rpg-delta-key">From ${target}:</span> <span class="rpg-delta-val">${rData.targetDescription}</span></li>`);
+                    }
+                    if (rData.targetMetrics && typeof rData.targetMetrics === 'object') {
+                        const metricStrs = Object.entries(rData.targetMetrics).map(([mName, mVal]) => {
+                            const val = typeof mVal === 'object' && mVal !== null ? mVal.value : mVal;
+                            return `${mName}: ${val}`;
+                        }).join(', ');
+                        if (metricStrs) {
+                            items.push(`<li><span class="rpg-delta-key">From ${target} (Metrics):</span> <span class="rpg-delta-val">${metricStrs}</span></li>`);
+                        }
                     }
                 }
             });
@@ -297,8 +366,18 @@ export function buildDeltaLogHtml(delta) {
             if (updates.location) items.push(`<li><span class="rpg-delta-key">Location:</span> <span class="rpg-delta-val">${updates.location}</span></li>`);
             if (updates.weather) items.push(`<li><span class="rpg-delta-key">Weather:</span> <span class="rpg-delta-val">${updates.weather}</span></li>`);
             if (Array.isArray(updates.events)) {
-                const evts = updates.events.map(e => typeof e === 'string' ? e : (e.name || e.desc || '')).join(', ');
-                if (evts) items.push(`<li><span class="rpg-delta-key">Events:</span> <span class="rpg-delta-val">${evts}</span></li>`);
+                updates.events.forEach((e, idx) => {
+                    if (typeof e === 'string') {
+                        items.push(`<li><span class="rpg-delta-key">Event ${idx + 1}:</span> <span class="rpg-delta-val">${e}</span></li>`);
+                    } else if (e && typeof e === 'object') {
+                        const nameStr = e.name ? `<strong>${e.name}</strong>` : '';
+                        const descStr = e.desc || e.description || '';
+                        const valStr = [nameStr, descStr].filter(Boolean).join(': ');
+                        if (valStr) {
+                            items.push(`<li><span class="rpg-delta-key">Event ${idx + 1}:</span> <span class="rpg-delta-val">${valStr}</span></li>`);
+                        }
+                    }
+                });
             }
             if (items.length > 0) {
                 charChanges.push(`
