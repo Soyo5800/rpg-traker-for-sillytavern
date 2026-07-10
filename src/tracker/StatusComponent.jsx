@@ -117,7 +117,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                   </div>
 
                   <div className={styles.relationSectionMyPerspective}>
-                    <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} to {targetName}</span>
+                    <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} ➔ {targetName}</span>
                     <div className={styles.relationDescriptionArea}>
                       <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
                         {data.text || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
@@ -176,7 +176,7 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                   </div>
 
                   <div className={styles.relationSectionTargetPerspective}>
-                    <span className={styles.relationSectionSubTitle}>{targetName} to {char.name || 'Character'}</span>
+                    <span className={styles.relationSectionSubTitle}>{targetName} ➔ {char.name || 'Character'}</span>
                     <div className={styles.relationDescriptionArea}>
                       <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
                         {targetText || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}

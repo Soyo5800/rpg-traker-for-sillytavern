@@ -87,7 +87,6 @@ export default function InventoryTab({
       return;
     }
 
-    // Equipping container name only
     if (dragItem.loc === 'container' && destLoc === 'equipment') {
       const storageKey = dragItem.item.storageKey;
       nextEquip[destKey] = {
@@ -111,7 +110,6 @@ export default function InventoryTab({
 
     let itemToMove = { ...dragItem.item };
 
-    // Prevent moving container items directly into storage slots as standard items
     if (itemToMove.isContainer && destLoc === 'storage') {
       return;
     }
@@ -137,7 +135,6 @@ export default function InventoryTab({
       }
     }
 
-    // Remove or subtract from source
     if (dragItem.loc === 'equipment') {
       if (isPartialMove) {
         nextEquip[dragItem.key] = {
@@ -162,7 +159,6 @@ export default function InventoryTab({
 
     itemToMove.quantity = qtyToMove;
 
-    // Handle merge logic on destination
     if (destLoc === 'equipment') {
       const targetItem = nextEquip[destKey];
       if (targetItem && targetItem.name?.trim().toLowerCase() === itemToMove.name?.trim().toLowerCase() && isStackable) {
@@ -174,7 +170,6 @@ export default function InventoryTab({
       } else {
         nextEquip[destKey] = itemToMove;
         if (targetItem) {
-          // If overwriting an item, send it back to the first available storage
           const firstStore = Object.keys(nextStorage)[0] || 'Backpack';
           if (!nextStorage[firstStore]) nextStorage[firstStore] = [];
           
@@ -347,9 +342,23 @@ export default function InventoryTab({
                         }}
                       />
                     </div>
-                    <div className={styles.flexCenterGroupSmall}>
+                    <div className={styles.flexCenterGroupSmall} style={{ gap: '4px' }}>
                       <button type="button" className={`${styles.sortBtn} ${styles.miniSortBtn}`} disabled={slotIdx === 0} onClick={() => handleReorderEquipmentSlot(slotKey, "up")}>▲</button>
                       <button type="button" className={`${styles.sortBtn} ${styles.miniSortBtn}`} disabled={slotIdx === totalSlots - 1} onClick={() => handleReorderEquipmentSlot(slotKey, "down")}>▼</button>
+                      <button
+                        type="button"
+                        className={styles.removeInlineBtn}
+                        style={{ padding: '2px 5px', fontSize: '9px' }}
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete the equipment slot "${slotKey}"?`)) {
+                            const equip = { ...(targetChar.inventory?.equipment || {}) };
+                            delete equip[slotKey];
+                            handleUpdateNestedField('inventory', 'equipment', equip);
+                          }
+                        }}
+                      >
+                        X
+                      </button>
                     </div>
                   </div>
 
