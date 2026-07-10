@@ -23,7 +23,7 @@ The core value of this extension is **eliminating the need to manually modify co
 * **World State:** Track the current Date, Time, Location, Weather, and ongoing World Events.
 
 ### 2. LLM Integration & Prompt Control
-* **JSON Parsing:** Instructs the LLM to output parameter changes in JSON format hidden within HTML comments (`<!-- <rpgmt>... -->`). The extension parses this block and applies the changes to the UI.
+* **JSON Parsing:** Instructs the LLM to output parameter changes in JSON format hidden within HTML comments. The extension parses this block and applies the changes to the UI.
 * **Prompt Editor:** Allows customization of system prompts, field definitions, and schema formats sent to the LLM. 
 * **Update Modes:** Choose between updating data automatically during standard chat generation (Merged mode) or via standalone API calls (Separated/Isolated modes).
 
