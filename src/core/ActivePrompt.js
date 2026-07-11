@@ -341,7 +341,7 @@ export function buildDynamicValuesPrompt(trackerData) {
               if (itemList.length > 0) {
                 storageObj[container] = itemList.map(i => {
                   const itemType = i.type || 'general';
-                  const base = { id: i.id, type: itemType, name: i.name };
+                  const base = { id: i.id, type: i.type || 'general', name: i.name };
 
                   if (itemType === 'currency') {
                     base.quantity = i.quantity || 0;
@@ -421,6 +421,9 @@ export function buildDynamicValuesPrompt(trackerData) {
 export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', footerPrompt = '', forcePlayer = null) {
   const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
 
+  // Generate dynamic schema layout template based on current configuration
+  const schemaExample = getDynamicSchemaExample(trackerData, forcePlayer) || '';
+
   const guidePromptsData = trackerData.guidePrompts || [];
   const activeGuides = guidePromptsData.filter(g => g.enabled && g.prompt && g.prompt.trim() !== '').map(g => `- ${g.prompt.trim()}`);
 
@@ -433,8 +436,10 @@ export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', foo
     ? `\n### SPECIAL INSTRUCTIONS / ACTIVE ADD-ONS\n${activeGuides.join('\n')}\n`
     : '';
 
+  // Combine components into the final structured prompt block
   const finalPrompt = [
     headerPrompt,
+    schemaExample,
     footerPrompt,
     addonSection,
     staticDefs

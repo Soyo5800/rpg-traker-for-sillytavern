@@ -1,4 +1,4 @@
-(function(){try{if(typeof document<`u`){var e=document.createElement(`style`);e.appendChild(document.createTextNode(`._toggleWrapper_1u82c_1{-webkit-user-select:none;user-select:none;position:fixed;top:8px;left:8px;z-index:1001!important;margin:0!important;padding:0!important}@media (width>=1001px){._toggleWrapper_1u82c_1:not(._userPositioned_1u82c_27){top:6px;left:40px}}@media (width<=1000px){._toggleWrapper_1u82c_1:not(._userPositioned_1u82c_27){top:45px!important;left:10px!important}}._toggleButton_1u82c_55{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:38px;height:38px;color:var(--rpg-text);cursor:pointer;touch-action:none;border-radius:6px;justify-content:center;align-items:center;margin:0;padding:0;transition:background .2s,border-color .2s,color .2s;display:flex;box-shadow:2px 2px 10px #00000080}._toggleButton_1u82c_55:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff0d}._dragModeActive_1u82c_103 ._toggleButton_1u82c_55{border-style:dashed;border-color:var(--rpg-highlight);opacity:.85;cursor:move;border-radius:6px}._icon_1u82c_119{width:20px;height:20px;display:block}._contextMenu_1u82c_131{background:var(--rpg-bg);border:1px solid var(--rpg-border);border-radius:6px;flex-direction:column;gap:2px;min-width:150px;padding:4px;display:flex;position:absolute;top:calc(100% + 6px);left:0;box-shadow:0 4px 15px #00000080}._contextMenu_1u82c_131 button{color:var(--rpg-text);opacity:.8;text-align:left;cursor:pointer;background:0 0;border:none;border-radius:4px;align-items:center;gap:8px;padding:8px 12px;font-size:11px;transition:background .2s,opacity .2s;display:flex}._contextMenu_1u82c_131 button:hover{opacity:1;background:#ffffff14}._contextMenu_1u82c_131 button._activeMenuBtn_1u82c_203{color:var(--rpg-highlight);background:#ffffff0d;font-weight:700}._menuIcon_1u82c_215{flex-shrink:0;width:13px;height:13px}._panelContainer_z010d_5{color:var(--rpg-text);flex-direction:column;transition:width .3s,left .3s,right .3s;box-shadow:0 0 20px #00000073;background:var(--rpg-bg)!important;opacity:1!important;z-index:1000!important;height:100vh!important;margin:0!important;display:flex!important;position:fixed!important;top:0!important;bottom:0!important}._panelContainer_z010d_5._left_z010d_37{border-right:1px solid var(--rpg-border);animation:.2s ease-out _slideIn_z010d_1;width:calc(50vw - var(--sheldWidth,800px) / 2)!important;min-width:280px!important;left:0!important}._panelContainer_z010d_5._right_z010d_53{border-left:1px solid var(--rpg-border);animation:.2s ease-out _slideInRight_z010d_1;width:calc(50vw - var(--sheldWidth,800px) / 2)!important;min-width:280px!important;right:0!important}@keyframes _slideIn_z010d_1{0%{transform:translate(-100%)}to{transform:translate(0)}}@keyframes _slideInRight_z010d_1{0%{transform:translate(100%)}to{transform:translate(0)}}._collapseButton_z010d_89{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:20px;height:60px;color:var(--rpg-text);cursor:pointer;z-index:1001;outline:none;justify-content:center;align-items:center;padding:0;display:flex;position:absolute;top:50%;transform:translateY(-50%);box-shadow:2px 0 8px #0000004d}._collapseButton_z010d_89._left_z010d_37{border-left:none;border-radius:0 6px 6px 0;right:-21px}._collapseButton_z010d_89._right_z010d_53{border-right:none;border-radius:6px 0 0 6px;left:-21px}._collapseButton_z010d_89:hover{background:#ffffff0d}._collapseButton_z010d_89:hover ._collapseIcon_z010d_159{color:var(--rpg-highlight)}._collapseIcon_z010d_159{width:18px;height:18px;color:var(--rpg-text);transition:color .2s}._panelHeader_z010d_181{border-bottom:1px solid var(--rpg-border);background:#0000001a;flex-shrink:0;justify-content:space-between;align-items:center;padding:8px 12px;display:flex}._headerLeftArea_z010d_201{align-items:center;display:flex}._headerRightArea_z010d_211{flex-direction:column;align-items:flex-end;gap:5px;display:flex}._headerButtonRow_z010d_225{align-items:center;gap:5px;display:flex}._brand_z010d_237{align-items:center;gap:6px;display:flex}._headerIcon_z010d_249{width:16px;height:16px;color:var(--rpg-text)}._headerTitle_z010d_261{font-size:12.5px;font-weight:700}._headerBtn_z010d_271{border:1px solid var(--rpg-border);color:var(--rpg-text);box-sizing:border-box;cursor:pointer;background:#ffffff0a;border-radius:4px;justify-content:center;align-items:center;gap:4px;width:85px;height:24px;font-size:10.5px;font-weight:700;transition:background .15s,border-color .15s,color .15s;display:inline-flex}._headerBtn_z010d_271:hover:not(:disabled){border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._headerBtn_z010d_271:disabled{opacity:.5;cursor:not-allowed}._headerBtnIcon_z010d_329{flex-shrink:0;width:12px;height:12px}._scrollContainer_z010d_341{flex-direction:column;flex:1;width:100%;display:flex;overflow:auto hidden}._scrollContainer_z010d_341::-webkit-scrollbar{height:6px}._scrollContainer_z010d_341::-webkit-scrollbar-track{background:#00000026;border:none!important}._scrollContainer_z010d_341::-webkit-scrollbar-thumb{background:#fff3;border-radius:4px;background-clip:border-box!important;border:none!important}._scrollContainer_z010d_341::-webkit-scrollbar-thumb:hover{background:#ffffff59}._contentWrapper_z010d_399{box-sizing:border-box;flex-direction:column;flex:1;min-height:0;margin:0 auto;display:flex;flex-shrink:0!important;width:380px!important;min-width:380px!important;max-width:380px!important;padding:0!important}._panelNav_z010d_427{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;width:100%;display:flex}._panelNav_z010d_427 button{color:var(--rpg-text);opacity:.6;cursor:pointer;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:12px 0;font-size:11px;transition:opacity .2s,border-color .2s,color .2s}._panelNav_z010d_427 button:hover{opacity:.9}._panelNav_z010d_427 button._activeTab_z010d_477{opacity:1;border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._panelBody_z010d_489{flex:1;width:100%;padding:16px 0;overflow-y:auto}._panelBody_z010d_489::-webkit-scrollbar{width:6px}._panelBody_z010d_489::-webkit-scrollbar-track{background:0 0;border:none!important}._panelBody_z010d_489::-webkit-scrollbar-thumb{background:#fff3;border-radius:4px;background-clip:border-box!important;border:none!important}._panelBody_z010d_489::-webkit-scrollbar-thumb:hover{background:#ffffff59}._sectionPlaceholder_z010d_543{flex-direction:column;gap:12px;display:flex}._sectionPlaceholder_z010d_543 h4{color:var(--rpg-highlight);margin:0;font-size:13px}._desc_z010d_567{opacity:.7;margin:0;font-size:11px;line-height:1.5}._infoRow_z010d_581{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:4px;justify-content:space-between;padding:8px;font-size:12px;display:flex}@media (width<=1000px){._panelContainer_z010d_5{width:85vw!important;max-width:100vw!important}._panelContainer_z010d_5._left_z010d_37,._panelContainer_z010d_5._right_z010d_53{width:85vw!important}}._statusDot_z010d_627{border-radius:50%;width:8px;height:8px;margin-left:6px;display:inline-block;box-shadow:0 0 4px #0003}._statusDotConnected_z010d_645{background-color:#2ed573;box-shadow:0 0 8px #2ed573}._statusDotDisconnected_z010d_655{background-color:#ff4757;box-shadow:0 0 8px #ff4757}._container_ulkgy_5{flex-direction:column;gap:8px;height:100%;padding-right:6px;display:flex;overflow-y:auto}._topActionBar_ulkgy_23{gap:8px;margin-bottom:2px;display:flex}._topActionBtn_ulkgy_35{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;flex:1;padding:6px 12px;font-size:11px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._topActionBtn_ulkgy_35:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._charBlock_ulkgy_73{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:8px;flex-direction:column;gap:6px;padding:8px 12px;transition:border-color .2s;display:flex}._blockHeader_ulkgy_95{justify-content:space-between;align-items:center;padding-bottom:2px;display:flex}._headerLeft_ulkgy_109{cursor:pointer;align-items:center;gap:6px;max-width:60%;display:flex}._collapseArrowBtn_ulkgy_125{color:var(--rpg-text);background:0 0;border:none;padding:2px;font-size:12px;transition:transform .15s ease-out;display:inline-block;transform:rotate(0)}._arrowExpanded_ulkgy_147{transform:rotate(90deg)}._charName_ulkgy_155{color:var(--rpg-text);white-space:normal;word-break:break-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-size:14px;font-weight:700}._headerSwitches_ulkgy_175{align-items:center;gap:10px;display:flex}._settingsGearBtn_ulkgy_187{color:var(--rpg-text);cursor:pointer;opacity:.7;background:0 0;border:none;justify-content:center;align-items:center;padding:4px;transition:opacity .15s,color .15s;display:flex}._settingsGearBtn_ulkgy_187:hover{opacity:1;color:var(--rpg-highlight)}._switchRow_ulkgy_223{opacity:.7;cursor:pointer;align-items:center;gap:4px;font-size:11px;display:flex}._switchContainer_ulkgy_243{width:28px;height:14px;display:inline-block;position:relative}._switchContainer_ulkgy_243 input{opacity:0;width:0;height:0}._switchSlider_ulkgy_269{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_ulkgy_269:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchContainer_ulkgy_243 input:checked+._switchSlider_ulkgy_269{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchContainer_ulkgy_243 input:checked+._switchSlider_ulkgy_269:before{background-color:var(--rpg-highlight);transform:translate(14px)}._dashboardContainer_ulkgy_339{border-top:1px solid #ffffff14;flex-direction:column;gap:6px;margin-top:2px;padding-top:6px;display:flex}._uniformControlGrid_ulkgy_357{align-items:center;gap:4px;width:100%;display:flex}._iconGridBtn_ulkgy_371{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;justify-content:center;align-items:center;width:32px;height:32px;transition:background .15s,border-color .15s,color .15s;display:flex}._iconGridBtn_ulkgy_371:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._activeGridBtn_ulkgy_411{background:var(--rpg-highlight-bg)!important;border-color:var(--rpg-highlight)!important;color:var(--rpg-highlight)!important}._avatarGridCell_ulkgy_423{border:1px solid var(--rpg-border);background:#0003;border-radius:5px;width:32px;height:32px;margin-left:auto;overflow:hidden}._avatarGridImage_ulkgy_443{object-fit:cover;width:100%;height:100%}._avatarGridFallback_ulkgy_455{color:var(--rpg-highlight);opacity:.8;justify-content:center;align-items:center;height:100%;font-size:11px;font-weight:700;display:flex}._statusComponentContainer_ulkgy_479{display:none}._statusComponentContainer_ulkgy_479._tabActive_ulkgy_487{margin-top:1px;margin-bottom:2px;display:block}._gaugeGrid_ulkgy_499{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;display:grid}._gaugeCard_ulkgy_511{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:4px;padding:6px 8px;display:flex}._gaugeLabelRow_ulkgy_531{justify-content:space-between;align-items:center;display:flex}._gaugeName_ulkgy_543{white-space:normal;word-break:break-word;flex:1;font-size:11px;font-weight:700}._gaugeLabelContainer_ulkgy_559{flex:1;align-items:center;min-width:0;margin-right:4px;display:flex}._lockIcon_ulkgy_575{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_ulkgy_591{opacity:1}._smallNumberInput_ulkgy_599{text-align:center;border:1px solid var(--rpg-border);width:32px;height:18px;min-height:18px;color:var(--rpg-text);-webkit-appearance:none;background:#0003;border-radius:4px;outline:none;margin:0;padding:0;font-size:11px;line-height:16px}._smallNumberInput_ulkgy_599:focus{border-color:var(--rpg-highlight)!important}._gaugeMaxText_ulkgy_641{margin-top:0;font-size:11px}._gaugeValues_ulkgy_651{align-items:center;gap:2px;display:flex}._gaugeValStatic_ulkgy_663{cursor:pointer;background:#ffffff0d;border-radius:3px;padding:1px 4px;font-size:11.5px;font-weight:700}._gaugeValStatic_ulkgy_663:hover{background:#ffffff1f}._gaugeInputActive_ulkgy_689{border:1px solid var(--rpg-highlight);color:var(--rpg-text);text-align:center;background:#0006;border-radius:3px;outline:none;width:36px;padding:1px;font-size:11.5px}._gaugeInputActive_ulkgy_689::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._gaugeInputActive_ulkgy_689::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._integerRowInputActive_ulkgy_719::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._integerRowInputActive_ulkgy_719::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._textBlockInput_ulkgy_723::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._textBlockInput_ulkgy_723::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._gaugeInputActive_ulkgy_689[type=number],._integerRowInputActive_ulkgy_719[type=number],._textBlockInput_ulkgy_723[type=number]{-moz-appearance:textfield}._gaugeMax_ulkgy_641{opacity:.5;font-size:10px}._gaugeTrack_ulkgy_755{border:1px solid var(--rpg-border);background:#0006;border-radius:3px;height:5px;overflow:hidden}._gaugeFill_ulkgy_771{border-radius:2px;height:100%;transition:width .3s ease-out}._integerRowGrid_ulkgy_785{grid-template-columns:repeat(4,1fr);gap:4px;display:grid}._integerBlockCard_ulkgy_797{background:#0000001f;border:1px solid #ffffff08;border-radius:5px;flex-direction:column;justify-content:space-between;align-items:center;gap:4px;height:100%;padding:4px;display:flex}._integerFieldLeft_ulkgy_823{flex:1;justify-content:center;align-items:center;width:100%;min-width:0;padding-left:18px;padding-right:18px;display:flex;position:relative}._integerFieldLeft_ulkgy_823 ._lockIcon_ulkgy_575{margin:0;position:absolute;top:50%;left:2px;transform:translateY(-50%)}._integerFieldName_ulkgy_863{white-space:normal;word-break:break-all;overflow-wrap:break-word;text-align:center;width:100%;font-size:11px;font-weight:700;line-height:1.1}._integerFieldControlGroup_ulkgy_885{justify-content:space-between;align-items:center;width:100%;padding:0 2px;display:flex}._integerRowValStatic_ulkgy_901{text-align:center;cursor:pointer;background:#ffffff0d;border-radius:3px;min-width:18px;padding:1px 2px;font-size:11.5px;font-weight:700}._integerRowInputActive_ulkgy_719{border:1px solid var(--rpg-highlight);color:var(--rpg-text);text-align:center;background:#0006;border-radius:3px;outline:none;width:24px;padding:1px;font-size:11.5px}._integerRowBtn_ulkgy_947{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:3px;justify-content:center;align-items:center;width:16px;height:16px;font-size:10px;display:flex}._textStack_ulkgy_975{flex-direction:column;gap:6px;display:flex}._textBlockCard_ulkgy_987{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;justify-content:space-between;align-items:center;gap:8px;padding:4px 8px;display:flex}._textBlockLabel_ulkgy_1009{color:var(--rpg-text);white-space:normal;word-break:break-word;text-align:left;flex:none;width:70px;margin:0;padding-right:4px;font-size:11px;font-weight:700}._textBlockInputWrapper_ulkgy_1037{flex:1;max-width:calc(100% - 22px);padding-left:4px}._textBlockInput_ulkgy_723{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:11px;line-height:1.4;transition:border-color .15s;display:block;overflow-y:hidden}._textBlockInput_ulkgy_723:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._dangerText_ulkgy_1097{color:#e74c3c!important}._dangerTrack_ulkgy_1099{border-color:#e74c3c}._dangerFlash_ulkgy_1101{animation:1s infinite alternate _flashDanger_ulkgy_1}@keyframes _flashDanger_ulkgy_1{0%{opacity:.5}to{opacity:1}}._tabContentStack_1d1oz_5{flex-direction:column;gap:10px;margin:6px 0;display:flex}._inlineTabContent_1d1oz_19{background:#00000040;border:1px solid #ffffff0d;border-radius:7px;padding:10px 12px;animation:.15s ease-out forwards _slideDownIn_1d1oz_1;box-shadow:inset 0 2px 8px #0000004d}@keyframes _slideDownIn_1d1oz_1{0%{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}._inlineHeaderLabelRow_1d1oz_47{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._inlineSheetTitle_1d1oz_61{color:var(--rpg-text);font-size:12.5px;font-weight:700}._quickAddBtn_1d1oz_73{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:3px 10px;font-size:10.5px;transition:background .15s}._quickAddBtn_1d1oz_73:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._appearanceGrid_1d1oz_109{flex-direction:column;gap:7px;display:flex}._appearanceRow_1d1oz_121{align-items:flex-start;gap:12px;display:flex}._appearanceRow_1d1oz_121 ._lockIcon_1d1oz_133{margin-top:6px}._fieldLabel_1d1oz_141{opacity:.6;white-space:normal;word-break:break-word;flex-shrink:0;width:60px;margin-top:6px;font-size:10.5px;font-weight:700}._appearanceInputWrapper_1d1oz_163{flex:1;width:calc(100% - 22px);min-width:0}._relationTargetCard_1d1oz_177{background:#ffffff03;border:1px solid #ffffff0a;border-radius:6px;flex-direction:column;gap:6px;margin-bottom:8px;padding:8px;display:flex}._relationTargetHeader_1d1oz_199{border-bottom:1px solid #ffffff08;justify-content:space-between;align-items:center;padding-bottom:4px;display:flex}._targetNameText_1d1oz_215{color:var(--rpg-text);white-space:normal;word-break:break-word;font-size:12.5px}._lockIcon_1d1oz_133{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_1d1oz_245{opacity:1!important}._flexCenterGap_1d1oz_253{align-items:center;gap:8px;display:flex}._relationSectionMyPerspective_1d1oz_265{background:0 0;border:none;flex-direction:column;gap:6px;padding:0;display:flex}._relationSectionTargetPerspective_1d1oz_283{background:0 0;border:none;flex-direction:column;gap:6px;margin-top:10px;padding:0;display:flex}._relationSectionSubTitle_1d1oz_303{color:var(--rpg-text);margin-bottom:2px;font-size:11px;font-weight:700}._relationGaugeInput_1d1oz_317{width:35px;color:var(--rpg-text);border:1px solid var(--rpg-border);text-align:center;background:#0000004d;border-radius:3px;outline:none;margin-right:2px;font-size:11px}._relationMetricsGrid_1d1oz_341{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:4px 0;display:grid}._gaugeCard_1d1oz_355{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:4px;padding:6px 8px;display:flex}._gaugeLabelRow_1d1oz_375{justify-content:space-between;align-items:center;display:flex}._gaugeName_1d1oz_387{white-space:normal;word-break:break-word;opacity:.8;max-width:50%;font-size:11px;font-weight:700}._gaugeValues_1d1oz_405{align-items:center;gap:2px;display:flex}._gaugeTrackWrapper_1d1oz_417{border:1px solid var(--rpg-border);background:#0006;border-radius:3px;height:5px;position:relative;overflow:hidden}._gaugeZeroMarker_1d1oz_435{z-index:2;background-color:#fff6;width:1px;position:absolute;top:0;bottom:0}._gaugeFill_1d1oz_453{border-radius:2px;height:100%;transition:width .3s ease-out,left .3s ease-out;position:absolute;top:0;bottom:0}._emptyPlaceholder_1d1oz_471{opacity:.3;text-align:center;padding:16px;font-size:11.5px}._textBlockInput_1d1oz_487{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:none;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:12px;line-height:1.4;display:block;overflow-y:hidden}._textBlockInput_1d1oz_487:focus{outline:none;border:1px solid var(--rpg-highlight)!important}input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._readOnlyBlock_1d1oz_553{cursor:default;white-space:pre-wrap;word-break:break-all;overflow-wrap:break-word;resize:none!important;background:#0000001a!important;border-color:#ffffff0d!important}._readOnlyNumberValue_1d1oz_573{min-width:25px;color:var(--rpg-text);text-align:center;background:#0003;border:1px solid #ffffff1a;border-radius:4px;padding:1px 5px;font-size:11px;font-weight:700;display:inline-block}._emptyPlaceholderInline_1d1oz_599{opacity:.4;font-size:11px;font-style:italic}._tabContentStack_78yvk_5{flex-direction:column;gap:10px;margin:6px 0;display:flex}._inlineTabContent_78yvk_19{background:#00000040;border:1px solid #ffffff0d;border-radius:7px;padding:10px 12px;animation:.15s ease-out forwards _slideDownIn_78yvk_1;box-shadow:inset 0 2px 8px #0000004d}@keyframes _slideDownIn_78yvk_1{0%{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}._inlineHeaderLabelRow_78yvk_47{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._inlineSheetTitle_78yvk_61{color:var(--rpg-text);font-size:12.5px;font-weight:700}._quickAddBtn_78yvk_73{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:3px 10px;font-size:10.5px;transition:background .15s}._quickAddBtn_78yvk_73:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._flexCenterGap_78yvk_107{align-items:center;gap:8px;display:flex}._lockIcon_78yvk_119{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_78yvk_135{opacity:1!important}._sidebarInventoryGrid_78yvk_145{flex-direction:column;gap:8px;display:flex}._sidebarSection_78yvk_157{background:#00000026;border-radius:5px;padding:6px 8px}._sidebarSectionHeader_78yvk_169{justify-content:space-between;align-items:center;margin-bottom:6px;display:flex}._sidebarSectionTitleRow_78yvk_183{align-items:center;gap:4px;display:flex}._sidebarSectionTitle_78yvk_183{opacity:.5;margin:0;font-size:11px;font-weight:700;display:block}._sideBySideRow_78yvk_211{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;display:grid}._sidebarEquipSlot_78yvk_223,._sidebarStorageSlot_78yvk_223{white-space:normal;word-break:break-all;overflow-wrap:break-word;background:#0003;border:1px solid #ffffff14;border-radius:4px;flex-direction:column;padding:6px;display:flex}._slotSmallLabel_78yvk_247{opacity:.4;margin-bottom:3px;font-size:11px}._itemInfoStack_78yvk_259{flex-direction:column;display:flex}._itemSidebarText_78yvk_269{color:var(--rpg-text);white-space:normal;word-break:break-all;overflow-wrap:break-word;font-size:11px}._containerBadge_78yvk_285{border:1px solid var(--rpg-border);color:var(--rpg-highlight);vertical-align:middle;background:#00000059;border-radius:3px;margin-left:4px;padding:1px 4px;font-size:9px;font-weight:700;line-height:1;display:inline-block}._itemSidebarDescText_78yvk_313{opacity:.5;margin-top:2px;font-size:9px}._itemSidebarDescTextIndented_78yvk_325{opacity:.5;padding-left:8px;font-size:9px}._sidebarStorageHeaderRow_78yvk_337{justify-content:space-between;align-items:center;margin-bottom:4px;display:flex}._sidebarStorageList_78yvk_351{flex-direction:column;gap:2px;display:flex}._storageItemBlock_78yvk_363{flex-direction:column;margin-bottom:4px;display:flex}._itemMainLine_78yvk_375{align-items:center;gap:4px;width:100%;display:flex}._itemBullet_78yvk_389{opacity:.5;flex-shrink:0;font-size:11px}._qtyBadge_78yvk_401{color:var(--rpg-text);opacity:.6;flex-shrink:0;margin-left:auto;font-size:10px;font-weight:700}._currencyBadge_78yvk_419{color:var(--rpg-highlight);border:1px solid var(--rpg-border);background:#00000040;border-radius:4px;flex-shrink:0;margin-left:auto;padding:1px 5px;font-size:10px;font-weight:700}._assetBadge_78yvk_443{color:var(--rpg-text);border:1px dashed var(--rpg-border);background:#ffffff0d;border-radius:4px;flex-shrink:0;margin-left:auto;padding:1px 5px;font-size:10px}._emptyTextIndicator_78yvk_465{opacity:.3;font-size:10px}._questContainer_78yvk_477{flex-direction:column;gap:8px;margin-bottom:14px;display:flex}._questContentBlock_78yvk_491{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;flex-direction:column;gap:6px;padding:8px 10px;display:flex;position:relative}._questCompleted_78yvk_513{opacity:.6}._textStrike_78yvk_521{text-decoration:line-through}._questHeaderRow_78yvk_529{align-items:center;gap:8px;width:100%;display:flex}._questTitleInputText_78yvk_543{flex:1;width:100%;margin:0;padding:5px 8px;font-size:12px;font-weight:700}._sideQuestHeader_78yvk_561{border-top:1px solid #ffffff0d;margin-bottom:8px;padding-top:10px}._questsListContainer_78yvk_573{flex-direction:column;gap:8px;display:flex}._questSideHeaderRow_78yvk_585{justify-content:space-between;align-items:center;gap:8px;display:flex}._questSideIndex_78yvk_599{opacity:.5;font-size:10px;font-weight:700}._questSideRemoveBtn_78yvk_611{color:#fff6;cursor:pointer;background:0 0;border:none;padding:0 4px;font-size:14px;line-height:1}._questSideRemoveBtn_78yvk_611:hover{color:#e74c3c}._emptyPlaceholder_78yvk_639{opacity:.3;text-align:center;padding:16px;font-size:11.5px}._switchRow_78yvk_655{opacity:.7;cursor:pointer;align-items:center;gap:4px;margin:0;font-size:11px;display:flex}._switchLabel_78yvk_675{width:28px;height:14px;display:inline-block;position:relative}._switchInput_78yvk_689{opacity:0;width:0;height:0}._switchSlider_78yvk_701{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_78yvk_701:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchInput_78yvk_689:checked+._switchSlider_78yvk_701{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchInput_78yvk_689:checked+._switchSlider_78yvk_701:before{background-color:var(--rpg-highlight);transform:translate(14px)}._textBlockInput_78yvk_773{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:12px;line-height:1.4;display:block;overflow-y:hidden}._textBlockInput_78yvk_773:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._overlay_m4aus_3{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;padding:24px;display:flex;position:fixed;top:0;left:0;z-index:2000!important}._modal_m4aus_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_m4aus_61{border-bottom:1px solid var(--rpg-border);box-sizing:border-box;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_m4aus_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._headerRight_m4aus_99{align-items:center;gap:12px;display:flex}._headerFolderBtn_m4aus_111{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._headerFolderBtn_m4aus_111:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._closeBtn_m4aus_147{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px;line-height:1}._closeBtn_m4aus_147:hover{opacity:1}._presetBar_m4aus_175{border-bottom:1px solid var(--rpg-border);background:#0003;align-items:center;gap:8px;padding:12px 18px;display:flex}._presetInputContainer_m4aus_193{flex:1}._presetInputWrapper_m4aus_201{border:1px solid var(--rpg-border);background:#0000004d;border-radius:4px;align-items:center;padding:2px 4px 2px 10px;display:flex}._presetInputWrapper_m4aus_201:focus-within{border-color:var(--rpg-highlight)}._presetNameInput_m4aus_227{color:var(--rpg-text);background:0 0;border:none;outline:none;flex:1;padding:4px 0;font-size:13px}._presetDropdown_m4aus_247{background:var(--rpg-bg);border:1px solid var(--rpg-border);z-index:100;border-radius:6px;flex-direction:column;width:100%;max-height:180px;margin-top:4px;display:flex;position:absolute;top:100%;right:0;overflow-y:auto;box-shadow:0 4px 12px #00000080}._presetDropdownItem_m4aus_281{background:0 0;border-bottom:1px solid #ffffff0d;align-items:center;min-height:38px;display:flex}._presetDropdownItem_m4aus_281:last-child{border-bottom:none}._presetDropdownItemLoadArea_m4aus_305{cursor:pointer;flex:1;justify-content:space-between;align-items:center;min-width:0;padding:8px 12px;display:flex}._presetDropdownItemLoadArea_m4aus_305:hover{background:#ffffff14}._presetItemName_m4aus_333{text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:8px;font-size:13px;overflow:hidden}._presetItemBadges_m4aus_351{flex-shrink:0;align-items:center;gap:4px;display:flex}._presetItemDeleteBtn_m4aus_365{color:#e74c3c;cursor:pointer;background:0 0;border:none;border-left:1px solid #ffffff0d;flex-shrink:0;justify-content:center;align-items:center;width:32px;height:38px;font-size:16px;font-weight:700;transition:background .15s,color .15s;display:flex}._presetItemDeleteBtn_m4aus_365:hover{color:#ff6b6b;background:#e74c3c1f}._presetDropdownEmpty_m4aus_409{text-align:center;opacity:.5;padding:12px;font-size:12px}._body_m4aus_423{flex-direction:column;flex:1;gap:10px;padding:18px;display:flex;overflow-y:auto}._charItem_m4aus_441{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;align-items:center;gap:12px;padding:8px 12px;display:flex}._dragControls_m4aus_461{flex-direction:column;gap:2px;display:flex}._dragControls_m4aus_461 button{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:3px;justify-content:center;align-items:center;width:20px;height:16px;font-size:8px;display:flex}._dragControls_m4aus_461 button:disabled{opacity:.2;cursor:not-allowed}._dragControls_m4aus_461 button:not(:disabled):hover{background:#ffffff26}._nameInput_m4aus_519{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0000004d;border-radius:4px;outline:none;flex:1;padding:6px 10px;font-size:13px;font-weight:700}._nameInput_m4aus_519:focus{border-color:var(--rpg-highlight)}._actions_m4aus_551{align-items:center;gap:6px;display:flex}._iconBtn_m4aus_563{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:4px;justify-content:center;align-items:center;width:28px;height:28px;transition:all .2s;display:flex}._iconBtn_m4aus_563:hover{background:#ffffff26}._deleteBtn_m4aus_599{color:#e74c3c;font-size:18px;font-weight:700}._deleteBtn_m4aus_599:hover{background:#e74c3c26;border-color:#e74c3c}._addBtn_m4aus_621{border:1px dashed var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;margin-top:4px;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._addBtn_m4aus_621:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._charIdBadge_m4aus_659{color:var(--rpg-text);opacity:.65;-webkit-user-select:none;user-select:none;text-align:center;background:#ffffff1a;border:1px solid #ffffff26;border-radius:4px;min-width:36px;margin-left:6px;padding:3px 6px;font-size:11px;font-weight:700;display:inline-block}._footer_m4aus_691{border-top:1px solid var(--rpg-border);box-sizing:border-box;background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:12px 18px;display:flex}._footerLeft_m4aus_717,._footerRight_m4aus_725{display:flex}._footerBtn_m4aus_733{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;padding:7px 14px;font-size:11.5px;font-weight:700;transition:background .15s,border-color .15s}._footerBtn_m4aus_733:hover{background:#ffffff14}._footerBtn_m4aus_733._reset_m4aus_765{color:#e74c3c;border-color:#e74c3c40}._footerBtn_m4aus_733._reset_m4aus_765:hover{background:#e74c3c1a;border-color:#e74c3c}._footerBtn_m4aus_733._save_m4aus_785{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._footerBtn_m4aus_733._save_m4aus_785:hover{opacity:.9}._addCharMainBtn_29ki7_5{border:1px dashed var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;width:100%;padding:8px 16px;font-size:12px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._addCharMainBtn_29ki7_5:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._editorOverlay_29ki7_43{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;padding:24px;display:flex;position:fixed;top:0;left:0;z-index:2000!important}._editorModal_29ki7_71{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._editorHeader_29ki7_101{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._headerNav_29ki7_121{align-items:center;gap:12px;width:90%;display:flex}._closeBtn_29ki7_135{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_29ki7_135:hover{opacity:1}._editorBody_29ki7_161{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._statEditorDetail_29ki7_179{flex-direction:column;gap:12px;display:flex}._sectionWrapper_29ki7_191{border:1px solid var(--rpg-border);background:#00000026;border-radius:7px;padding:12px}._sectionHeaderLine_29ki7_205{justify-content:space-between;align-items:center;margin-bottom:10px;display:flex}._sectionHeaderLine_29ki7_205 h5{opacity:.8;margin:0;font-size:12px}._addQuickFieldBtn_29ki7_231{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:4px;padding:4px 10px;font-size:10.5px;font-weight:700}._emptySectionText_29ki7_253{opacity:.35;text-align:center;margin:8px 0;font-size:11px}._schemaItem_29ki7_267{border:1px solid var(--rpg-border);background:#ffffff03;border-radius:5px;margin-bottom:6px;overflow:hidden}._itemExpanded_29ki7_283{background:#ffffff05;border-color:#ffffff26}._itemHeader_29ki7_293{background:#0000001a;justify-content:space-between;align-items:center;padding:6px 10px;display:flex}._headerLeftZone_29ki7_309{align-items:center;gap:8px;display:flex}._accordionToggleBtn_29ki7_321{color:var(--rpg-text);cursor:pointer;background:0 0;border:none;padding:3px;font-size:10px;transition:transform .2s;transform:rotate(0)}._activeToggle_29ki7_343{transform:rotate(90deg)}._headerRightZone_29ki7_351{align-items:center;gap:5px;display:flex}._sortBtn_29ki7_363{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff05;border-radius:3px;justify-content:center;align-items:center;width:20px;height:20px;font-size:9px;display:flex}._sortBtn_29ki7_363:disabled{opacity:.15;cursor:not-allowed}._sortBtn_29ki7_363:not(:disabled):hover{background:#ffffff14}._switchRow_29ki7_409{opacity:.7;cursor:pointer;align-items:center;gap:4px;margin-right:4px;font-size:11px;display:flex}._switchLabel_29ki7_429{width:28px;height:14px;display:inline-block;position:relative}._switchInput_29ki7_443{opacity:0;width:0;height:0}._switchSlider_29ki7_455{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_29ki7_455:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchInput_29ki7_443:checked+._switchSlider_29ki7_455{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchInput_29ki7_443:checked+._switchSlider_29ki7_455:before{background-color:var(--rpg-highlight);transform:translate(14px)}._removeInlineBtn_29ki7_525{color:#e74c3c;cursor:pointer;background:#e74c3c26;border:1px solid #e74c3c4d;border-radius:3px;padding:2px 6px;font-size:10.5px;font-weight:700}._removeInlineBtn_29ki7_525:hover{background:#e74c3c40}._itemFields_29ki7_555{background:#0000001a;border-top:1px solid #ffffff0a;flex-direction:column;gap:8px;padding:10px;display:flex}._inlineRow_29ki7_573{justify-content:space-between;align-items:center;gap:10px;width:100%;display:flex}._inlineRow_29ki7_573 label{opacity:.6;min-width:70px;font-size:11.5px;font-weight:700}._inlineRow_29ki7_573 input,._inlineRow_29ki7_573 select{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11.5px;transition:border-color .15s}._inlineRow_29ki7_573 input:focus,._inlineRow_29ki7_573 select:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._inlineRow_29ki7_573 input[type=color]{cursor:pointer;width:30px;height:20px;padding:0}._fixedBadge_29ki7_655{opacity:.7;background:#ffffff0d;border:1px solid #ffffff1a;border-radius:3px;padding:2px 5px;font-size:9px;font-weight:700}._editorFooter_29ki7_675{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:12px 18px;display:flex}._footerLeft_29ki7_699{gap:6px;display:flex}._footerRight_29ki7_701{display:flex}._footerBtn_29ki7_705{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;padding:7px 14px;font-size:11.5px;font-weight:700;transition:background .15s,border-color .15s}._footerBtn_29ki7_705:hover{background:#ffffff14}._footerBtn_29ki7_705._reset_29ki7_737{color:#e74c3c;border-color:#e74c3c40}._footerBtn_29ki7_705._reset_29ki7_737:hover{background:#e74c3c1a;border-color:#e74c3c}._footerBtn_29ki7_705._save_29ki7_757{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._footerBtn_29ki7_705._save_29ki7_757:hover{opacity:.9}._editorTabs_29ki7_773{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;display:flex}._tabBtn_29ki7_787{color:var(--rpg-text);opacity:.6;cursor:pointer;text-align:center;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._tabBtn_29ki7_787:hover{opacity:1;background:#ffffff05}._tabBtnActive_29ki7_827{opacity:1;color:var(--rpg-highlight);border-bottom:2px solid var(--rpg-highlight);background:#ffffff0a}._appearanceSection_29ki7_841{margin-top:10px}._relationsTabBody_29ki7_845,._inventoryTabBody_29ki7_847{flex-direction:column;gap:12px;padding:4px 2px;display:flex}._tabHeaderRow_29ki7_861{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._tabHeaderRow_29ki7_861 span{font-size:13px;font-weight:700;color:var(--rpg-text)!important}._relationCard_29ki7_887{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:6px;flex-direction:column;gap:8px;padding:10px;display:flex}._relationCardHeader_29ki7_907{border-bottom:1px solid #ffffff0d;justify-content:space-between;align-items:center;padding-bottom:6px;display:flex}._relationCardHeader_29ki7_907 strong{color:var(--rpg-text)!important}._metricBlock_29ki7_933{background:#00000026;border:1px solid #ffffff0a;border-radius:5px;flex-direction:column;gap:6px;padding:6px 8px;display:flex}._metricHeaderRow_29ki7_953{justify-content:space-between;align-items:center;gap:8px;width:100%;display:flex}._metricValueGroup_29ki7_969{flex-shrink:0;align-items:center;gap:6px;display:flex}._metricValueInput_29ki7_983{border:1px solid var(--rpg-border);width:48px;color:var(--rpg-text);text-align:center;background:#0003;border-radius:4px;outline:none;padding:4px;font-size:11px;font-weight:700}._metricValueInput_29ki7_983:focus{border-color:var(--rpg-highlight)!important}._metricConfigRow_29ki7_1017{border-top:1px dashed #ffffff0d;flex-wrap:wrap;align-items:center;gap:12px;width:100%;padding-top:4px;display:flex}._invActionBar_29ki7_1037{gap:6px;margin-bottom:10px;display:flex}._invActionBtn_29ki7_1049{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:4px;flex:1;padding:6px;font-size:11px;font-weight:700;transition:all .15s}._invActionBtn_29ki7_1049:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._invSection_29ki7_1087{margin-bottom:10px}._invSectionTitle_29ki7_1091{opacity:.6;margin-bottom:6px;font-size:11.5px;font-weight:700}._invEquipGrid_29ki7_1105,._invStorageGrid_29ki7_1105{grid-template-columns:1fr;gap:8px;display:grid}._invSlotCard_29ki7_1117{background:#00000026;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;justify-content:space-between;min-height:80px;padding:8px;display:flex}._slotHeader_29ki7_1139{justify-content:space-between;align-items:center;margin-bottom:6px;display:flex}._emptyText_29ki7_1153{opacity:.3;text-align:center;padding:10px 0;font-size:11px}._invStorageBox_29ki7_1167{background:#00000026;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:6px;padding:8px;display:flex}._invStorageItemsList_29ki7_1187{flex-direction:column;gap:6px;min-height:80px;display:flex}._invItemRow_29ki7_1201{background:#ffffff05;border:1px solid #ffffff05;border-radius:4px;justify-content:space-between;align-items:center;padding:6px 8px;display:flex}._itemTitleLine_29ki7_1221{flex-wrap:nowrap;align-items:center;gap:8px;width:100%;display:flex}._itemDescLine_29ki7_1237{flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;width:100%;display:flex}._itemQtyBox_29ki7_1255{flex-shrink:0;justify-content:flex-end;align-items:center;width:58px;display:flex}._itemQtyInputRefactored_29ki7_1271{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;box-sizing:border-box;vertical-align:middle;background:#ffffff14;border-radius:4px;outline:none;width:58px;height:22px;margin:0;padding:2px 4px;font-size:11px;font-weight:700;display:inline-block}._itemDeleteBtn_29ki7_1307{color:#fff6;cursor:pointer;background:0 0;border:none;flex-shrink:0;justify-content:flex-end;align-items:center;width:58px;padding-right:2px;font-size:14px;line-height:1;display:inline-flex}._itemDeleteBtn_29ki7_1307:hover{color:#e74c3c}input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}._invItemRow_29ki7_1201 textarea,._invItemRow_29ki7_1201 input{touch-action:auto!important;-webkit-user-select:text!important;user-select:text!important}._accordionArrow_29ki7_1373{color:var(--rpg-text);margin-right:8px;font-size:10px;line-height:1;transition:transform .15s ease-out;display:inline-block}._activeArrow_29ki7_1391{transform:rotate(90deg)}._miniAddBtn_29ki7_1399{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:3px;flex-shrink:0;padding:2px 6px;font-size:9.5px;font-weight:700;transition:all .12s}._miniAddBtn_29ki7_1399:hover{opacity:.9}._itemTypeSelectWrapper_29ki7_1433{flex-shrink:0;align-items:center;margin:0;display:inline-flex}._assetValueGroup_29ki7_1447{flex-shrink:0;align-items:center;gap:4px;width:140px;display:flex}._assetAmountInput_29ki7_1463{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;background:#ffffff14;border-radius:4px;outline:none;width:60px;padding:2px 4px;font-size:11px;font-weight:700}._assetCurrencyInput_29ki7_1489{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;background:#ffffff14;border-radius:4px;outline:none;width:72px;padding:2px 4px;font-size:11px;font-weight:700}._charNameInput_29ki7_1515{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;padding:4px 8px;font-size:16px;font-weight:700}._presetSelect_29ki7_1537{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0000004d;border-radius:4px;outline:none;padding:2px 4px;font-size:11px}._limitInput_29ki7_1557{border:1px solid var(--rpg-border);width:45px;color:var(--rpg-text);text-align:center;background:#0000004d;border-radius:4px;outline:none;padding:2px 4px;font-size:11px}._nameInput_29ki7_1581{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;width:100px;padding:4px 8px;font-size:11px}._descTextarea_29ki7_1603{border:1px solid var(--rpg-border);width:100%;min-height:50px;color:var(--rpg-text);resize:vertical;background:#0000004d;border-radius:4px;outline:none;padding:6px;font-size:11px}._metricNameInput_29ki7_1629{border:1px solid var(--rpg-border);min-width:80px;color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11px;font-weight:700}._metricLimitInput_29ki7_1655{width:40px;color:var(--rpg-text);border:1px solid var(--rpg-border);text-align:center;background:#0000004d;border-radius:3px;padding:4px;font-size:11px}._colorPickerInput_29ki7_1677{cursor:pointer;background:0 0;border:none;width:22px;height:22px;padding:0}._miniSortBtn_29ki7_1695{padding:2px 4px;font-size:9px}._syncBadge_29ki7_1705{color:#3498db;background:#3498db1a;border:1px solid #3498db4d;border-radius:3px;padding:2px 6px;font-size:10px}._metricLimitWrapper_29ki7_1723{align-items:center;gap:4px;display:flex}._metricLimitLabel_29ki7_1735{opacity:.6;font-size:10px}._flexCenterGroup_29ki7_1745{align-items:center;gap:6px;display:flex}._flexCenterGroupSmall_29ki7_1757{align-items:center;gap:3px;display:flex}._flexColumnFull_29ki7_1769{flex-direction:column;gap:3px;width:100%;display:flex}._flexItemLine_29ki7_1783{align-items:center;gap:8px;display:flex}._slotInputOuter_29ki7_1795{flex:1;align-items:center;gap:6px;margin-right:10px;display:flex}._slotRenameInputRefactored_29ki7_1811{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;padding:4px 8px;font-size:11px}._itemTitleInputRefactored_29ki7_1833{width:100%;color:var(--rpg-text);resize:none;vertical-align:middle;box-sizing:border-box;background:0 0;border:none;border-bottom:1px solid #0000;outline:none;flex:1;min-width:0;height:18px;margin:0;padding:4px 0;font-family:inherit;font-size:11px;line-height:1.4;display:inline-block;overflow-y:hidden}._itemDescInputRefactored_29ki7_1877{width:100%;color:var(--rpg-text);opacity:.6;resize:none;background:0 0;border:none;outline:none;flex:200px;min-width:0;height:auto;margin-top:2px;padding:2px 0;font-family:inherit;font-size:10px;display:block;overflow-y:hidden}._flatHeaderRow_29ki7_1915{-webkit-user-select:none;user-select:none;background:0 0;justify-content:space-between;align-items:center;margin-bottom:6px;padding:8px 2px;display:flex}._flatHeaderTitle_29ki7_1935{color:var(--rpg-text);font-size:13.5px;font-weight:700}._flatHeaderAddBtn_29ki7_1947{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:4px;padding:4px 10px;font-size:10.5px;font-weight:700;transition:all .15s}._flatHeaderAddBtn_29ki7_1947:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff1f}._accordionSeparator_29ki7_1983{background:#ffffff26;width:100%;height:1px;margin:12px 0}._dragHandleIconWrapper_29ki7_1997{cursor:grab;opacity:.45;color:var(--rpg-text);flex-shrink:0;justify-content:center;align-items:center;width:16px;height:16px;margin:0;padding:0;display:inline-flex}._dragHandleIconWrapper_29ki7_1997:hover{opacity:1;color:var(--rpg-highlight)}._dragHandleIconWrapper_29ki7_1997:active{cursor:grabbing}._spacedHeaderButtonGroup_29ki7_2043{flex-shrink:0;align-items:center;gap:12px;display:flex}._itemTypeSelect_29ki7_1433{appearance:none;height:22px;color:var(--rpg-text);border:1px solid var(--rpg-border);cursor:pointer;box-sizing:border-box;vertical-align:middle;background-image:url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");background-position:right 4px center;background-repeat:no-repeat;background-size:14px;border-radius:4px;outline:none;align-items:center;margin:0;font-size:10.5px;line-height:22px;display:inline-flex;background:#00000073!important;padding:0 18px 0 6px!important}._inlineRow_29ki7_573 select{appearance:none;color:var(--rpg-text);border:1px solid var(--rpg-border);cursor:pointer;box-sizing:border-box;background-image:url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");background-position:right 6px center;background-repeat:no-repeat;background-size:16px;border-radius:4px;outline:none;font-size:11.5px;background:#0000004d!important;padding:5px 24px 5px 10px!important}._overlay_1hn40_5{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:3000!important}._modal_1hn40_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_1hn40_61{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_1hn40_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._closeBtn_1hn40_97{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_1hn40_97:hover{opacity:1}._editorTabs_1hn40_123{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;display:flex}._tabBtn_1hn40_137{color:var(--rpg-text);opacity:.6;cursor:pointer;text-align:center;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._tabBtn_1hn40_137:hover{opacity:1;background:#ffffff05}._tabBtnActive_1hn40_177{opacity:1;color:var(--rpg-highlight);border-bottom:2px solid var(--rpg-highlight);background:#ffffff0a}._body_1hn40_191{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._section_1hn40_209{flex-direction:column;gap:8px;height:100%;display:flex}._label_1hn40_223{color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._textarea_1hn40_235{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:none;background:#0003;border-radius:6px;outline:none;flex:1;padding:10px;font-size:12px}._textarea_1hn40_235:focus{border-color:var(--rpg-highlight)}._addonList_1hn40_269{flex-direction:column;gap:10px;display:flex}._addonItem_1hn40_281{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;overflow:hidden}._addonHeader_1hn40_295{cursor:pointer;-webkit-user-select:none;user-select:none;background:#0003;justify-content:space-between;align-items:center;padding:10px 12px;display:flex}._addonHeaderLeft_1hn40_315{color:var(--rpg-text);align-items:center;gap:8px;font-size:13px;font-weight:700;display:flex}._addonHeaderRight_1hn40_333{align-items:center;display:flex}._collapseIcon_1hn40_343{opacity:.7;width:14px;height:14px;transition:transform .2s}._collapseIcon_1hn40_343._open_1hn40_357{transform:rotate(90deg)}._addonBody_1hn40_365{background:#0000001a;border-top:1px solid #ffffff0d;padding:12px}._addonInput_1hn40_377{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;min-height:60px;padding:8px;font-size:11.5px;transition:border-color .15s}._addonInput_1hn40_377:focus{border-color:var(--rpg-highlight)}._addGuideBtn_1hn40_413{border:1px dashed var(--rpg-border);color:var(--rpg-highlight);cursor:pointer;text-align:center;background:0 0;border-radius:6px;margin-top:4px;padding:10px;font-size:12px;font-weight:700;transition:all .2s}._addGuideBtn_1hn40_413:hover{border-color:var(--rpg-highlight);background:#ffffff0d}._footer_1hn40_451{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:12px 18px;display:flex}._cancelBtn_1hn40_477{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._cancelBtn_1hn40_477:hover{background:#ffffff1a}._saveBtn_1hn40_507{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._saveBtn_1hn40_507:hover{opacity:.9}._defGroup_1hn40_537{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;flex-direction:column;gap:8px;padding:12px;display:flex}._defGroupTitle_1hn40_557{color:var(--rpg-highlight);border-bottom:1px dashed #ffffff1a;margin:0;padding-bottom:4px;font-size:12px}._defRow_1hn40_573{align-items:center;gap:10px;display:flex}._defLabel_1hn40_585{width:80px;color:var(--rpg-text);text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;font-size:11.5px;font-weight:700;overflow:hidden}._defInput_1hn40_607{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11.5px;transition:border-color .15s}._defInput_1hn40_607:focus{border-color:var(--rpg-highlight)}._switch_1hn40_641{flex-shrink:0;width:32px;height:18px;display:inline-block;position:relative}._switch_1hn40_641 input{opacity:0;width:0;height:0}._slider_1hn40_669{cursor:pointer;border:1px solid var(--rpg-border);background-color:#0006;border-radius:20px;transition:all .2s;position:absolute;inset:0}._slider_1hn40_669:before{content:"";background-color:var(--rpg-text);opacity:.5;border-radius:50%;width:12px;height:12px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switch_1hn40_641 input:checked+._slider_1hn40_669{border-color:var(--rpg-highlight);background-color:#ffffff1a}._switch_1hn40_641 input:checked+._slider_1hn40_669:before{background-color:var(--rpg-highlight);opacity:1;transform:translate(14px)}._switch_1hn40_641 input:disabled+._slider_1hn40_669{opacity:.3;cursor:not-allowed}._overlay_pic3v_5{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:3000!important}._modal_pic3v_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_pic3v_61{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_pic3v_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._closeBtn_pic3v_97{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_pic3v_97:hover{opacity:1}._body_pic3v_123{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._section_pic3v_141{flex-direction:column;gap:8px;height:auto;display:flex}._label_pic3v_155{color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._footer_pic3v_167{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:12px 18px;display:flex}._cancelBtn_pic3v_193{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._cancelBtn_pic3v_193:hover{background:#ffffff1a}._saveBtn_pic3v_223{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._saveBtn_pic3v_223:hover{opacity:.9}._settingsDesc_pic3v_253{opacity:.6;margin-top:-4px;margin-bottom:8px;font-size:11px}._rowFlex_pic3v_267{align-items:center;gap:8px;display:flex}._checkboxLabel_pic3v_279{cursor:pointer;-webkit-user-select:none;user-select:none;color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._settingsSelect_pic3v_295{width:100%;color:inherit;border:1px solid var(--rpg-border);background:#0003;border-radius:4px;outline:none;margin-bottom:8px;padding:6px 10px;font-family:inherit}._settingsSelect_pic3v_295:focus{border-color:var(--rpg-highlight)}._colorPaletteGrid_pic3v_327{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;flex-direction:column;gap:8px;margin-top:4px;padding:12px;display:flex}._colorRow_pic3v_349{align-items:center;gap:10px;width:100%;display:flex}._colorLabel_pic3v_363{opacity:.85;flex-shrink:0;width:90px;font-size:11.5px;font-weight:700}._colorPicker_pic3v_379{border:1px solid var(--rpg-border);cursor:pointer;background:0 0;border-radius:4px;flex-shrink:0;width:28px;height:28px;padding:0}._colorTextInput_pic3v_401{border:1px solid var(--rpg-border);color:var(--rpg-text);text-transform:uppercase;background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-family:monospace;font-size:11.5px}._colorTextInput_pic3v_401:focus{border-color:var(--rpg-highlight)}._switch_pic3v_437{flex-shrink:0;width:32px;height:18px;display:inline-block;position:relative}._switch_pic3v_437 input{opacity:0;width:0;height:0}._slider_pic3v_465{cursor:pointer;border:1px solid var(--rpg-border);background-color:#0006;border-radius:20px;transition:all .2s;position:absolute;inset:0}._slider_pic3v_465:before{content:"";background-color:var(--rpg-text);opacity:.5;border-radius:50%;width:12px;height:12px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switch_pic3v_437 input:checked+._slider_pic3v_465{border-color:var(--rpg-highlight);background-color:#ffffff1a}._switch_pic3v_437 input:checked+._slider_pic3v_465:before{background-color:var(--rpg-highlight);opacity:1;transform:translate(14px)}._switch_pic3v_437 input:disabled+._slider_pic3v_465{opacity:.3;cursor:not-allowed}._container_qwt2m_1{color:var(--rpg-text);flex-direction:column;gap:16px;padding:12px 10px;display:flex}._sectionHeader_qwt2m_17{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._sectionTitle_qwt2m_31{color:var(--rpg-highlight);font-size:13px;font-weight:700}._eventsSection_qwt2m_43{margin-top:8px}._eventsSectionTitle_qwt2m_51{color:var(--rpg-text);font-size:13px;font-weight:700}._addBtn_qwt2m_63{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:4px 12px;font-size:12px;transition:background .15s}._addBtn_qwt2m_63:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._stateGrid_qwt2m_99{flex-direction:column;gap:10px;margin-top:10px;display:flex}._rowField_qwt2m_113{align-items:center;gap:8px;display:flex}._twoCol_qwt2m_125{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;display:grid}._fieldLabel_qwt2m_137{opacity:.6;width:60px;color:var(--rpg-text);flex-shrink:0;font-size:12px;font-weight:700}._lockBtn_qwt2m_155{color:var(--rpg-text);opacity:.5;cursor:pointer;background:0 0;border:none;justify-content:center;align-items:center;width:20px;height:20px;padding:4px;font-size:11px;transition:opacity .15s,color .15s;display:flex}._lockBtn_qwt2m_155:hover{opacity:1;color:var(--rpg-highlight)}._stateTextarea_qwt2m_197{border:1px solid var(--rpg-border);color:var(--rpg-text);resize:none;background:#0003;border-radius:4px;outline:none;flex:1;width:100%;height:auto;min-height:28px;padding:6px 10px;font-family:inherit;font-size:11px;line-height:1.4;display:block;overflow-y:hidden}._stateTextarea_qwt2m_197:focus:not(:disabled){border-color:var(--rpg-highlight)}._stateTextarea_qwt2m_197:disabled{opacity:.5;cursor:not-allowed;background:#0000001a}._eventsList_qwt2m_257{flex-direction:column;gap:10px;display:flex}._eventBlock_qwt2m_269{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;flex-direction:column;gap:8px;padding:10px 12px;display:flex;position:relative}._eventHeaderRow_qwt2m_291{justify-content:space-between;align-items:center;gap:8px;display:flex}._eventNumber_qwt2m_305{opacity:.5;font-size:11.5px;font-weight:700}._removeBtn_qwt2m_317{color:#fff6;cursor:pointer;background:0 0;border:none;padding:0 4px;font-size:16px;line-height:1}._removeBtn_qwt2m_317:hover{color:#e74c3c}._eventTitleInput_qwt2m_345{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);background:#00000040;border-radius:4px;outline:none;padding:6px 10px;font-family:inherit;font-size:11px;font-weight:700}._eventTitleInput_qwt2m_345:focus{border-color:var(--rpg-highlight)}._eventDescTextarea_qwt2m_379{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:32px;padding:6px 10px;font-family:inherit;font-size:11px;line-height:1.4;display:block;overflow-y:hidden}._eventDescTextarea_qwt2m_379:focus{border-color:var(--rpg-highlight)}._emptyPlaceholder_qwt2m_423{opacity:.5;text-align:center;margin:4px 0 0;font-size:12.5px}._overlay_pdu8a_1{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:4000!important}._modal_pdu8a_27{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_pdu8a_57{border-bottom:1px solid var(--rpg-border);box-sizing:border-box;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:0 20px;display:flex}._header_pdu8a_57 h4{color:var(--rpg-highlight);margin:0;font-size:15px}._closeBtn_pdu8a_91{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;outline:none;justify-content:center;align-items:center;width:24px;height:24px;padding:0;font-size:24px;line-height:1;transition:opacity .15s;display:inline-flex}._closeBtn_pdu8a_91:hover{opacity:1}._body_pdu8a_135{flex-direction:column;flex:1;gap:14px;padding:16px;display:flex;overflow-y:auto}._section_pdu8a_153{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;padding:12px}._sectionTitleRow_pdu8a_167{justify-content:space-between;align-items:center;margin-bottom:10px;display:flex}._sectionTitle_pdu8a_167{color:var(--rpg-highlight);font-size:13px;font-weight:700}._deselectAllBtn_pdu8a_193{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;box-sizing:border-box;background:#ffffff08;border-radius:4px;outline:none;justify-content:center;align-items:center;height:22px;padding:0 8px;font-size:10.5px;font-weight:700;line-height:1;transition:all .15s ease-out;display:inline-flex}._deselectAllBtn_pdu8a_193:hover{color:#ff6b6b;background:#e74c3c14;border-color:#e74c3c}._charRow_pdu8a_243{border-bottom:1px dashed #ffffff0d;align-items:center;padding:8px 0;display:flex}._charRow_pdu8a_243:last-child{border-bottom:none}._worldRow_pdu8a_265{border-bottom:1px solid #ffffff1a;align-items:flex-start;margin-bottom:6px;padding-bottom:10px}._charNameLabel_pdu8a_279{white-space:nowrap;text-overflow:ellipsis;width:110px;color:var(--rpg-text);font-weight:700;display:inline-block;overflow:hidden}._charOptionsColumn_pdu8a_299{flex-direction:column;flex:1;gap:2px;transition:opacity .2s;display:flex}._charOptionsRow_pdu8a_315{flex-wrap:wrap;align-items:center;gap:14px;display:flex}._worldOptionsContainer_pdu8a_329{flex-direction:column;flex:1;gap:8px;transition:opacity .2s;display:flex}._worldOptionsRow_pdu8a_345{align-items:center;gap:14px;display:flex}._activeOps_pdu8a_357{opacity:1}._disabledOps_pdu8a_365{opacity:.25;pointer-events:none}._checkboxItem_pdu8a_375{cursor:pointer;align-items:center;gap:6px;font-size:12px;display:flex}._textarea_pdu8a_391{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;box-sizing:border-box;background:#0003;border-radius:4px;outline:none;min-height:50px;padding:8px;font-size:12px}._textarea_pdu8a_391:focus:not(:disabled){border-color:var(--rpg-highlight)}._textarea_pdu8a_391:disabled{opacity:.4;cursor:not-allowed}._viewBtn_pdu8a_437{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;box-sizing:border-box;background:#ffffff0d;border-radius:4px;outline:none;justify-content:center;align-items:center;height:24px;padding:0 10px;font-size:11px;line-height:1;transition:all .15s;display:inline-flex}._viewBtn_pdu8a_437:hover{background:#ffffff1f}._viewBtnActive_pdu8a_481{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;box-sizing:border-box;border-radius:4px;outline:none;justify-content:center;align-items:center;height:24px;padding:0 10px;font-size:11px;line-height:1;display:inline-flex;box-shadow:0 0 8px #0003}._jsonEditor_pdu8a_517{color:#8892b0;resize:vertical;box-sizing:border-box;background:#00000059;border:1px solid #ffffff1a;border-radius:4px;outline:none;width:100%;height:160px;padding:10px;font-family:monospace;font-size:11.5px;transition:all .2s}._jsonEditorWritable_pdu8a_549{box-shadow:inset 0 0 6px #00000080;color:#e6ebf5!important;border-color:var(--rpg-highlight)!important;background:#111216!important}._footer_pdu8a_563{border-top:1px solid var(--rpg-border);box-sizing:border-box;background:#0003;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:0 20px;display:flex}._cancelBtn_pdu8a_589,._saveBtn_pdu8a_589{cursor:pointer;box-sizing:border-box;border-radius:5px;outline:none;justify-content:center;align-items:center;height:32px;padding:0 16px;font-size:12px;font-weight:700;line-height:1;transition:all .15s ease-out;display:inline-flex}._cancelBtn_pdu8a_589{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#ffffff0d}._cancelBtn_pdu8a_589:hover{border-color:var(--rpg-highlight);background:#ffffff1f}._saveBtn_pdu8a_589{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._saveBtn_pdu8a_589:hover{opacity:.9}.dnd-poly-drag-image{opacity:.5!important}.dnd-poly-drag-image.dnd-poly-snapback{transition-property:transform!important;transition-duration:.25s!important;transition-timing-function:ease-out!important}/*$vite$:1*/`)),document.head.appendChild(e)}}catch(e){console.error(`vite-plugin-css-injected-by-js`,e)}})();
+(function(){try{if(typeof document<`u`){var e=document.createElement(`style`);e.appendChild(document.createTextNode(`._toggleWrapper_1u82c_1{-webkit-user-select:none;user-select:none;position:fixed;top:8px;left:8px;z-index:1001!important;margin:0!important;padding:0!important}@media (width>=1001px){._toggleWrapper_1u82c_1:not(._userPositioned_1u82c_27){top:6px;left:40px}}@media (width<=1000px){._toggleWrapper_1u82c_1:not(._userPositioned_1u82c_27){top:45px!important;left:10px!important}}._toggleButton_1u82c_55{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:38px;height:38px;color:var(--rpg-text);cursor:pointer;touch-action:none;border-radius:6px;justify-content:center;align-items:center;margin:0;padding:0;transition:background .2s,border-color .2s,color .2s;display:flex;box-shadow:2px 2px 10px #00000080}._toggleButton_1u82c_55:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff0d}._dragModeActive_1u82c_103 ._toggleButton_1u82c_55{border-style:dashed;border-color:var(--rpg-highlight);opacity:.85;cursor:move;border-radius:6px}._icon_1u82c_119{width:20px;height:20px;display:block}._contextMenu_1u82c_131{background:var(--rpg-bg);border:1px solid var(--rpg-border);border-radius:6px;flex-direction:column;gap:2px;min-width:150px;padding:4px;display:flex;position:absolute;top:calc(100% + 6px);left:0;box-shadow:0 4px 15px #00000080}._contextMenu_1u82c_131 button{color:var(--rpg-text);opacity:.8;text-align:left;cursor:pointer;background:0 0;border:none;border-radius:4px;align-items:center;gap:8px;padding:8px 12px;font-size:11px;transition:background .2s,opacity .2s;display:flex}._contextMenu_1u82c_131 button:hover{opacity:1;background:#ffffff14}._contextMenu_1u82c_131 button._activeMenuBtn_1u82c_203{color:var(--rpg-highlight);background:#ffffff0d;font-weight:700}._menuIcon_1u82c_215{flex-shrink:0;width:13px;height:13px}._panelContainer_z010d_5{color:var(--rpg-text);flex-direction:column;transition:width .3s,left .3s,right .3s;box-shadow:0 0 20px #00000073;background:var(--rpg-bg)!important;opacity:1!important;z-index:1000!important;height:100vh!important;margin:0!important;display:flex!important;position:fixed!important;top:0!important;bottom:0!important}._panelContainer_z010d_5._left_z010d_37{border-right:1px solid var(--rpg-border);animation:.2s ease-out _slideIn_z010d_1;width:calc(50vw - var(--sheldWidth,800px) / 2)!important;min-width:280px!important;left:0!important}._panelContainer_z010d_5._right_z010d_53{border-left:1px solid var(--rpg-border);animation:.2s ease-out _slideInRight_z010d_1;width:calc(50vw - var(--sheldWidth,800px) / 2)!important;min-width:280px!important;right:0!important}@keyframes _slideIn_z010d_1{0%{transform:translate(-100%)}to{transform:translate(0)}}@keyframes _slideInRight_z010d_1{0%{transform:translate(100%)}to{transform:translate(0)}}._collapseButton_z010d_89{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:20px;height:60px;color:var(--rpg-text);cursor:pointer;z-index:1001;outline:none;justify-content:center;align-items:center;padding:0;display:flex;position:absolute;top:50%;transform:translateY(-50%);box-shadow:2px 0 8px #0000004d}._collapseButton_z010d_89._left_z010d_37{border-left:none;border-radius:0 6px 6px 0;right:-21px}._collapseButton_z010d_89._right_z010d_53{border-right:none;border-radius:6px 0 0 6px;left:-21px}._collapseButton_z010d_89:hover{background:#ffffff0d}._collapseButton_z010d_89:hover ._collapseIcon_z010d_159{color:var(--rpg-highlight)}._collapseIcon_z010d_159{width:18px;height:18px;color:var(--rpg-text);transition:color .2s}._panelHeader_z010d_181{border-bottom:1px solid var(--rpg-border);background:#0000001a;flex-shrink:0;justify-content:space-between;align-items:center;padding:8px 12px;display:flex}._headerLeftArea_z010d_201{align-items:center;display:flex}._headerRightArea_z010d_211{flex-direction:column;align-items:flex-end;gap:5px;display:flex}._headerButtonRow_z010d_225{align-items:center;gap:5px;display:flex}._brand_z010d_237{align-items:center;gap:6px;display:flex}._headerIcon_z010d_249{width:16px;height:16px;color:var(--rpg-text)}._headerTitle_z010d_261{font-size:12.5px;font-weight:700}._headerBtn_z010d_271{border:1px solid var(--rpg-border);color:var(--rpg-text);box-sizing:border-box;cursor:pointer;background:#ffffff0a;border-radius:4px;justify-content:center;align-items:center;gap:4px;width:85px;height:24px;font-size:10.5px;font-weight:700;transition:background .15s,border-color .15s,color .15s;display:inline-flex}._headerBtn_z010d_271:hover:not(:disabled){border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._headerBtn_z010d_271:disabled{opacity:.5;cursor:not-allowed}._headerBtnIcon_z010d_329{flex-shrink:0;width:12px;height:12px}._scrollContainer_z010d_341{flex-direction:column;flex:1;width:100%;display:flex;overflow:auto hidden}._scrollContainer_z010d_341::-webkit-scrollbar{height:6px}._scrollContainer_z010d_341::-webkit-scrollbar-track{background:#00000026;border:none!important}._scrollContainer_z010d_341::-webkit-scrollbar-thumb{background:#fff3;border-radius:4px;background-clip:border-box!important;border:none!important}._scrollContainer_z010d_341::-webkit-scrollbar-thumb:hover{background:#ffffff59}._contentWrapper_z010d_399{box-sizing:border-box;flex-direction:column;flex:1;min-height:0;margin:0 auto;display:flex;flex-shrink:0!important;width:380px!important;min-width:380px!important;max-width:380px!important;padding:0!important}._panelNav_z010d_427{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;width:100%;display:flex}._panelNav_z010d_427 button{color:var(--rpg-text);opacity:.6;cursor:pointer;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:12px 0;font-size:11px;transition:opacity .2s,border-color .2s,color .2s}._panelNav_z010d_427 button:hover{opacity:.9}._panelNav_z010d_427 button._activeTab_z010d_477{opacity:1;border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._panelBody_z010d_489{flex:1;width:100%;padding:16px 0;overflow-y:auto}._panelBody_z010d_489::-webkit-scrollbar{width:6px}._panelBody_z010d_489::-webkit-scrollbar-track{background:0 0;border:none!important}._panelBody_z010d_489::-webkit-scrollbar-thumb{background:#fff3;border-radius:4px;background-clip:border-box!important;border:none!important}._panelBody_z010d_489::-webkit-scrollbar-thumb:hover{background:#ffffff59}._sectionPlaceholder_z010d_543{flex-direction:column;gap:12px;display:flex}._sectionPlaceholder_z010d_543 h4{color:var(--rpg-highlight);margin:0;font-size:13px}._desc_z010d_567{opacity:.7;margin:0;font-size:11px;line-height:1.5}._infoRow_z010d_581{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:4px;justify-content:space-between;padding:8px;font-size:12px;display:flex}@media (width<=1000px){._panelContainer_z010d_5{width:85vw!important;max-width:100vw!important}._panelContainer_z010d_5._left_z010d_37,._panelContainer_z010d_5._right_z010d_53{width:85vw!important}}._statusDot_z010d_627{border-radius:50%;width:8px;height:8px;margin-left:6px;display:inline-block;box-shadow:0 0 4px #0003}._statusDotConnected_z010d_645{background-color:#2ed573;box-shadow:0 0 8px #2ed573}._statusDotDisconnected_z010d_655{background-color:#ff4757;box-shadow:0 0 8px #ff4757}._container_ulkgy_5{flex-direction:column;gap:8px;height:100%;padding-right:6px;display:flex;overflow-y:auto}._topActionBar_ulkgy_23{gap:8px;margin-bottom:2px;display:flex}._topActionBtn_ulkgy_35{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;flex:1;padding:6px 12px;font-size:11px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._topActionBtn_ulkgy_35:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._charBlock_ulkgy_73{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:8px;flex-direction:column;gap:6px;padding:8px 12px;transition:border-color .2s;display:flex}._blockHeader_ulkgy_95{justify-content:space-between;align-items:center;padding-bottom:2px;display:flex}._headerLeft_ulkgy_109{cursor:pointer;align-items:center;gap:6px;max-width:60%;display:flex}._collapseArrowBtn_ulkgy_125{color:var(--rpg-text);background:0 0;border:none;padding:2px;font-size:12px;transition:transform .15s ease-out;display:inline-block;transform:rotate(0)}._arrowExpanded_ulkgy_147{transform:rotate(90deg)}._charName_ulkgy_155{color:var(--rpg-text);white-space:normal;word-break:break-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-size:14px;font-weight:700}._headerSwitches_ulkgy_175{align-items:center;gap:10px;display:flex}._settingsGearBtn_ulkgy_187{color:var(--rpg-text);cursor:pointer;opacity:.7;background:0 0;border:none;justify-content:center;align-items:center;padding:4px;transition:opacity .15s,color .15s;display:flex}._settingsGearBtn_ulkgy_187:hover{opacity:1;color:var(--rpg-highlight)}._switchRow_ulkgy_223{opacity:.7;cursor:pointer;align-items:center;gap:4px;font-size:11px;display:flex}._switchContainer_ulkgy_243{width:28px;height:14px;display:inline-block;position:relative}._switchContainer_ulkgy_243 input{opacity:0;width:0;height:0}._switchSlider_ulkgy_269{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_ulkgy_269:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchContainer_ulkgy_243 input:checked+._switchSlider_ulkgy_269{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchContainer_ulkgy_243 input:checked+._switchSlider_ulkgy_269:before{background-color:var(--rpg-highlight);transform:translate(14px)}._dashboardContainer_ulkgy_339{border-top:1px solid #ffffff14;flex-direction:column;gap:6px;margin-top:2px;padding-top:6px;display:flex}._uniformControlGrid_ulkgy_357{align-items:center;gap:4px;width:100%;display:flex}._iconGridBtn_ulkgy_371{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;justify-content:center;align-items:center;width:32px;height:32px;transition:background .15s,border-color .15s,color .15s;display:flex}._iconGridBtn_ulkgy_371:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._activeGridBtn_ulkgy_411{background:var(--rpg-highlight-bg)!important;border-color:var(--rpg-highlight)!important;color:var(--rpg-highlight)!important}._avatarGridCell_ulkgy_423{border:1px solid var(--rpg-border);background:#0003;border-radius:5px;width:32px;height:32px;margin-left:auto;overflow:hidden}._avatarGridImage_ulkgy_443{object-fit:cover;width:100%;height:100%}._avatarGridFallback_ulkgy_455{color:var(--rpg-highlight);opacity:.8;justify-content:center;align-items:center;height:100%;font-size:11px;font-weight:700;display:flex}._statusComponentContainer_ulkgy_479{display:none}._statusComponentContainer_ulkgy_479._tabActive_ulkgy_487{margin-top:1px;margin-bottom:2px;display:block}._gaugeGrid_ulkgy_499{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;display:grid}._gaugeCard_ulkgy_511{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:4px;padding:6px 8px;display:flex}._gaugeLabelRow_ulkgy_531{justify-content:space-between;align-items:center;display:flex}._gaugeName_ulkgy_543{white-space:normal;word-break:break-word;flex:1;font-size:11px;font-weight:700}._gaugeLabelContainer_ulkgy_559{flex:1;align-items:center;min-width:0;margin-right:4px;display:flex}._lockIcon_ulkgy_575{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_ulkgy_591{opacity:1}._smallNumberInput_ulkgy_599{text-align:center;border:1px solid var(--rpg-border);width:32px;height:18px;min-height:18px;color:var(--rpg-text);-webkit-appearance:none;background:#0003;border-radius:4px;outline:none;margin:0;padding:0;font-size:11px;line-height:16px}._smallNumberInput_ulkgy_599:focus{border-color:var(--rpg-highlight)!important}._gaugeMaxText_ulkgy_641{margin-top:0;font-size:11px}._gaugeValues_ulkgy_651{align-items:center;gap:2px;display:flex}._gaugeValStatic_ulkgy_663{cursor:pointer;background:#ffffff0d;border-radius:3px;padding:1px 4px;font-size:11.5px;font-weight:700}._gaugeValStatic_ulkgy_663:hover{background:#ffffff1f}._gaugeInputActive_ulkgy_689{border:1px solid var(--rpg-highlight);color:var(--rpg-text);text-align:center;background:#0006;border-radius:3px;outline:none;width:36px;padding:1px;font-size:11.5px}._gaugeInputActive_ulkgy_689::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._gaugeInputActive_ulkgy_689::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._integerRowInputActive_ulkgy_719::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._integerRowInputActive_ulkgy_719::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._textBlockInput_ulkgy_723::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}._textBlockInput_ulkgy_723::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._gaugeInputActive_ulkgy_689[type=number],._integerRowInputActive_ulkgy_719[type=number],._textBlockInput_ulkgy_723[type=number]{-moz-appearance:textfield}._gaugeMax_ulkgy_641{opacity:.5;font-size:10px}._gaugeTrack_ulkgy_755{border:1px solid var(--rpg-border);background:#0006;border-radius:3px;height:5px;overflow:hidden}._gaugeFill_ulkgy_771{border-radius:2px;height:100%;transition:width .3s ease-out}._integerRowGrid_ulkgy_785{grid-template-columns:repeat(4,1fr);gap:4px;display:grid}._integerBlockCard_ulkgy_797{background:#0000001f;border:1px solid #ffffff08;border-radius:5px;flex-direction:column;justify-content:space-between;align-items:center;gap:4px;height:100%;padding:4px;display:flex}._integerFieldLeft_ulkgy_823{flex:1;justify-content:center;align-items:center;width:100%;min-width:0;padding-left:18px;padding-right:18px;display:flex;position:relative}._integerFieldLeft_ulkgy_823 ._lockIcon_ulkgy_575{margin:0;position:absolute;top:50%;left:2px;transform:translateY(-50%)}._integerFieldName_ulkgy_863{white-space:normal;word-break:break-all;overflow-wrap:break-word;text-align:center;width:100%;font-size:11px;font-weight:700;line-height:1.1}._integerFieldControlGroup_ulkgy_885{justify-content:space-between;align-items:center;width:100%;padding:0 2px;display:flex}._integerRowValStatic_ulkgy_901{text-align:center;cursor:pointer;background:#ffffff0d;border-radius:3px;min-width:18px;padding:1px 2px;font-size:11.5px;font-weight:700}._integerRowInputActive_ulkgy_719{border:1px solid var(--rpg-highlight);color:var(--rpg-text);text-align:center;background:#0006;border-radius:3px;outline:none;width:24px;padding:1px;font-size:11.5px}._integerRowBtn_ulkgy_947{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:3px;justify-content:center;align-items:center;width:16px;height:16px;font-size:10px;display:flex}._textStack_ulkgy_975{flex-direction:column;gap:6px;display:flex}._textBlockCard_ulkgy_987{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;justify-content:space-between;align-items:center;gap:8px;padding:4px 8px;display:flex}._textBlockLabel_ulkgy_1009{color:var(--rpg-text);white-space:normal;word-break:break-word;text-align:left;flex:none;width:70px;margin:0;padding-right:4px;font-size:11px;font-weight:700}._textBlockInputWrapper_ulkgy_1037{flex:1;max-width:calc(100% - 22px);padding-left:4px}._textBlockInput_ulkgy_723{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:11px;line-height:1.4;transition:border-color .15s;display:block;overflow-y:hidden}._textBlockInput_ulkgy_723:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._dangerText_ulkgy_1097{color:#e74c3c!important}._dangerTrack_ulkgy_1099{border-color:#e74c3c}._dangerFlash_ulkgy_1101{animation:1s infinite alternate _flashDanger_ulkgy_1}@keyframes _flashDanger_ulkgy_1{0%{opacity:.5}to{opacity:1}}._tabContentStack_1d1oz_5{flex-direction:column;gap:10px;margin:6px 0;display:flex}._inlineTabContent_1d1oz_19{background:#00000040;border:1px solid #ffffff0d;border-radius:7px;padding:10px 12px;animation:.15s ease-out forwards _slideDownIn_1d1oz_1;box-shadow:inset 0 2px 8px #0000004d}@keyframes _slideDownIn_1d1oz_1{0%{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}._inlineHeaderLabelRow_1d1oz_47{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._inlineSheetTitle_1d1oz_61{color:var(--rpg-text);font-size:12.5px;font-weight:700}._quickAddBtn_1d1oz_73{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:3px 10px;font-size:10.5px;transition:background .15s}._quickAddBtn_1d1oz_73:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._appearanceGrid_1d1oz_109{flex-direction:column;gap:7px;display:flex}._appearanceRow_1d1oz_121{align-items:flex-start;gap:12px;display:flex}._appearanceRow_1d1oz_121 ._lockIcon_1d1oz_133{margin-top:6px}._fieldLabel_1d1oz_141{opacity:.6;white-space:normal;word-break:break-word;flex-shrink:0;width:60px;margin-top:6px;font-size:10.5px;font-weight:700}._appearanceInputWrapper_1d1oz_163{flex:1;width:calc(100% - 22px);min-width:0}._relationTargetCard_1d1oz_177{background:#ffffff03;border:1px solid #ffffff0a;border-radius:6px;flex-direction:column;gap:6px;margin-bottom:8px;padding:8px;display:flex}._relationTargetHeader_1d1oz_199{border-bottom:1px solid #ffffff08;justify-content:space-between;align-items:center;padding-bottom:4px;display:flex}._targetNameText_1d1oz_215{color:var(--rpg-text);white-space:normal;word-break:break-word;font-size:12.5px}._lockIcon_1d1oz_133{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_1d1oz_245{opacity:1!important}._flexCenterGap_1d1oz_253{align-items:center;gap:8px;display:flex}._relationSectionMyPerspective_1d1oz_265{background:0 0;border:none;flex-direction:column;gap:6px;padding:0;display:flex}._relationSectionTargetPerspective_1d1oz_283{background:0 0;border:none;flex-direction:column;gap:6px;margin-top:10px;padding:0;display:flex}._relationSectionSubTitle_1d1oz_303{color:var(--rpg-text);margin-bottom:2px;font-size:11px;font-weight:700}._relationGaugeInput_1d1oz_317{width:35px;color:var(--rpg-text);border:1px solid var(--rpg-border);text-align:center;background:#0000004d;border-radius:3px;outline:none;margin-right:2px;font-size:11px}._relationMetricsGrid_1d1oz_341{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:4px 0;display:grid}._gaugeCard_1d1oz_355{background:#0000001f;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:4px;padding:6px 8px;display:flex}._gaugeLabelRow_1d1oz_375{justify-content:space-between;align-items:center;display:flex}._gaugeName_1d1oz_387{white-space:normal;word-break:break-word;opacity:.8;max-width:50%;font-size:11px;font-weight:700}._gaugeValues_1d1oz_405{align-items:center;gap:2px;display:flex}._gaugeTrackWrapper_1d1oz_417{border:1px solid var(--rpg-border);background:#0006;border-radius:3px;height:5px;position:relative;overflow:hidden}._gaugeZeroMarker_1d1oz_435{z-index:2;background-color:#fff6;width:1px;position:absolute;top:0;bottom:0}._gaugeFill_1d1oz_453{border-radius:2px;height:100%;transition:width .3s ease-out,left .3s ease-out;position:absolute;top:0;bottom:0}._emptyPlaceholder_1d1oz_471{opacity:.3;text-align:center;padding:16px;font-size:11.5px}._textBlockInput_1d1oz_487{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:none;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:12px;line-height:1.4;display:block;overflow-y:hidden}._textBlockInput_1d1oz_487:focus{outline:none;border:1px solid var(--rpg-highlight)!important}input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}._readOnlyBlock_1d1oz_553{cursor:default;white-space:pre-wrap;word-break:break-all;overflow-wrap:break-word;resize:none!important;background:#0000001a!important;border-color:#ffffff0d!important}._readOnlyNumberValue_1d1oz_573{min-width:25px;color:var(--rpg-text);text-align:center;background:#0003;border:1px solid #ffffff1a;border-radius:4px;padding:1px 5px;font-size:11px;font-weight:700;display:inline-block}._emptyPlaceholderInline_1d1oz_599{opacity:.4;font-size:11px;font-style:italic}._tabContentStack_78yvk_5{flex-direction:column;gap:10px;margin:6px 0;display:flex}._inlineTabContent_78yvk_19{background:#00000040;border:1px solid #ffffff0d;border-radius:7px;padding:10px 12px;animation:.15s ease-out forwards _slideDownIn_78yvk_1;box-shadow:inset 0 2px 8px #0000004d}@keyframes _slideDownIn_78yvk_1{0%{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}._inlineHeaderLabelRow_78yvk_47{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._inlineSheetTitle_78yvk_61{color:var(--rpg-text);font-size:12.5px;font-weight:700}._quickAddBtn_78yvk_73{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:3px 10px;font-size:10.5px;transition:background .15s}._quickAddBtn_78yvk_73:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._flexCenterGap_78yvk_107{align-items:center;gap:8px;display:flex}._lockIcon_78yvk_119{cursor:pointer;opacity:.4;flex-shrink:0;margin-right:4px;transition:opacity .15s}._lockIconActive_78yvk_135{opacity:1!important}._sidebarInventoryGrid_78yvk_145{flex-direction:column;gap:8px;display:flex}._sidebarSection_78yvk_157{background:#00000026;border-radius:5px;padding:6px 8px}._sidebarSectionHeader_78yvk_169{justify-content:space-between;align-items:center;margin-bottom:6px;display:flex}._sidebarSectionTitleRow_78yvk_183{align-items:center;gap:4px;display:flex}._sidebarSectionTitle_78yvk_183{opacity:.5;margin:0;font-size:11px;font-weight:700;display:block}._sideBySideRow_78yvk_211{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;display:grid}._sidebarEquipSlot_78yvk_223,._sidebarStorageSlot_78yvk_223{white-space:normal;word-break:break-all;overflow-wrap:break-word;background:#0003;border:1px solid #ffffff14;border-radius:4px;flex-direction:column;padding:6px;display:flex}._slotSmallLabel_78yvk_247{opacity:.4;margin-bottom:3px;font-size:11px}._itemInfoStack_78yvk_259{flex-direction:column;display:flex}._itemSidebarText_78yvk_269{color:var(--rpg-text);white-space:normal;word-break:break-all;overflow-wrap:break-word;font-size:11px}._containerBadge_78yvk_285{border:1px solid var(--rpg-border);color:var(--rpg-highlight);vertical-align:middle;background:#00000059;border-radius:3px;margin-left:4px;padding:1px 4px;font-size:9px;font-weight:700;line-height:1;display:inline-block}._itemSidebarDescText_78yvk_313{opacity:.5;margin-top:2px;font-size:9px}._itemSidebarDescTextIndented_78yvk_325{opacity:.5;padding-left:8px;font-size:9px}._sidebarStorageHeaderRow_78yvk_337{justify-content:space-between;align-items:center;margin-bottom:4px;display:flex}._sidebarStorageList_78yvk_351{flex-direction:column;gap:2px;display:flex}._storageItemBlock_78yvk_363{flex-direction:column;margin-bottom:4px;display:flex}._itemMainLine_78yvk_375{align-items:center;gap:4px;width:100%;display:flex}._itemBullet_78yvk_389{opacity:.5;flex-shrink:0;font-size:11px}._qtyBadge_78yvk_401{color:var(--rpg-text);opacity:.6;flex-shrink:0;margin-left:auto;font-size:10px;font-weight:700}._currencyBadge_78yvk_419{color:var(--rpg-highlight);border:1px solid var(--rpg-border);background:#00000040;border-radius:4px;flex-shrink:0;margin-left:auto;padding:1px 5px;font-size:10px;font-weight:700}._assetBadge_78yvk_443{color:var(--rpg-text);border:1px dashed var(--rpg-border);background:#ffffff0d;border-radius:4px;flex-shrink:0;margin-left:auto;padding:1px 5px;font-size:10px}._emptyTextIndicator_78yvk_465{opacity:.3;font-size:10px}._questContainer_78yvk_477{flex-direction:column;gap:8px;margin-bottom:14px;display:flex}._questContentBlock_78yvk_491{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;flex-direction:column;gap:6px;padding:8px 10px;display:flex;position:relative}._questCompleted_78yvk_513{opacity:.6}._textStrike_78yvk_521{text-decoration:line-through}._questHeaderRow_78yvk_529{align-items:center;gap:8px;width:100%;display:flex}._questTitleInputText_78yvk_543{flex:1;width:100%;margin:0;padding:5px 8px;font-size:12px;font-weight:700}._sideQuestHeader_78yvk_561{border-top:1px solid #ffffff0d;margin-bottom:8px;padding-top:10px}._questsListContainer_78yvk_573{flex-direction:column;gap:8px;display:flex}._questSideHeaderRow_78yvk_585{justify-content:space-between;align-items:center;gap:8px;display:flex}._questSideIndex_78yvk_599{opacity:.5;font-size:10px;font-weight:700}._questSideRemoveBtn_78yvk_611{color:#fff6;cursor:pointer;background:0 0;border:none;padding:0 4px;font-size:14px;line-height:1}._questSideRemoveBtn_78yvk_611:hover{color:#e74c3c}._emptyPlaceholder_78yvk_639{opacity:.3;text-align:center;padding:16px;font-size:11.5px}._switchRow_78yvk_655{opacity:.7;cursor:pointer;align-items:center;gap:4px;margin:0;font-size:11px;display:flex}._switchLabel_78yvk_675{width:28px;height:14px;display:inline-block;position:relative}._switchInput_78yvk_689{opacity:0;width:0;height:0}._switchSlider_78yvk_701{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_78yvk_701:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchInput_78yvk_689:checked+._switchSlider_78yvk_701{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchInput_78yvk_689:checked+._switchSlider_78yvk_701:before{background-color:var(--rpg-highlight);transform:translate(14px)}._textBlockInput_78yvk_773{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:28px;padding:5px 8px;font-size:12px;line-height:1.4;display:block;overflow-y:hidden}._textBlockInput_78yvk_773:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._overlay_m4aus_3{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;padding:24px;display:flex;position:fixed;top:0;left:0;z-index:2000!important}._modal_m4aus_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_m4aus_61{border-bottom:1px solid var(--rpg-border);box-sizing:border-box;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_m4aus_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._headerRight_m4aus_99{align-items:center;gap:12px;display:flex}._headerFolderBtn_m4aus_111{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._headerFolderBtn_m4aus_111:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._closeBtn_m4aus_147{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px;line-height:1}._closeBtn_m4aus_147:hover{opacity:1}._presetBar_m4aus_175{border-bottom:1px solid var(--rpg-border);background:#0003;align-items:center;gap:8px;padding:12px 18px;display:flex}._presetInputContainer_m4aus_193{flex:1}._presetInputWrapper_m4aus_201{border:1px solid var(--rpg-border);background:#0000004d;border-radius:4px;align-items:center;padding:2px 4px 2px 10px;display:flex}._presetInputWrapper_m4aus_201:focus-within{border-color:var(--rpg-highlight)}._presetNameInput_m4aus_227{color:var(--rpg-text);background:0 0;border:none;outline:none;flex:1;padding:4px 0;font-size:13px}._presetDropdown_m4aus_247{background:var(--rpg-bg);border:1px solid var(--rpg-border);z-index:100;border-radius:6px;flex-direction:column;width:100%;max-height:180px;margin-top:4px;display:flex;position:absolute;top:100%;right:0;overflow-y:auto;box-shadow:0 4px 12px #00000080}._presetDropdownItem_m4aus_281{background:0 0;border-bottom:1px solid #ffffff0d;align-items:center;min-height:38px;display:flex}._presetDropdownItem_m4aus_281:last-child{border-bottom:none}._presetDropdownItemLoadArea_m4aus_305{cursor:pointer;flex:1;justify-content:space-between;align-items:center;min-width:0;padding:8px 12px;display:flex}._presetDropdownItemLoadArea_m4aus_305:hover{background:#ffffff14}._presetItemName_m4aus_333{text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:8px;font-size:13px;overflow:hidden}._presetItemBadges_m4aus_351{flex-shrink:0;align-items:center;gap:4px;display:flex}._presetItemDeleteBtn_m4aus_365{color:#e74c3c;cursor:pointer;background:0 0;border:none;border-left:1px solid #ffffff0d;flex-shrink:0;justify-content:center;align-items:center;width:32px;height:38px;font-size:16px;font-weight:700;transition:background .15s,color .15s;display:flex}._presetItemDeleteBtn_m4aus_365:hover{color:#ff6b6b;background:#e74c3c1f}._presetDropdownEmpty_m4aus_409{text-align:center;opacity:.5;padding:12px;font-size:12px}._body_m4aus_423{flex-direction:column;flex:1;gap:10px;padding:18px;display:flex;overflow-y:auto}._charItem_m4aus_441{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;align-items:center;gap:12px;padding:8px 12px;display:flex}._dragControls_m4aus_461{flex-direction:column;gap:2px;display:flex}._dragControls_m4aus_461 button{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:3px;justify-content:center;align-items:center;width:20px;height:16px;font-size:8px;display:flex}._dragControls_m4aus_461 button:disabled{opacity:.2;cursor:not-allowed}._dragControls_m4aus_461 button:not(:disabled):hover{background:#ffffff26}._nameInput_m4aus_519{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0000004d;border-radius:4px;outline:none;flex:1;padding:6px 10px;font-size:13px;font-weight:700}._nameInput_m4aus_519:focus{border-color:var(--rpg-highlight)}._actions_m4aus_551{align-items:center;gap:6px;display:flex}._iconBtn_m4aus_563{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:4px;justify-content:center;align-items:center;width:28px;height:28px;transition:all .2s;display:flex}._iconBtn_m4aus_563:hover{background:#ffffff26}._deleteBtn_m4aus_599{color:#e74c3c;font-size:18px;font-weight:700}._deleteBtn_m4aus_599:hover{background:#e74c3c26;border-color:#e74c3c}._addBtn_m4aus_621{border:1px dashed var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;margin-top:4px;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._addBtn_m4aus_621:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._charIdBadge_m4aus_659{color:var(--rpg-text);opacity:.65;-webkit-user-select:none;user-select:none;text-align:center;background:#ffffff1a;border:1px solid #ffffff26;border-radius:4px;min-width:36px;margin-left:6px;padding:3px 6px;font-size:11px;font-weight:700;display:inline-block}._footer_m4aus_691{border-top:1px solid var(--rpg-border);box-sizing:border-box;background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:12px 18px;display:flex}._footerLeft_m4aus_717,._footerRight_m4aus_725{display:flex}._footerBtn_m4aus_733{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;padding:7px 14px;font-size:11.5px;font-weight:700;transition:background .15s,border-color .15s}._footerBtn_m4aus_733:hover{background:#ffffff14}._footerBtn_m4aus_733._reset_m4aus_765{color:#e74c3c;border-color:#e74c3c40}._footerBtn_m4aus_733._reset_m4aus_765:hover{background:#e74c3c1a;border-color:#e74c3c}._footerBtn_m4aus_733._save_m4aus_785{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._footerBtn_m4aus_733._save_m4aus_785:hover{opacity:.9}._addCharMainBtn_29ki7_5{border:1px dashed var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:6px;width:100%;padding:8px 16px;font-size:12px;font-weight:700;transition:background .15s,border-color .15s,color .15s}._addCharMainBtn_29ki7_5:hover{background:var(--rpg-highlight-bg);border-color:var(--rpg-highlight);color:var(--rpg-highlight)}._editorOverlay_29ki7_43{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;padding:24px;display:flex;position:fixed;top:0;left:0;z-index:2000!important}._editorModal_29ki7_71{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._editorHeader_29ki7_101{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._headerNav_29ki7_121{align-items:center;gap:12px;width:90%;display:flex}._closeBtn_29ki7_135{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_29ki7_135:hover{opacity:1}._editorBody_29ki7_161{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._statEditorDetail_29ki7_179{flex-direction:column;gap:12px;display:flex}._sectionWrapper_29ki7_191{border:1px solid var(--rpg-border);background:#00000026;border-radius:7px;padding:12px}._sectionHeaderLine_29ki7_205{justify-content:space-between;align-items:center;margin-bottom:10px;display:flex}._sectionHeaderLine_29ki7_205 h5{opacity:.8;margin:0;font-size:12px}._addQuickFieldBtn_29ki7_231{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:4px;padding:4px 10px;font-size:10.5px;font-weight:700}._emptySectionText_29ki7_253{opacity:.35;text-align:center;margin:8px 0;font-size:11px}._schemaItem_29ki7_267{border:1px solid var(--rpg-border);background:#ffffff03;border-radius:5px;margin-bottom:6px;overflow:hidden}._itemExpanded_29ki7_283{background:#ffffff05;border-color:#ffffff26}._itemHeader_29ki7_293{background:#0000001a;justify-content:space-between;align-items:center;padding:6px 10px;display:flex}._headerLeftZone_29ki7_309{align-items:center;gap:8px;display:flex}._accordionToggleBtn_29ki7_321{color:var(--rpg-text);cursor:pointer;background:0 0;border:none;padding:3px;font-size:10px;transition:transform .2s;transform:rotate(0)}._activeToggle_29ki7_343{transform:rotate(90deg)}._headerRightZone_29ki7_351{align-items:center;gap:5px;display:flex}._sortBtn_29ki7_363{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff05;border-radius:3px;justify-content:center;align-items:center;width:20px;height:20px;font-size:9px;display:flex}._sortBtn_29ki7_363:disabled{opacity:.15;cursor:not-allowed}._sortBtn_29ki7_363:not(:disabled):hover{background:#ffffff14}._switchRow_29ki7_409{opacity:.7;cursor:pointer;align-items:center;gap:4px;margin-right:4px;font-size:11px;display:flex}._switchLabel_29ki7_429{width:28px;height:14px;display:inline-block;position:relative}._switchInput_29ki7_443{opacity:0;width:0;height:0}._switchSlider_29ki7_455{cursor:pointer;border:1px solid var(--rpg-border);background-color:#ffffff14;border-radius:14px;transition:all .2s;position:absolute;inset:0}._switchSlider_29ki7_455:before{content:"";background-color:var(--rpg-text);border-radius:50%;width:8px;height:8px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switchInput_29ki7_443:checked+._switchSlider_29ki7_455{background-color:var(--rpg-highlight-bg);border-color:var(--rpg-highlight)}._switchInput_29ki7_443:checked+._switchSlider_29ki7_455:before{background-color:var(--rpg-highlight);transform:translate(14px)}._removeInlineBtn_29ki7_525{color:#e74c3c;cursor:pointer;background:#e74c3c26;border:1px solid #e74c3c4d;border-radius:3px;padding:2px 6px;font-size:10.5px;font-weight:700}._removeInlineBtn_29ki7_525:hover{background:#e74c3c40}._itemFields_29ki7_555{background:#0000001a;border-top:1px solid #ffffff0a;flex-direction:column;gap:8px;padding:10px;display:flex}._inlineRow_29ki7_573{justify-content:space-between;align-items:center;gap:10px;width:100%;display:flex}._inlineRow_29ki7_573 label{opacity:.6;min-width:70px;font-size:11.5px;font-weight:700}._inlineRow_29ki7_573 input,._inlineRow_29ki7_573 select{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11.5px;transition:border-color .15s}._inlineRow_29ki7_573 input:focus,._inlineRow_29ki7_573 select:focus{outline:none;border:1px solid var(--rpg-highlight)!important}._inlineRow_29ki7_573 input[type=color]{cursor:pointer;width:30px;height:20px;padding:0}._fixedBadge_29ki7_655{opacity:.7;background:#ffffff0d;border:1px solid #ffffff1a;border-radius:3px;padding:2px 5px;font-size:9px;font-weight:700}._editorFooter_29ki7_675{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:12px 18px;display:flex}._footerLeft_29ki7_699{gap:6px;display:flex}._footerRight_29ki7_701{display:flex}._footerBtn_29ki7_705{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:5px;padding:7px 14px;font-size:11.5px;font-weight:700;transition:background .15s,border-color .15s}._footerBtn_29ki7_705:hover{background:#ffffff14}._footerBtn_29ki7_705._reset_29ki7_737{color:#e74c3c;border-color:#e74c3c40}._footerBtn_29ki7_705._reset_29ki7_737:hover{background:#e74c3c1a;border-color:#e74c3c}._footerBtn_29ki7_705._save_29ki7_757{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._footerBtn_29ki7_705._save_29ki7_757:hover{opacity:.9}._editorTabs_29ki7_773{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;display:flex}._tabBtn_29ki7_787{color:var(--rpg-text);opacity:.6;cursor:pointer;text-align:center;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._tabBtn_29ki7_787:hover{opacity:1;background:#ffffff05}._tabBtnActive_29ki7_827{opacity:1;color:var(--rpg-highlight);border-bottom:2px solid var(--rpg-highlight);background:#ffffff0a}._appearanceSection_29ki7_841{margin-top:10px}._relationsTabBody_29ki7_845,._inventoryTabBody_29ki7_847{flex-direction:column;gap:12px;padding:4px 2px;display:flex}._tabHeaderRow_29ki7_861{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._tabHeaderRow_29ki7_861 span{font-size:13px;font-weight:700;color:var(--rpg-text)!important}._relationCard_29ki7_887{border:1px solid var(--rpg-border);background:#ffffff05;border-radius:6px;flex-direction:column;gap:8px;padding:10px;display:flex}._relationCardHeader_29ki7_907{border-bottom:1px solid #ffffff0d;justify-content:space-between;align-items:center;padding-bottom:6px;display:flex}._relationCardHeader_29ki7_907 strong{color:var(--rpg-text)!important}._metricBlock_29ki7_933{background:#00000026;border:1px solid #ffffff0a;border-radius:5px;flex-direction:column;gap:6px;padding:6px 8px;display:flex}._metricHeaderRow_29ki7_953{justify-content:space-between;align-items:center;gap:8px;width:100%;display:flex}._metricValueGroup_29ki7_969{flex-shrink:0;align-items:center;gap:6px;display:flex}._metricValueInput_29ki7_983{border:1px solid var(--rpg-border);width:48px;color:var(--rpg-text);text-align:center;background:#0003;border-radius:4px;outline:none;padding:4px;font-size:11px;font-weight:700}._metricValueInput_29ki7_983:focus{border-color:var(--rpg-highlight)!important}._metricConfigRow_29ki7_1017{border-top:1px dashed #ffffff0d;flex-wrap:wrap;align-items:center;gap:12px;width:100%;padding-top:4px;display:flex}._invActionBar_29ki7_1037{gap:6px;margin-bottom:10px;display:flex}._invActionBtn_29ki7_1049{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff08;border-radius:4px;flex:1;padding:6px;font-size:11px;font-weight:700;transition:all .15s}._invActionBtn_29ki7_1049:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._invSection_29ki7_1087{margin-bottom:10px}._invSectionTitle_29ki7_1091{opacity:.6;margin-bottom:6px;font-size:11.5px;font-weight:700}._invEquipGrid_29ki7_1105,._invStorageGrid_29ki7_1105{grid-template-columns:1fr;gap:8px;display:grid}._invSlotCard_29ki7_1117{background:#00000026;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;justify-content:space-between;min-height:80px;padding:8px;display:flex}._slotHeader_29ki7_1139{justify-content:space-between;align-items:center;margin-bottom:6px;display:flex}._emptyText_29ki7_1153{opacity:.3;text-align:center;padding:10px 0;font-size:11px}._invStorageBox_29ki7_1167{background:#00000026;border:1px solid #ffffff08;border-radius:6px;flex-direction:column;gap:6px;padding:8px;display:flex}._invStorageItemsList_29ki7_1187{flex-direction:column;gap:6px;min-height:80px;display:flex}._invItemRow_29ki7_1201{background:#ffffff05;border:1px solid #ffffff05;border-radius:4px;justify-content:space-between;align-items:center;padding:6px 8px;display:flex}._itemTitleLine_29ki7_1221{flex-wrap:nowrap;align-items:center;gap:8px;width:100%;display:flex}._itemDescLine_29ki7_1237{flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;width:100%;display:flex}._itemQtyBox_29ki7_1255{flex-shrink:0;justify-content:flex-end;align-items:center;width:58px;display:flex}._itemQtyInputRefactored_29ki7_1271{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;box-sizing:border-box;vertical-align:middle;background:#ffffff14;border-radius:4px;outline:none;width:58px;height:22px;margin:0;padding:2px 4px;font-size:11px;font-weight:700;display:inline-block}._itemDeleteBtn_29ki7_1307{color:#fff6;cursor:pointer;background:0 0;border:none;flex-shrink:0;justify-content:flex-end;align-items:center;width:58px;padding-right:2px;font-size:14px;line-height:1;display:inline-flex}._itemDeleteBtn_29ki7_1307:hover{color:#e74c3c}input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}._invItemRow_29ki7_1201 textarea,._invItemRow_29ki7_1201 input{touch-action:auto!important;-webkit-user-select:text!important;user-select:text!important}._accordionArrow_29ki7_1373{color:var(--rpg-text);margin-right:8px;font-size:10px;line-height:1;transition:transform .15s ease-out;display:inline-block}._activeArrow_29ki7_1391{transform:rotate(90deg)}._miniAddBtn_29ki7_1399{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:3px;flex-shrink:0;padding:2px 6px;font-size:9.5px;font-weight:700;transition:all .12s}._miniAddBtn_29ki7_1399:hover{opacity:.9}._itemTypeSelectWrapper_29ki7_1433{flex-shrink:0;align-items:center;margin:0;display:inline-flex}._assetValueGroup_29ki7_1447{flex-shrink:0;align-items:center;gap:4px;width:140px;display:flex}._assetAmountInput_29ki7_1463{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;background:#ffffff14;border-radius:4px;outline:none;width:60px;padding:2px 4px;font-size:11px;font-weight:700}._assetCurrencyInput_29ki7_1489{border:1px solid var(--rpg-border);color:var(--rpg-text);text-align:center;background:#ffffff14;border-radius:4px;outline:none;width:72px;padding:2px 4px;font-size:11px;font-weight:700}._charNameInput_29ki7_1515{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;padding:4px 8px;font-size:16px;font-weight:700}._presetSelect_29ki7_1537{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0000004d;border-radius:4px;outline:none;padding:2px 4px;font-size:11px}._limitInput_29ki7_1557{border:1px solid var(--rpg-border);width:45px;color:var(--rpg-text);text-align:center;background:#0000004d;border-radius:4px;outline:none;padding:2px 4px;font-size:11px}._nameInput_29ki7_1581{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;width:100px;padding:4px 8px;font-size:11px}._descTextarea_29ki7_1603{border:1px solid var(--rpg-border);width:100%;min-height:50px;color:var(--rpg-text);resize:vertical;background:#0000004d;border-radius:4px;outline:none;padding:6px;font-size:11px}._metricNameInput_29ki7_1629{border:1px solid var(--rpg-border);min-width:80px;color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11px;font-weight:700}._metricLimitInput_29ki7_1655{width:40px;color:var(--rpg-text);border:1px solid var(--rpg-border);text-align:center;background:#0000004d;border-radius:3px;padding:4px;font-size:11px}._colorPickerInput_29ki7_1677{cursor:pointer;background:0 0;border:none;width:22px;height:22px;padding:0}._miniSortBtn_29ki7_1695{padding:2px 4px;font-size:9px}._syncBadge_29ki7_1705{color:#3498db;background:#3498db1a;border:1px solid #3498db4d;border-radius:3px;padding:2px 6px;font-size:10px}._metricLimitWrapper_29ki7_1723{align-items:center;gap:4px;display:flex}._metricLimitLabel_29ki7_1735{opacity:.6;font-size:10px}._flexCenterGroup_29ki7_1745{align-items:center;gap:6px;display:flex}._flexCenterGroupSmall_29ki7_1757{align-items:center;gap:3px;display:flex}._flexColumnFull_29ki7_1769{flex-direction:column;gap:3px;width:100%;display:flex}._flexItemLine_29ki7_1783{align-items:center;gap:8px;display:flex}._slotInputOuter_29ki7_1795{flex:1;align-items:center;gap:6px;margin-right:10px;display:flex}._slotRenameInputRefactored_29ki7_1811{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;padding:4px 8px;font-size:11px}._itemTitleInputRefactored_29ki7_1833{width:100%;color:var(--rpg-text);resize:none;vertical-align:middle;box-sizing:border-box;background:0 0;border:none;border-bottom:1px solid #0000;outline:none;flex:1;min-width:0;height:18px;margin:0;padding:4px 0;font-family:inherit;font-size:11px;line-height:1.4;display:inline-block;overflow-y:hidden}._itemDescInputRefactored_29ki7_1877{width:100%;color:var(--rpg-text);opacity:.6;resize:none;background:0 0;border:none;outline:none;flex:200px;min-width:0;height:auto;margin-top:2px;padding:2px 0;font-family:inherit;font-size:10px;display:block;overflow-y:hidden}._flatHeaderRow_29ki7_1915{-webkit-user-select:none;user-select:none;background:0 0;justify-content:space-between;align-items:center;margin-bottom:6px;padding:8px 2px;display:flex}._flatHeaderTitle_29ki7_1935{color:var(--rpg-text);font-size:13.5px;font-weight:700}._flatHeaderAddBtn_29ki7_1947{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:4px;padding:4px 10px;font-size:10.5px;font-weight:700;transition:all .15s}._flatHeaderAddBtn_29ki7_1947:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff1f}._accordionSeparator_29ki7_1983{background:#ffffff26;width:100%;height:1px;margin:12px 0}._dragHandleIconWrapper_29ki7_1997{cursor:grab;opacity:.45;color:var(--rpg-text);flex-shrink:0;justify-content:center;align-items:center;width:16px;height:16px;margin:0;padding:0;display:inline-flex}._dragHandleIconWrapper_29ki7_1997:hover{opacity:1;color:var(--rpg-highlight)}._dragHandleIconWrapper_29ki7_1997:active{cursor:grabbing}._spacedHeaderButtonGroup_29ki7_2043{flex-shrink:0;align-items:center;gap:12px;display:flex}._itemTypeSelect_29ki7_1433{appearance:none;height:22px;color:var(--rpg-text);border:1px solid var(--rpg-border);cursor:pointer;box-sizing:border-box;vertical-align:middle;background-image:url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");background-position:right 4px center;background-repeat:no-repeat;background-size:14px;border-radius:4px;outline:none;align-items:center;margin:0;font-size:10.5px;line-height:22px;display:inline-flex;background:#00000073!important;padding:0 18px 0 6px!important}._inlineRow_29ki7_573 select{appearance:none;color:var(--rpg-text);border:1px solid var(--rpg-border);cursor:pointer;box-sizing:border-box;background-image:url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");background-position:right 6px center;background-repeat:no-repeat;background-size:16px;border-radius:4px;outline:none;font-size:11.5px;background:#0000004d!important;padding:5px 24px 5px 10px!important}._overlay_1hn40_5{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:3000!important}._modal_1hn40_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_1hn40_61{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_1hn40_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._closeBtn_1hn40_97{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_1hn40_97:hover{opacity:1}._editorTabs_1hn40_123{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;display:flex}._tabBtn_1hn40_137{color:var(--rpg-text);opacity:.6;cursor:pointer;text-align:center;background:0 0;border:none;border-bottom:2px solid #0000;flex:1;padding:10px;font-size:12px;font-weight:700;transition:all .15s}._tabBtn_1hn40_137:hover{opacity:1;background:#ffffff05}._tabBtnActive_1hn40_177{opacity:1;color:var(--rpg-highlight);border-bottom:2px solid var(--rpg-highlight);background:#ffffff0a}._body_1hn40_191{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._section_1hn40_209{flex-direction:column;gap:8px;height:100%;display:flex}._label_1hn40_223{color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._textarea_1hn40_235{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:none;background:#0003;border-radius:6px;outline:none;flex:1;padding:10px;font-size:12px}._textarea_1hn40_235:focus{border-color:var(--rpg-highlight)}._addonList_1hn40_269{flex-direction:column;gap:10px;display:flex}._addonItem_1hn40_281{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;overflow:hidden}._addonHeader_1hn40_295{cursor:pointer;-webkit-user-select:none;user-select:none;background:#0003;justify-content:space-between;align-items:center;padding:10px 12px;display:flex}._addonHeaderLeft_1hn40_315{color:var(--rpg-text);align-items:center;gap:8px;font-size:13px;font-weight:700;display:flex}._addonHeaderRight_1hn40_333{align-items:center;display:flex}._collapseIcon_1hn40_343{opacity:.7;width:14px;height:14px;transition:transform .2s}._collapseIcon_1hn40_343._open_1hn40_357{transform:rotate(90deg)}._addonBody_1hn40_365{background:#0000001a;border-top:1px solid #ffffff0d;padding:12px}._addonInput_1hn40_377{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;min-height:60px;padding:8px;font-size:11.5px;transition:border-color .15s}._addonInput_1hn40_377:focus{border-color:var(--rpg-highlight)}._addGuideBtn_1hn40_413{border:1px dashed var(--rpg-border);color:var(--rpg-highlight);cursor:pointer;text-align:center;background:0 0;border-radius:6px;margin-top:4px;padding:10px;font-size:12px;font-weight:700;transition:all .2s}._addGuideBtn_1hn40_413:hover{border-color:var(--rpg-highlight);background:#ffffff0d}._footer_1hn40_451{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:12px 18px;display:flex}._cancelBtn_1hn40_477{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._cancelBtn_1hn40_477:hover{background:#ffffff1a}._saveBtn_1hn40_507{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._saveBtn_1hn40_507:hover{opacity:.9}._defGroup_1hn40_537{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;flex-direction:column;gap:8px;padding:12px;display:flex}._defGroupTitle_1hn40_557{color:var(--rpg-highlight);border-bottom:1px dashed #ffffff1a;margin:0;padding-bottom:4px;font-size:12px}._defRow_1hn40_573{align-items:center;gap:10px;display:flex}._defLabel_1hn40_585{width:80px;color:var(--rpg-text);text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;font-size:11.5px;font-weight:700;overflow:hidden}._defInput_1hn40_607{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11.5px;transition:border-color .15s}._defInput_1hn40_607:focus{border-color:var(--rpg-highlight)}._switch_1hn40_641{flex-shrink:0;width:32px;height:18px;display:inline-block;position:relative}._switch_1hn40_641 input{opacity:0;width:0;height:0}._slider_1hn40_669{cursor:pointer;border:1px solid var(--rpg-border);background-color:#0006;border-radius:20px;transition:all .2s;position:absolute;inset:0}._slider_1hn40_669:before{content:"";background-color:var(--rpg-text);opacity:.5;border-radius:50%;width:12px;height:12px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switch_1hn40_641 input:checked+._slider_1hn40_669{border-color:var(--rpg-highlight);background-color:#ffffff1a}._switch_1hn40_641 input:checked+._slider_1hn40_669:before{background-color:var(--rpg-highlight);opacity:1;transform:translate(14px)}._switch_1hn40_641 input:disabled+._slider_1hn40_669{opacity:.3;cursor:not-allowed}._overlay_pic3v_5{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:3000!important}._modal_pic3v_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_pic3v_61{border-bottom:1px solid var(--rpg-border);flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:14px 20px;display:flex}._header_pic3v_61 h4{color:var(--rpg-highlight);letter-spacing:.7px;margin:0;font-weight:700;font-size:15px!important}._closeBtn_pic3v_97{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;font-size:24px}._closeBtn_pic3v_97:hover{opacity:1}._body_pic3v_123{flex-direction:column;flex:1;gap:14px;padding:18px;display:flex;overflow-y:auto}._section_pic3v_141{flex-direction:column;gap:8px;height:auto;display:flex}._label_pic3v_155{color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._footer_pic3v_167{border-top:1px solid var(--rpg-border);background:#0003;border-radius:0 0 10px 10px;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:12px 18px;display:flex}._cancelBtn_pic3v_193{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0d;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._cancelBtn_pic3v_193:hover{background:#ffffff1a}._saveBtn_pic3v_223{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700}._saveBtn_pic3v_223:hover{opacity:.9}._settingsDesc_pic3v_253{opacity:.6;margin-top:-4px;margin-bottom:8px;font-size:11px}._rowFlex_pic3v_267{align-items:center;gap:8px;display:flex}._checkboxLabel_pic3v_279{cursor:pointer;-webkit-user-select:none;user-select:none;color:var(--rpg-highlight);font-size:12.5px;font-weight:700}._settingsSelect_pic3v_295{width:100%;color:inherit;border:1px solid var(--rpg-border);background:#0003;border-radius:4px;outline:none;margin-bottom:8px;padding:6px 10px;font-family:inherit}._settingsSelect_pic3v_295:focus{border-color:var(--rpg-highlight)}._colorPaletteGrid_pic3v_327{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;flex-direction:column;gap:8px;margin-top:4px;padding:12px;display:flex}._colorRow_pic3v_349{align-items:center;gap:10px;width:100%;display:flex}._colorLabel_pic3v_363{opacity:.85;flex-shrink:0;width:90px;font-size:11.5px;font-weight:700}._colorPicker_pic3v_379{border:1px solid var(--rpg-border);cursor:pointer;background:0 0;border-radius:4px;flex-shrink:0;width:28px;height:28px;padding:0}._colorTextInput_pic3v_401{border:1px solid var(--rpg-border);color:var(--rpg-text);text-transform:uppercase;background:#0003;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-family:monospace;font-size:11.5px}._colorTextInput_pic3v_401:focus{border-color:var(--rpg-highlight)}._switch_pic3v_437{flex-shrink:0;width:32px;height:18px;display:inline-block;position:relative}._switch_pic3v_437 input{opacity:0;width:0;height:0}._slider_pic3v_465{cursor:pointer;border:1px solid var(--rpg-border);background-color:#0006;border-radius:20px;transition:all .2s;position:absolute;inset:0}._slider_pic3v_465:before{content:"";background-color:var(--rpg-text);opacity:.5;border-radius:50%;width:12px;height:12px;transition:all .2s;position:absolute;bottom:2px;left:2px}._switch_pic3v_437 input:checked+._slider_pic3v_465{border-color:var(--rpg-highlight);background-color:#ffffff1a}._switch_pic3v_437 input:checked+._slider_pic3v_465:before{background-color:var(--rpg-highlight);opacity:1;transform:translate(14px)}._switch_pic3v_437 input:disabled+._slider_pic3v_465{opacity:.3;cursor:not-allowed}._container_qwt2m_1{color:var(--rpg-text);flex-direction:column;gap:16px;padding:12px 10px;display:flex}._sectionHeader_qwt2m_17{justify-content:space-between;align-items:center;margin-bottom:8px;display:flex}._sectionTitle_qwt2m_31{color:var(--rpg-highlight);font-size:13px;font-weight:700}._eventsSection_qwt2m_43{margin-top:8px}._eventsSectionTitle_qwt2m_51{color:var(--rpg-text);font-size:13px;font-weight:700}._addBtn_qwt2m_63{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:0 0;border-radius:4px;padding:4px 12px;font-size:12px;transition:background .15s}._addBtn_qwt2m_63:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._stateGrid_qwt2m_99{flex-direction:column;gap:10px;margin-top:10px;display:flex}._rowField_qwt2m_113{align-items:center;gap:8px;display:flex}._twoCol_qwt2m_125{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;display:grid}._fieldLabel_qwt2m_137{opacity:.6;width:60px;color:var(--rpg-text);flex-shrink:0;font-size:12px;font-weight:700}._lockBtn_qwt2m_155{color:var(--rpg-text);opacity:.5;cursor:pointer;background:0 0;border:none;justify-content:center;align-items:center;width:20px;height:20px;padding:4px;font-size:11px;transition:opacity .15s,color .15s;display:flex}._lockBtn_qwt2m_155:hover{opacity:1;color:var(--rpg-highlight)}._stateTextarea_qwt2m_197{border:1px solid var(--rpg-border);color:var(--rpg-text);resize:none;background:#0003;border-radius:4px;outline:none;flex:1;width:100%;height:auto;min-height:28px;padding:6px 10px;font-family:inherit;font-size:11px;line-height:1.4;display:block;overflow-y:hidden}._stateTextarea_qwt2m_197:focus:not(:disabled){border-color:var(--rpg-highlight)}._stateTextarea_qwt2m_197:disabled{opacity:.5;cursor:not-allowed;background:#0000001a}._eventsList_qwt2m_257{flex-direction:column;gap:10px;display:flex}._eventBlock_qwt2m_269{background:#00000026;border:1px solid #ffffff0d;border-radius:6px;flex-direction:column;gap:8px;padding:10px 12px;display:flex;position:relative}._eventHeaderRow_qwt2m_291{justify-content:space-between;align-items:center;gap:8px;display:flex}._eventNumber_qwt2m_305{opacity:.5;font-size:11.5px;font-weight:700}._removeBtn_qwt2m_317{color:#fff6;cursor:pointer;background:0 0;border:none;padding:0 4px;font-size:16px;line-height:1}._removeBtn_qwt2m_317:hover{color:#e74c3c}._eventTitleInput_qwt2m_345{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);background:#00000040;border-radius:4px;outline:none;padding:6px 10px;font-family:inherit;font-size:11px;font-weight:700}._eventTitleInput_qwt2m_345:focus{border-color:var(--rpg-highlight)}._eventDescTextarea_qwt2m_379{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;background:#0003;border-radius:4px;outline:none;height:auto;min-height:32px;padding:6px 10px;font-family:inherit;font-size:11px;line-height:1.4;display:block;overflow-y:hidden}._eventDescTextarea_qwt2m_379:focus{border-color:var(--rpg-highlight)}._emptyPlaceholder_qwt2m_423{opacity:.5;text-align:center;margin:4px 0 0;font-size:12.5px}._overlay_d7kfo_5{background:#000000bf;justify-content:center;align-items:center;width:100vw;height:100vh;display:flex;position:fixed;top:0;left:0;z-index:4000!important}._modal_d7kfo_31{background:var(--rpg-bg);border:1px solid var(--rpg-border);width:540px;max-width:100%;height:680px;max-height:90vh;color:var(--rpg-text);border-radius:10px;flex-direction:column;display:flex;overflow:hidden;box-shadow:0 12px 35px #000000a6}._header_d7kfo_61{border-bottom:1px solid var(--rpg-border);box-sizing:border-box;flex-shrink:0;justify-content:space-between;align-items:center;height:54px;padding:0 20px;display:flex}._header_d7kfo_61 h4{color:var(--rpg-highlight);margin:0;font-size:15px}._closeBtn_d7kfo_95{color:var(--rpg-text);cursor:pointer;opacity:.6;background:0 0;border:none;outline:none;justify-content:center;align-items:center;width:24px;height:24px;padding:0;font-size:24px;line-height:1;transition:opacity .15s;display:inline-flex}._closeBtn_d7kfo_95:hover{opacity:1}._tabNav_d7kfo_141{border-bottom:1px solid var(--rpg-border);background:#00000026;flex-shrink:0;width:100%;display:flex}._tabBtn_d7kfo_157{color:var(--rpg-text);opacity:.6;cursor:pointer;background:0 0;border:none;border-bottom:2px solid #0000;outline:none;flex:1;padding:12px 0;font-size:11.5px;font-weight:700;transition:opacity .15s,border-color .15s,color .15s}._tabBtn_d7kfo_157:hover{opacity:.9;background:#ffffff05}._tabActive_d7kfo_197{background:#ffffff0a;opacity:1!important;border-color:var(--rpg-highlight)!important;color:var(--rpg-highlight)!important}._body_d7kfo_211{flex-direction:column;flex:1;gap:14px;padding:16px;display:flex;overflow-y:auto}._tabContentFadeIn_d7kfo_231{animation:.18s ease-out forwards _tabFadeIn_d7kfo_1}@keyframes _tabFadeIn_d7kfo_1{0%{opacity:0;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}._section_d7kfo_249{border:1px solid var(--rpg-border);background:#00000026;border-radius:6px;padding:12px}._sectionTitleRow_d7kfo_263{justify-content:space-between;align-items:center;margin-bottom:10px;display:flex}._sectionTitle_d7kfo_263{color:var(--rpg-highlight);font-size:13px;font-weight:700}._deselectAllBtn_d7kfo_289{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;box-sizing:border-box;background:#ffffff08;border-radius:4px;outline:none;justify-content:center;align-items:center;height:22px;padding:0 8px;font-size:10.5px;font-weight:700;line-height:1;transition:all .15s ease-out;display:inline-flex}._deselectAllBtn_d7kfo_289:hover{color:#ff6b6b;background:#ffffff14;border-color:#e74c3c}._charRow_d7kfo_339{border-bottom:1px dashed #ffffff0d;align-items:center;padding:8px 0;display:flex}._charRow_d7kfo_339:last-child{border-bottom:none}._worldRow_d7kfo_361{border-bottom:1px solid #ffffff1a;align-items:flex-start;margin-bottom:6px;padding-bottom:10px}._charNameLabel_d7kfo_375{white-space:nowrap;text-overflow:ellipsis;width:110px;color:var(--rpg-text);font-weight:700;display:inline-block;overflow:hidden}._charOptionsRow_d7kfo_395{flex-wrap:wrap;align-items:center;gap:14px;display:flex}._worldOptionsContainer_d7kfo_409{flex-direction:column;flex:1;gap:8px;transition:opacity .2s;display:flex}._worldOptionsRow_d7kfo_425{align-items:center;gap:14px;display:flex}._activeOps_d7kfo_437{opacity:1}._disabledOps_d7kfo_445{opacity:.25;pointer-events:none}._checkboxItem_d7kfo_455{cursor:pointer;align-items:center;gap:6px;font-size:12px;display:flex}._textarea_d7kfo_471{border:1px solid var(--rpg-border);width:100%;color:var(--rpg-text);resize:vertical;box-sizing:border-box;background:#0003;border-radius:4px;outline:none;min-height:60px;padding:8px;font-size:12px}._textarea_d7kfo_471:focus:not(:disabled){border-color:var(--rpg-highlight)}._viewBtn_d7kfo_507{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;box-sizing:border-box;background:#ffffff0d;border-radius:4px;outline:none;justify-content:center;align-items:center;height:24px;padding:0 10px;font-size:11px;line-height:1;transition:all .15s;display:inline-flex}._viewBtn_d7kfo_507:hover{background:#ffffff1f}._viewBtnActive_d7kfo_551{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight);cursor:pointer;box-sizing:border-box;border-radius:4px;outline:none;justify-content:center;align-items:center;height:24px;padding:0 10px;font-size:11px;line-height:1;display:inline-flex;box-shadow:0 0 8px #0003}._jsonEditor_d7kfo_587{color:#8892b0;resize:vertical;box-sizing:border-box;background:#00000059;border:1px solid #ffffff1a;border-radius:4px;outline:none;width:100%;height:280px;padding:10px;font-family:monospace;font-size:11.5px;transition:all .2s}._jsonEditorWritable_d7kfo_619{box-shadow:inset 0 0 6px #00000080;color:#e6ebf5!important;border-color:var(--rpg-highlight)!important;background:#111216!important}._footer_d7kfo_633{border-top:1px solid var(--rpg-border);box-sizing:border-box;background:#0003;flex-shrink:0;justify-content:flex-end;align-items:center;gap:10px;height:54px;padding:0 20px;display:flex}._cancelBtn_d7kfo_659,._saveBtn_d7kfo_659{cursor:pointer;box-sizing:border-box;border-radius:5px;outline:none;justify-content:center;align-items:center;height:32px;padding:0 16px;font-size:12px;font-weight:700;line-height:1;transition:all .15s ease-out;display:inline-flex}._cancelBtn_d7kfo_659{border:1px solid var(--rpg-border);color:var(--rpg-text);background:#ffffff0d}._cancelBtn_d7kfo_659:hover{border-color:var(--rpg-highlight);background:#ffffff1f}._saveBtn_d7kfo_659{background:var(--rpg-highlight-bg);border:1px solid var(--rpg-highlight);color:var(--rpg-highlight)}._saveBtn_d7kfo_659:hover{opacity:.9}._syncLiveBtn_d7kfo_737{border:1px solid var(--rpg-border);color:var(--rpg-text);cursor:pointer;background:#ffffff0a;border-radius:4px;outline:none;justify-content:center;align-items:center;height:22px;padding:0 10px;font-size:10.5px;font-weight:700;line-height:1;transition:background .15s,border-color .15s,color .15s;display:inline-flex}._syncLiveBtn_d7kfo_737:hover{border-color:var(--rpg-highlight);color:var(--rpg-highlight);background:#ffffff14}._editorGroupBlock_d7kfo_785{box-sizing:border-box;background:#00000038;border:1px solid #ffffff0d;border-radius:6px;flex-direction:column;gap:8px;width:100%;margin-bottom:12px;padding:10px 12px;display:flex}._editorGroupBlock_d7kfo_785:last-child{margin-bottom:0}._editorGroupTitle_d7kfo_819{color:var(--rpg-highlight);border-bottom:1px dashed #ffffff1a;margin-bottom:2px;padding-bottom:4px;font-size:11.5px;font-weight:700}._visualEditorRow_d7kfo_837{align-items:center;gap:12px;width:100%;display:flex}._visualEditorLabel_d7kfo_851{opacity:.6;text-align:left;white-space:nowrap;text-overflow:ellipsis;width:75px;color:var(--rpg-text,#fff);flex-shrink:0;font-size:11px;font-weight:700;overflow:hidden}._visualEditorSubLabel_d7kfo_877{opacity:.55;color:var(--rpg-text,#fff);margin-top:4px;font-size:10.5px;font-weight:700}._visualEditorInput_d7kfo_893{border:1px solid var(--rpg-border);color:var(--rpg-text);box-sizing:border-box;background:#00000040;border-radius:4px;outline:none;flex:1;padding:5px 8px;font-size:11px;transition:border-color .15s}._visualEditorInput_d7kfo_893:focus{border-color:var(--rpg-highlight)}._visualEditorTextarea_d7kfo_927{border:1px solid var(--rpg-border);color:var(--rpg-text);resize:vertical;box-sizing:border-box;background:#00000040;border-radius:4px;outline:none;flex:1;min-height:24px;padding:5px 8px;font-family:inherit;font-size:11px;line-height:1.4;transition:border-color .15s}._visualEditorTextarea_d7kfo_927:focus{border-color:var(--rpg-highlight)}.dnd-poly-drag-image{opacity:.5!important}.dnd-poly-drag-image.dnd-poly-snapback{transition-property:transform!important;transition-duration:.25s!important;transition-timing-function:ease-out!important}/*$vite$:1*/`)),document.head.appendChild(e)}}catch(e){console.error(`vite-plugin-css-injected-by-js`,e)}})();
 //#region \0rolldown/runtime.js
 var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (e && (t = e(e = 0)), t), s = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), c = (e, i, o, s) => {
 	if (i && typeof i == "object" || typeof i == "function") for (var c = r(i), l = 0, u = c.length, d; l < u; l++) d = c[l], !a.call(e, d) && d !== o && t(e, d, {
@@ -2187,7 +2187,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 	}
 	function Xi() {
 		var e = Hi;
-		return e !== null && (Yl === null ? Yl = e : Yl.push.apply(Yl, e), Hi = null), e;
+		return e !== null && (Z === null ? Z = e : Z.push.apply(Z, e), Hi = null), e;
 	}
 	function Zi(e) {
 		Hi === null ? Hi = [e] : Hi.push(e);
@@ -2366,7 +2366,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 	}
 	var xa = w.S;
 	w.S = function(e, t) {
-		Ql = Re(), typeof t == "object" && t && typeof t.then == "function" && ya(e, t), xa !== null && xa(e, t);
+		$l = Re(), typeof t == "object" && t && typeof t.then == "function" && ya(e, t), xa !== null && xa(e, t);
 	};
 	var Sa = he(null);
 	function Ca() {
@@ -2772,7 +2772,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 					p = s, s = p.next, p.next = null, i.lastBaseUpdate = p, i.shared.pending = null;
 				}
 			} while (1);
-			u === null && (c = d), i.baseState = c, i.firstBaseUpdate = l, i.lastBaseUpdate = u, a === null && (i.shared.lanes = 0), Wl |= o, e.lanes = o, e.memoizedState = d;
+			u === null && (c = d), i.baseState = c, i.firstBaseUpdate = l, i.lastBaseUpdate = u, a === null && (i.shared.lanes = 0), Gl |= o, e.lanes = o, e.memoizedState = d;
 		}
 	}
 	function eo(e, t) {
@@ -2785,13 +2785,13 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 	}
 	var no = he(null), ro = he(0);
 	function io(e, t) {
-		e = Hl, _e(ro, e), _e(no, t), Hl = e | t.baseLanes;
+		e = Ul, _e(ro, e), _e(no, t), Ul = e | t.baseLanes;
 	}
 	function ao() {
-		_e(ro, Hl), _e(no, no.current);
+		_e(ro, Ul), _e(no, no.current);
 	}
 	function oo() {
-		Hl = ro.current, ge(no), ge(ro);
+		Ul = ro.current, ge(no), ge(ro);
 	}
 	var so = he(null), co = null;
 	function lo(e) {
@@ -2994,7 +2994,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 						hasEagerState: u.hasEagerState,
 						eagerState: u.eagerState,
 						next: null
-					}, l === null ? (c = l = f, s = o) : l = l.next = f, I.lanes |= p, Wl |= p;
+					}, l === null ? (c = l = f, s = o) : l = l.next = f, I.lanes |= p, Gl |= p;
 					f = u.action, So && n(o, f), o = u.hasEagerState ? u.eagerState : n(o, f);
 				} else p = {
 					lane: f,
@@ -3004,7 +3004,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 					hasEagerState: u.hasEagerState,
 					eagerState: u.eagerState,
 					next: null
-				}, l === null ? (c = l = p, s = o) : l = l.next = p, I.lanes |= f, Wl |= f;
+				}, l === null ? (c = l = p, s = o) : l = l.next = p, I.lanes |= f, Gl |= f;
 				u = u.next;
 			} while (u !== null && u !== t);
 			if (l === null ? s = o : l.next = c, !O(o, e.memoizedState) && (ac = !0, d && (n = va, n !== null))) throw n;
@@ -3330,10 +3330,10 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return n.memoizedState = [r, t], r;
 	}
 	function Cs(e, t, n) {
-		return n === void 0 || _o & 1073741824 && !(X & 261930) ? e.memoizedState = t : (e.memoizedState = n, e = fu(), I.lanes |= e, Wl |= e, n);
+		return n === void 0 || _o & 1073741824 && !(X & 261930) ? e.memoizedState = t : (e.memoizedState = n, e = fu(), I.lanes |= e, Gl |= e, n);
 	}
 	function ws(e, t, n, r) {
-		return O(n, t) ? n : no.current === null ? !(_o & 42) || _o & 1073741824 && !(X & 261930) ? (ac = !0, e.memoizedState = n) : (e = fu(), I.lanes |= e, Wl |= e, t) : (e = Cs(e, n, r), O(e, t) || (ac = !0), e);
+		return O(n, t) ? n : no.current === null ? !(_o & 42) || _o & 1073741824 && !(X & 261930) ? (ac = !0, e.memoizedState = n) : (e = fu(), I.lanes |= e, Gl |= e, t) : (e = Cs(e, n, r), O(e, t) || (ac = !0), e);
 	}
 	function Ts(e, t, n, r, i) {
 		var a = T.p;
@@ -3784,7 +3784,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		}
 		var o = n.stateNode;
 		o !== null && typeof o.componentDidCatch == "function" && (e.callback = function() {
-			ec(t, n, r), typeof i != "function" && (tu === null ? tu = new Set([this]) : tu.add(this));
+			ec(t, n, r), typeof i != "function" && (nu === null ? nu = new Set([this]) : nu.add(this));
 			var e = r.stack;
 			this.componentDidCatch(r.value, { componentStack: e === null ? "" : e });
 		});
@@ -3794,7 +3794,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			if (t = n.alternate, t !== null && aa(t, n, a, !0), n = so.current, n !== null) {
 				switch (n.tag) {
 					case 31:
-					case 13: return co === null ? Tu() : n.alternate === null && Ul === 0 && (Ul = 3), n.flags &= -257, n.flags |= 65536, n.lanes = a, r === ka ? n.flags |= 16384 : (t = n.updateQueue, t === null ? n.updateQueue = new Set([r]) : t.add(r), Wu(e, r, a)), !1;
+					case 13: return co === null ? Tu() : n.alternate === null && Wl === 0 && (Wl = 3), n.flags &= -257, n.flags |= 65536, n.lanes = a, r === ka ? n.flags |= 16384 : (t = n.updateQueue, t === null ? n.updateQueue = new Set([r]) : t.add(r), Wu(e, r, a)), !1;
 					case 22: return n.flags |= 65536, r === ka ? n.flags |= 16384 : (t = n.updateQueue, t === null ? (t = {
 						transitions: null,
 						markerInstances: null,
@@ -3805,14 +3805,14 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			}
 			return Wu(e, r, a), Tu(), !1;
 		}
-		if (M) return t = so.current, t === null ? (r !== Wi && (t = Error(i(423), { cause: r }), Zi(Di(t, n))), e = e.current.alternate, e.flags |= 65536, a &= -a, e.lanes |= a, r = Di(r, n), a = tc(e.stateNode, r, a), Xa(e, a), Ul !== 4 && (Ul = 2)) : (!(t.flags & 65536) && (t.flags |= 256), t.flags |= 65536, t.lanes = a, r !== Wi && (e = Error(i(422), { cause: r }), Zi(Di(e, n)))), !1;
+		if (M) return t = so.current, t === null ? (r !== Wi && (t = Error(i(423), { cause: r }), Zi(Di(t, n))), e = e.current.alternate, e.flags |= 65536, a &= -a, e.lanes |= a, r = Di(r, n), a = tc(e.stateNode, r, a), Xa(e, a), Wl !== 4 && (Wl = 2)) : (!(t.flags & 65536) && (t.flags |= 256), t.flags |= 65536, t.lanes = a, r !== Wi && (e = Error(i(422), { cause: r }), Zi(Di(e, n)))), !1;
 		var o = Error(i(520), { cause: r });
-		if (o = Di(o, n), Jl === null ? Jl = [o] : Jl.push(o), Ul !== 4 && (Ul = 2), t === null) return !0;
+		if (o = Di(o, n), Xl === null ? Xl = [o] : Xl.push(o), Wl !== 4 && (Wl = 2), t === null) return !0;
 		r = Di(r, n), n = t;
 		do {
 			switch (n.tag) {
 				case 3: return n.flags |= 65536, e = a & -a, n.lanes |= e, e = tc(n.stateNode, r, e), Xa(n, e), !1;
-				case 1: if (t = n.type, o = n.stateNode, !(n.flags & 128) && (typeof t.getDerivedStateFromError == "function" || o !== null && typeof o.componentDidCatch == "function" && (tu === null || !tu.has(o)))) return n.flags |= 65536, a &= -a, n.lanes |= a, a = nc(a), rc(a, e, n, r), Xa(n, a), !1;
+				case 1: if (t = n.type, o = n.stateNode, !(n.flags & 128) && (typeof t.getDerivedStateFromError == "function" || o !== null && typeof o.componentDidCatch == "function" && (nu === null || !nu.has(o)))) return n.flags |= 65536, a &= -a, n.lanes |= a, a = nc(a), rc(a, e, n, r), Xa(n, a), !1;
 			}
 			n = n.return;
 		} while (n !== null);
@@ -3986,7 +3986,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		};
 	}
 	function Sc(e, t, n) {
-		return e = e === null ? 0 : e.childLanes & ~n, t && (e |= Kl), e;
+		return e = e === null ? 0 : e.childLanes & ~n, t && (e |= Jl), e;
 	}
 	function Cc(e, t, n) {
 		var r = t.pendingProps, a = !1, o = (t.flags & 128) != 0, s;
@@ -4113,7 +4113,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return t.child;
 	}
 	function Ac(e, t, n) {
-		if (e !== null && (t.dependencies = e.dependencies), Wl |= t.lanes, (n & t.childLanes) === 0) if (e !== null) {
+		if (e !== null && (t.dependencies = e.dependencies), Gl |= t.lanes, (n & t.childLanes) === 0) if (e !== null) {
 			if (aa(e, t, n, !1), (n & t.childLanes) === 0) return null;
 		} else return null;
 		if (e !== null && t.child !== e.child) throw Error(i(153));
@@ -4271,7 +4271,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		else throw Na = ka, Da;
 	}
 	function W(e, t) {
-		t !== null && (e.flags |= 4), e.flags & 16384 && (t = e.tag === 22 ? 536870912 : st(), e.lanes |= t, ql |= t);
+		t !== null && (e.flags |= 4), e.flags & 16384 && (t = e.tag === 22 ? 536870912 : st(), e.lanes |= t, Yl |= t);
 	}
 	function Ic(e, t) {
 		if (!M) switch (e.tailMode) {
@@ -4429,19 +4429,19 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				if (ge(ho), r = t.memoizedState, r === null) return Lc(t), null;
 				if (a = (t.flags & 128) != 0, o = r.rendering, o === null) if (a) Ic(r, !1);
 				else {
-					if (Ul !== 0 || e !== null && e.flags & 128) for (e = t.child; e !== null;) {
+					if (Wl !== 0 || e !== null && e.flags & 128) for (e = t.child; e !== null;) {
 						if (o = go(e), o !== null) {
 							for (t.flags |= 128, Ic(r, !1), e = o.updateQueue, t.updateQueue = e, W(t, e), t.subtreeFlags = 0, e = n, n = t.child; n !== null;) bi(n, e), n = n.sibling;
 							return _e(ho, ho.current & 1 | 2), M && Ii(t, r.treeForkCount), t.child;
 						}
 						e = e.sibling;
 					}
-					r.tail !== null && Re() > $l && (t.flags |= 128, a = !0, Ic(r, !1), t.lanes = 4194304);
+					r.tail !== null && Re() > eu && (t.flags |= 128, a = !0, Ic(r, !1), t.lanes = 4194304);
 				}
 				else {
 					if (!a) if (e = go(o), e !== null) {
 						if (t.flags |= 128, a = !0, e = e.updateQueue, t.updateQueue = e, W(t, e), Ic(r, !0), r.tail === null && r.tailMode === "hidden" && !o.alternate && !M) return Lc(t), null;
-					} else 2 * Re() - r.renderingStartTime > $l && n !== 536870912 && (t.flags |= 128, a = !0, Ic(r, !1), t.lanes = 4194304);
+					} else 2 * Re() - r.renderingStartTime > eu && n !== 536870912 && (t.flags |= 128, a = !0, Ic(r, !1), t.lanes = 4194304);
 					r.isBackwards ? (o.sibling = t.child, t.child = o) : (e = r.last, e === null ? t.child = o : e.sibling = o, r.last = o);
 				}
 				return r.tail === null ? (Lc(t), null) : (e = r.tail, r.rendering = e, r.tail = e.sibling, r.renderingStartTime = Re(), e.sibling = null, n = ho.current, _e(ho, a ? n & 1 | 2 : n & 1), M && Ii(t, r.treeForkCount), e);
@@ -5050,7 +5050,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				pl(t, e), gl(e), r & 4 && (r = e.updateQueue, r !== null && (e.updateQueue = null, fl(e, r)));
 				break;
 			case 13:
-				pl(t, e), gl(e), e.child.flags & 8192 && e.memoizedState !== null != (n !== null && n.memoizedState !== null) && (Zl = Re()), r & 4 && (r = e.updateQueue, r !== null && (e.updateQueue = null, fl(e, r)));
+				pl(t, e), gl(e), e.child.flags & 8192 && e.memoizedState !== null != (n !== null && n.memoizedState !== null) && (Ql = Re()), r & 4 && (r = e.updateQueue, r !== null && (e.updateQueue = null, fl(e, r)));
 				break;
 			case 22:
 				a = e.memoizedState !== null;
@@ -5451,26 +5451,26 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		cacheSignal: function() {
 			return ca(ma).controller.signal;
 		}
-	}, Il = typeof WeakMap == "function" ? WeakMap : Map, J = 0, Ll = null, Y = null, X = 0, Rl = 0, Z = null, zl = !1, Bl = !1, Vl = !1, Hl = 0, Ul = 0, Wl = 0, Q = 0, Gl = 0, Kl = 0, ql = 0, Jl = null, Yl = null, Xl = !1, Zl = 0, Ql = 0, $l = Infinity, eu = null, tu = null, nu = 0, ru = null, iu = null, au = 0, ou = 0, su = null, cu = null, lu = 0, uu = null;
+	}, Il = typeof WeakMap == "function" ? WeakMap : Map, J = 0, Ll = null, Y = null, X = 0, Rl = 0, zl = null, Bl = !1, Vl = !1, Hl = !1, Ul = 0, Wl = 0, Gl = 0, Kl = 0, ql = 0, Jl = 0, Yl = 0, Xl = null, Z = null, Zl = !1, Ql = 0, $l = 0, eu = Infinity, tu = null, nu = null, Q = 0, ru = null, iu = null, au = 0, ou = 0, su = null, cu = null, lu = 0, uu = null;
 	function du() {
 		return J & 2 && X !== 0 ? X & -X : w.T === null ? gt() : ud();
 	}
 	function fu() {
-		if (Kl === 0) if (!(X & 536870912) || M) {
+		if (Jl === 0) if (!(X & 536870912) || M) {
 			var e = tt;
-			tt <<= 1, !(tt & 3932160) && (tt = 262144), Kl = e;
-		} else Kl = 536870912;
-		return e = so.current, e !== null && (e.flags |= 32), Kl;
+			tt <<= 1, !(tt & 3932160) && (tt = 262144), Jl = e;
+		} else Jl = 536870912;
+		return e = so.current, e !== null && (e.flags |= 32), Jl;
 	}
 	function pu(e, t, n) {
-		(e === Ll && (Rl === 2 || Rl === 9) || e.cancelPendingCommit !== null) && (bu(e, 0), _u(e, X, Kl, !1)), lt(e, n), (!(J & 2) || e !== Ll) && (e === Ll && (!(J & 2) && (Q |= n), Ul === 4 && _u(e, X, Kl, !1)), nd(e));
+		(e === Ll && (Rl === 2 || Rl === 9) || e.cancelPendingCommit !== null) && (bu(e, 0), _u(e, X, Jl, !1)), lt(e, n), (!(J & 2) || e !== Ll) && (e === Ll && (!(J & 2) && (Kl |= n), Wl === 4 && _u(e, X, Jl, !1)), nd(e));
 	}
 	function mu(e, t, n) {
 		if (J & 6) throw Error(i(327));
 		var r = !n && (t & 127) == 0 && (t & e.expiredLanes) === 0 || at(e, t), a = r ? Ou(e, t) : Eu(e, t, !0), o = r;
 		do {
 			if (a === 0) {
-				Bl && !r && _u(e, t, 0, !1);
+				Vl && !r && _u(e, t, 0, !1);
 				break;
 			} else {
 				if (n = e.current.alternate, o && !gu(n)) {
@@ -5484,14 +5484,14 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 						t = s;
 						a: {
 							var c = e;
-							a = Jl;
+							a = Xl;
 							var l = c.current.memoizedState.isDehydrated;
 							if (l && (bu(c, s).flags |= 256), s = Eu(c, s, !1), s !== 2) {
-								if (Vl && !l) {
-									c.errorRecoveryDisabledLanes |= o, Q |= o, a = 4;
+								if (Hl && !l) {
+									c.errorRecoveryDisabledLanes |= o, Kl |= o, a = 4;
 									break a;
 								}
-								o = Yl, Yl = a, o !== null && (Yl === null ? Yl = o : Yl.push.apply(Yl, o));
+								o = Z, Z = a, o !== null && (Z === null ? Z = o : Z.push.apply(Z, o));
 							}
 							a = s;
 						}
@@ -5508,21 +5508,21 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 						case 1: throw Error(i(345));
 						case 4: if ((t & 4194048) !== t) break;
 						case 6:
-							_u(r, t, Kl, !zl);
+							_u(r, t, Jl, !Bl);
 							break a;
 						case 2:
-							Yl = null;
+							Z = null;
 							break;
 						case 3:
 						case 5: break;
 						default: throw Error(i(329));
 					}
-					if ((t & 62914560) === t && (a = Zl + 300 - Re(), 10 < a)) {
-						if (_u(r, t, Kl, !zl), it(r, 0, !0) !== 0) break a;
-						au = t, r.timeoutHandle = Kd(hu.bind(null, r, n, Yl, eu, Xl, t, Kl, Q, ql, zl, o, "Throttled", -0, 0), a);
+					if ((t & 62914560) === t && (a = Ql + 300 - Re(), 10 < a)) {
+						if (_u(r, t, Jl, !Bl), it(r, 0, !0) !== 0) break a;
+						au = t, r.timeoutHandle = Kd(hu.bind(null, r, n, Z, tu, Zl, t, Jl, Kl, Yl, Bl, o, "Throttled", -0, 0), a);
 						break a;
 					}
-					hu(r, n, Yl, eu, Xl, t, Kl, Q, ql, zl, o, null, -0, 0);
+					hu(r, n, Z, tu, Zl, t, Jl, Kl, Yl, Bl, o, null, -0, 0);
 				}
 			}
 			break;
@@ -5541,7 +5541,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				waitingForViewTransition: !1,
 				unsuspend: fn
 			}, kl(t, a, d);
-			var m = (a & 62914560) === a ? Zl - Re() : (a & 4194048) === a ? Ql - Re() : 0;
+			var m = (a & 62914560) === a ? Ql - Re() : (a & 4194048) === a ? $l - Re() : 0;
 			if (m = qf(d, m), m !== null) {
 				au = a, e.cancelPendingCommit = m(Fu.bind(null, e, t, a, n, r, i, o, s, c, u, d, null, f, p)), _u(e, a, o, !l);
 				return;
@@ -5574,7 +5574,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return !0;
 	}
 	function _u(e, t, n, r) {
-		t &= ~Gl, t &= ~Q, e.suspendedLanes |= t, e.pingedLanes &= ~t, r && (e.warmLanes |= t), r = e.expirationTimes;
+		t &= ~ql, t &= ~Kl, e.suspendedLanes |= t, e.pingedLanes &= ~t, r && (e.warmLanes |= t), r = e.expirationTimes;
 		for (var i = t; 0 < i;) {
 			var a = 31 - Xe(i), o = 1 << a;
 			r[a] = -1, i &= ~o;
@@ -5594,16 +5594,16 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 	}
 	function bu(e, t) {
 		var n = e.timeoutHandle;
-		n !== -1 && (e.timeoutHandle = -1, qd(n)), n = e.cancelPendingCommit, n !== null && (e.cancelPendingCommit = null, n()), au = 0, yu(), Ll = e, Y = n = yi(e.current, null), X = t, Rl = 0, Z = null, zl = !1, Bl = at(e, t), Vl = !1, ql = Kl = Gl = Q = Wl = Ul = 0, Yl = Jl = null, Xl = !1, t & 8 && (t |= t & 32);
+		n !== -1 && (e.timeoutHandle = -1, qd(n)), n = e.cancelPendingCommit, n !== null && (e.cancelPendingCommit = null, n()), au = 0, yu(), Ll = e, Y = n = yi(e.current, null), X = t, Rl = 0, zl = null, Bl = !1, Vl = at(e, t), Hl = !1, Yl = Jl = ql = Kl = Gl = Wl = 0, Z = Xl = null, Zl = !1, t & 8 && (t |= t & 32);
 		var r = e.entangledLanes;
 		if (r !== 0) for (e = e.entanglements, r &= t; 0 < r;) {
 			var i = 31 - Xe(r), a = 1 << i;
 			t |= e[i], r &= ~a;
 		}
-		return Hl = t, li(), n;
+		return Ul = t, li(), n;
 	}
 	function xu(e, t) {
-		I = null, w.H = Vs, t === Ea || t === Oa ? (t = Pa(), Rl = 3) : t === Da ? (t = Pa(), Rl = 4) : Rl = t === ic ? 8 : typeof t == "object" && t && typeof t.then == "function" ? 6 : 1, Z = t, Y === null && (Ul = 1, $s(e, Di(t, e.current)));
+		I = null, w.H = Vs, t === Ea || t === Oa ? (t = Pa(), Rl = 3) : t === Da ? (t = Pa(), Rl = 4) : Rl = t === ic ? 8 : typeof t == "object" && t && typeof t.then == "function" ? 6 : 1, zl = t, Y === null && (Wl = 1, $s(e, Di(t, e.current)));
 	}
 	function Su() {
 		var e = so.current;
@@ -5618,18 +5618,18 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return w.A = Fl, e;
 	}
 	function Tu() {
-		Ul = 4, zl || (X & 4194048) !== X && so.current !== null || (Bl = !0), !(Wl & 134217727) && !(Q & 134217727) || Ll === null || _u(Ll, X, Kl, !1);
+		Wl = 4, Bl || (X & 4194048) !== X && so.current !== null || (Vl = !0), !(Gl & 134217727) && !(Kl & 134217727) || Ll === null || _u(Ll, X, Jl, !1);
 	}
 	function Eu(e, t, n) {
 		var r = J;
 		J |= 2;
 		var i = Cu(), a = wu();
-		(Ll !== e || X !== t) && (eu = null, bu(e, t)), t = !1;
-		var o = Ul;
+		(Ll !== e || X !== t) && (tu = null, bu(e, t)), t = !1;
+		var o = Wl;
 		a: do
 			try {
 				if (Rl !== 0 && Y !== null) {
-					var s = Y, c = Z;
+					var s = Y, c = zl;
 					switch (Rl) {
 						case 8:
 							yu(), o = 6;
@@ -5640,15 +5640,15 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 						case 6:
 							so.current === null && (t = !0);
 							var l = Rl;
-							if (Rl = 0, Z = null, Mu(e, s, c, l), n && Bl) {
+							if (Rl = 0, zl = null, Mu(e, s, c, l), n && Vl) {
 								o = 0;
 								break a;
 							}
 							break;
-						default: l = Rl, Rl = 0, Z = null, Mu(e, s, c, l);
+						default: l = Rl, Rl = 0, zl = null, Mu(e, s, c, l);
 					}
 				}
-				Du(), o = Ul;
+				Du(), o = Wl;
 				break;
 			} catch (t) {
 				xu(e, t);
@@ -5663,20 +5663,20 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		var n = J;
 		J |= 2;
 		var r = Cu(), a = wu();
-		Ll !== e || X !== t ? (eu = null, $l = Re() + 500, bu(e, t)) : Bl = at(e, t);
+		Ll !== e || X !== t ? (tu = null, eu = Re() + 500, bu(e, t)) : Vl = at(e, t);
 		a: do
 			try {
 				if (Rl !== 0 && Y !== null) {
 					t = Y;
-					var o = Z;
+					var o = zl;
 					b: switch (Rl) {
 						case 1:
-							Rl = 0, Z = null, Mu(e, t, o, 1);
+							Rl = 0, zl = null, Mu(e, t, o, 1);
 							break;
 						case 2:
 						case 9:
 							if (Aa(o)) {
-								Rl = 0, Z = null, ju(t);
+								Rl = 0, zl = null, ju(t);
 								break;
 							}
 							t = function() {
@@ -5690,7 +5690,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 							Rl = 5;
 							break a;
 						case 7:
-							Aa(o) ? (Rl = 0, Z = null, ju(t)) : (Rl = 0, Z = null, Mu(e, t, o, 7));
+							Aa(o) ? (Rl = 0, zl = null, ju(t)) : (Rl = 0, zl = null, Mu(e, t, o, 7));
 							break;
 						case 5:
 							var s = null;
@@ -5700,7 +5700,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 								case 27:
 									var c = Y;
 									if (s ? Wf(s) : c.stateNode.complete) {
-										Rl = 0, Z = null;
+										Rl = 0, zl = null;
 										var l = c.sibling;
 										if (l !== null) Y = l;
 										else {
@@ -5710,13 +5710,13 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 										break b;
 									}
 							}
-							Rl = 0, Z = null, Mu(e, t, o, 5);
+							Rl = 0, zl = null, Mu(e, t, o, 5);
 							break;
 						case 6:
-							Rl = 0, Z = null, Mu(e, t, o, 6);
+							Rl = 0, zl = null, Mu(e, t, o, 6);
 							break;
 						case 8:
-							yu(), Ul = 6;
+							yu(), Wl = 6;
 							break a;
 						default: throw Error(i(462));
 					}
@@ -5727,13 +5727,13 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				xu(e, t);
 			}
 		while (1);
-		return ea = $i = null, w.H = r, w.A = a, J = n, Y === null ? (Ll = null, X = 0, li(), Ul) : 0;
+		return ea = $i = null, w.H = r, w.A = a, J = n, Y === null ? (Ll = null, X = 0, li(), Wl) : 0;
 	}
 	function ku() {
 		for (; Y !== null && !Ie();) Au(Y);
 	}
 	function Au(e) {
-		var t = Mc(e.alternate, e, Hl);
+		var t = Mc(e.alternate, e, Ul);
 		e.memoizedProps = e.pendingProps, t === null ? Nu(e) : Y = t;
 	}
 	function ju(e) {
@@ -5747,7 +5747,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				t = _c(n, t, t.pendingProps, t.type.render, t.ref, X);
 				break;
 			case 5: Fo(t);
-			default: Bc(n, t), t = Y = bi(t, Hl), t = Mc(n, t, Hl);
+			default: Bc(n, t), t = Y = bi(t, Ul), t = Mc(n, t, Ul);
 		}
 		e.memoizedProps = e.pendingProps, t === null ? Nu(e) : Y = t;
 	}
@@ -5756,25 +5756,25 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		var i = t.return;
 		try {
 			if (V(e, i, t, n, X)) {
-				Ul = 1, $s(e, Di(n, e.current)), Y = null;
+				Wl = 1, $s(e, Di(n, e.current)), Y = null;
 				return;
 			}
 		} catch (t) {
 			if (i !== null) throw Y = i, t;
-			Ul = 1, $s(e, Di(n, e.current)), Y = null;
+			Wl = 1, $s(e, Di(n, e.current)), Y = null;
 			return;
 		}
-		t.flags & 32768 ? (M || r === 1 ? e = !0 : Bl || X & 536870912 ? e = !1 : (zl = e = !0, (r === 2 || r === 9 || r === 3 || r === 6) && (r = so.current, r !== null && r.tag === 13 && (r.flags |= 16384))), Pu(t, e)) : Nu(t);
+		t.flags & 32768 ? (M || r === 1 ? e = !0 : Vl || X & 536870912 ? e = !1 : (Bl = e = !0, (r === 2 || r === 9 || r === 3 || r === 6) && (r = so.current, r !== null && r.tag === 13 && (r.flags |= 16384))), Pu(t, e)) : Nu(t);
 	}
 	function Nu(e) {
 		var t = e;
 		do {
 			if (t.flags & 32768) {
-				Pu(t, zl);
+				Pu(t, Bl);
 				return;
 			}
 			e = t.return;
-			var n = Rc(t.alternate, t, Hl);
+			var n = Rc(t.alternate, t, Ul);
 			if (n !== null) {
 				Y = n;
 				return;
@@ -5785,7 +5785,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			}
 			Y = t = e;
 		} while (t !== null);
-		Ul === 0 && (Ul = 5);
+		Wl === 0 && (Wl = 5);
 	}
 	function Pu(e, t) {
 		do {
@@ -5800,13 +5800,13 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			}
 			Y = e = n;
 		} while (e !== null);
-		Ul = 6, Y = null;
+		Wl = 6, Y = null;
 	}
 	function Fu(e, t, n, r, a, o, s, c, l) {
 		e.cancelPendingCommit = null;
 		do
 			Bu();
-		while (nu !== 0);
+		while (Q !== 0);
 		if (J & 6) throw Error(i(327));
 		if (t !== null) {
 			if (t === e.current) throw Error(i(177));
@@ -5820,12 +5820,12 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 					J = s, T.p = a, w.T = r;
 				}
 			}
-			nu = 1, Iu(), Lu(), Ru();
+			Q = 1, Iu(), Lu(), Ru();
 		}
 	}
 	function Iu() {
-		if (nu === 1) {
-			nu = 0;
+		if (Q === 1) {
+			Q = 0;
 			var e = ru, t = iu, n = (t.flags & 13878) != 0;
 			if (t.subtreeFlags & 13878 || n) {
 				n = w.T, w.T = null;
@@ -5868,12 +5868,12 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 					J = i, T.p = r, w.T = n;
 				}
 			}
-			e.current = t, nu = 2;
+			e.current = t, Q = 2;
 		}
 	}
 	function Lu() {
-		if (nu === 2) {
-			nu = 0;
+		if (Q === 2) {
+			Q = 0;
 			var e = ru, t = iu, n = (t.flags & 8772) != 0;
 			if (t.subtreeFlags & 8772 || n) {
 				n = w.T, w.T = null;
@@ -5887,16 +5887,16 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 					J = i, T.p = r, w.T = n;
 				}
 			}
-			nu = 3;
+			Q = 3;
 		}
 	}
 	function Ru() {
-		if (nu === 4 || nu === 3) {
-			nu = 0, Le();
+		if (Q === 4 || Q === 3) {
+			Q = 0, Le();
 			var e = ru, t = iu, n = au, r = cu;
-			t.subtreeFlags & 10256 || t.flags & 10256 ? nu = 5 : (nu = 0, iu = ru = null, zu(e, e.pendingLanes));
+			t.subtreeFlags & 10256 || t.flags & 10256 ? Q = 5 : (Q = 0, iu = ru = null, zu(e, e.pendingLanes));
 			var i = e.pendingLanes;
-			if (i === 0 && (tu = null), ht(n), t = t.stateNode, Je && typeof Je.onCommitFiberRoot == "function") try {
+			if (i === 0 && (nu = null), ht(n), t = t.stateNode, Je && typeof Je.onCommitFiberRoot == "function") try {
 				Je.onCommitFiberRoot(qe, t, void 0, (t.current.flags & 128) == 128);
 			} catch {}
 			if (r !== null) {
@@ -5920,14 +5920,14 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return Iu(), Lu(), Ru(), Vu();
 	}
 	function Vu() {
-		if (nu !== 5) return !1;
+		if (Q !== 5) return !1;
 		var e = ru, t = ou;
 		ou = 0;
 		var n = ht(au), r = w.T, a = T.p;
 		try {
 			T.p = 32 > n ? 32 : n, w.T = null, n = su, su = null;
 			var o = ru, s = au;
-			if (nu = 0, iu = ru = null, au = 0, J & 6) throw Error(i(331));
+			if (Q = 0, iu = ru = null, au = 0, J & 6) throw Error(i(331));
 			var c = J;
 			if (J |= 4, Ml(o.current), wl(o, o.current, s, n), J = c, rd(0, !1), Je && typeof Je.onPostCommitFiberRoot == "function") try {
 				Je.onPostCommitFiberRoot(qe, o);
@@ -5948,7 +5948,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 				break;
 			} else if (t.tag === 1) {
 				var r = t.stateNode;
-				if (typeof t.type.getDerivedStateFromError == "function" || typeof r.componentDidCatch == "function" && (tu === null || !tu.has(r))) {
+				if (typeof t.type.getDerivedStateFromError == "function" || typeof r.componentDidCatch == "function" && (nu === null || !nu.has(r))) {
 					e = Di(n, e), n = nc(2), r = Ja(t, n, 2), r !== null && (rc(n, r, t, e), lt(r, 2), nd(r));
 					break;
 				}
@@ -5963,11 +5963,11 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			var i = /* @__PURE__ */ new Set();
 			r.set(t, i);
 		} else i = r.get(t), i === void 0 && (i = /* @__PURE__ */ new Set(), r.set(t, i));
-		i.has(n) || (Vl = !0, i.add(n), e = Gu.bind(null, e, t, n), t.then(e, e));
+		i.has(n) || (Hl = !0, i.add(n), e = Gu.bind(null, e, t, n), t.then(e, e));
 	}
 	function Gu(e, t, n) {
 		var r = e.pingCache;
-		r !== null && r.delete(t), e.pingedLanes |= e.suspendedLanes & n, e.warmLanes &= ~n, Ll === e && (X & n) === n && (Ul === 4 || Ul === 3 && (X & 62914560) === X && 300 > Re() - Zl ? !(J & 2) && bu(e, 0) : Gl |= n, ql === X && (ql = 0)), nd(e);
+		r !== null && r.delete(t), e.pingedLanes |= e.suspendedLanes & n, e.warmLanes &= ~n, Ll === e && (X & n) === n && (Wl === 4 || Wl === 3 && (X & 62914560) === X && 300 > Re() - Ql ? !(J & 2) && bu(e, 0) : ql |= n, Yl === X && (Yl = 0)), nd(e);
 	}
 	function Ku(e, t) {
 		t === 0 && (t = st()), e = fi(e, t), e !== null && (lt(e, t), nd(e));
@@ -6032,7 +6032,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 			var i = r.next, a = od(r, t);
 			a === 0 ? (r.next = null, n === null ? Xu = i : n.next = i, i === null && (Zu = n)) : (n = r, (e !== 0 || a & 3) && ($u = !0)), r = i;
 		}
-		nu !== 0 && nu !== 5 || rd(e, !1), td !== 0 && (td = 0);
+		Q !== 0 && Q !== 5 || rd(e, !1), td !== 0 && (td = 0);
 	}
 	function od(e, t) {
 		for (var n = e.suspendedLanes, r = e.pingedLanes, i = e.expirationTimes, a = e.pendingLanes & -62914561; 0 < a;) {
@@ -6060,7 +6060,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 		return r !== null && r !== null && Fe(r), e.callbackPriority = 2, e.callbackNode = null, 2;
 	}
 	function sd(e, t) {
-		if (nu !== 0 && nu !== 5) return e.callbackNode = null, e.callbackPriority = 0, null;
+		if (Q !== 0 && Q !== 5) return e.callbackNode = null, e.callbackPriority = 0, null;
 		var n = e.callbackNode;
 		if (Bu() && e.callbackNode !== n) return null;
 		var r = X;
@@ -7648,7 +7648,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 										var c = 1 << 31 - Xe(o);
 										s.entanglements[1] |= c, o &= ~c;
 									}
-									nd(a), !(J & 6) && ($l = Re() + 500, rd(0, !1));
+									nd(a), !(J & 6) && (eu = Re() + 500, rd(0, !1));
 								}
 							}
 							break;
@@ -15780,40 +15780,52 @@ var ll, q, ul = o((() => {
 			}) : this.props.children;
 		}
 	};
-})), hl, gl, _l, vl, yl, bl, xl, Sl, Cl, wl, Tl, El, Dl, Ol, kl, Al, jl, Ml, Nl, Pl, Fl, Il, J, Ll, Y, X, Rl, Z, zl = o((() => {
-	hl = "_overlay_pdu8a_1", gl = "_modal_pdu8a_27", _l = "_header_pdu8a_57", vl = "_closeBtn_pdu8a_91", yl = "_body_pdu8a_135", bl = "_section_pdu8a_153", xl = "_sectionTitleRow_pdu8a_167", Sl = "_sectionTitle_pdu8a_167", Cl = "_deselectAllBtn_pdu8a_193", wl = "_charRow_pdu8a_243", Tl = "_worldRow_pdu8a_265", El = "_charNameLabel_pdu8a_279", Dl = "_charOptionsColumn_pdu8a_299", Ol = "_charOptionsRow_pdu8a_315", kl = "_worldOptionsContainer_pdu8a_329", Al = "_worldOptionsRow_pdu8a_345", jl = "_activeOps_pdu8a_357", Ml = "_disabledOps_pdu8a_365", Nl = "_checkboxItem_pdu8a_375", Pl = "_textarea_pdu8a_391", Fl = "_viewBtn_pdu8a_437", Il = "_viewBtnActive_pdu8a_481", J = "_jsonEditor_pdu8a_517", Ll = "_jsonEditorWritable_pdu8a_549", Y = "_footer_pdu8a_563", X = "_cancelBtn_pdu8a_589", Rl = "_saveBtn_pdu8a_589", Z = {
+})), hl, gl, _l, vl, yl, bl, xl, Sl, Cl, wl, Tl, El, Dl, Ol, kl, Al, jl, Ml, Nl, Pl, Fl, Il, J, Ll, Y, X, Rl, zl, Bl, Vl, Hl, Ul, Wl, Gl, Kl, ql, Jl, Yl, Xl, Z, Zl = o((() => {
+	hl = "_overlay_d7kfo_5", gl = "_modal_d7kfo_31", _l = "_header_d7kfo_61", vl = "_closeBtn_d7kfo_95", yl = "_tabNav_d7kfo_141", bl = "_tabBtn_d7kfo_157", xl = "_tabActive_d7kfo_197", Sl = "_body_d7kfo_211", Cl = "_tabContentFadeIn_d7kfo_231", wl = "_tabFadeIn_d7kfo_1", Tl = "_section_d7kfo_249", El = "_sectionTitleRow_d7kfo_263", Dl = "_sectionTitle_d7kfo_263", Ol = "_deselectAllBtn_d7kfo_289", kl = "_charRow_d7kfo_339", Al = "_worldRow_d7kfo_361", jl = "_charNameLabel_d7kfo_375", Ml = "_charOptionsRow_d7kfo_395", Nl = "_worldOptionsContainer_d7kfo_409", Pl = "_worldOptionsRow_d7kfo_425", Fl = "_activeOps_d7kfo_437", Il = "_disabledOps_d7kfo_445", J = "_checkboxItem_d7kfo_455", Ll = "_textarea_d7kfo_471", Y = "_viewBtn_d7kfo_507", X = "_viewBtnActive_d7kfo_551", Rl = "_jsonEditor_d7kfo_587", zl = "_jsonEditorWritable_d7kfo_619", Bl = "_footer_d7kfo_633", Vl = "_cancelBtn_d7kfo_659", Hl = "_saveBtn_d7kfo_659", Ul = "_syncLiveBtn_d7kfo_737", Wl = "_editorGroupBlock_d7kfo_785", Gl = "_editorGroupTitle_d7kfo_819", Kl = "_visualEditorRow_d7kfo_837", ql = "_visualEditorLabel_d7kfo_851", Jl = "_visualEditorSubLabel_d7kfo_877", Yl = "_visualEditorInput_d7kfo_893", Xl = "_visualEditorTextarea_d7kfo_927", Z = {
 		overlay: hl,
 		modal: gl,
 		header: _l,
 		closeBtn: vl,
-		body: yl,
-		section: bl,
-		sectionTitleRow: xl,
-		sectionTitle: Sl,
-		deselectAllBtn: Cl,
-		charRow: wl,
-		worldRow: Tl,
-		charNameLabel: El,
-		charOptionsColumn: Dl,
-		charOptionsRow: Ol,
-		worldOptionsContainer: kl,
-		worldOptionsRow: Al,
-		activeOps: jl,
-		disabledOps: Ml,
-		checkboxItem: Nl,
-		textarea: Pl,
-		viewBtn: Fl,
-		viewBtnActive: Il,
-		jsonEditor: J,
-		jsonEditorWritable: Ll,
-		footer: Y,
-		cancelBtn: X,
-		saveBtn: Rl
+		tabNav: yl,
+		tabBtn: bl,
+		tabActive: xl,
+		body: Sl,
+		tabContentFadeIn: Cl,
+		tabFadeIn: wl,
+		section: Tl,
+		sectionTitleRow: El,
+		sectionTitle: Dl,
+		deselectAllBtn: Ol,
+		charRow: kl,
+		worldRow: Al,
+		charNameLabel: jl,
+		charOptionsRow: Ml,
+		worldOptionsContainer: Nl,
+		worldOptionsRow: Pl,
+		activeOps: Fl,
+		disabledOps: Il,
+		checkboxItem: J,
+		textarea: Ll,
+		viewBtn: Y,
+		viewBtnActive: X,
+		jsonEditor: Rl,
+		jsonEditorWritable: zl,
+		footer: Bl,
+		cancelBtn: Vl,
+		saveBtn: Hl,
+		syncLiveBtn: Ul,
+		editorGroupBlock: Wl,
+		editorGroupTitle: Gl,
+		visualEditorRow: Kl,
+		visualEditorLabel: ql,
+		visualEditorSubLabel: Jl,
+		visualEditorInput: Yl,
+		visualEditorTextarea: Xl
 	};
 }));
 //#endregion
 //#region src/messagetracker/SnapshotCore.js
-function Bl(e, t, n) {
+function Ql(e, t, n) {
 	if (!e) return {};
 	let r = {}, i = t.world && typeof t.world == "object";
 	if ((i ? t.world.selected : t.world) && e.worldState) {
@@ -15829,14 +15841,14 @@ function Bl(e, t, n) {
 		}
 	}), Object.keys(a).length > 0 && (r.chars = a), n && n.trim() !== "" && (r.note = n.trim()), r;
 }
-function Vl(e) {
+function $l(e) {
 	return !e || Object.keys(e).length === 0 ? "" : `\n\n<!-- <rpgmt>${JSON.stringify(e)}</rpgmt> -->`;
 }
-var Hl = o((() => {}));
+var eu = o((() => {}));
 //#endregion
 //#region src/messagetracker/SnapshotModal.jsx
-function Ul() {
-	let { trackerData: e, snapshotModalData: t } = ze(), [n, r] = (0, Wl.useState)({
+function tu() {
+	let { trackerData: e, snapshotModalData: t } = ze(), n = !!t?.historicalData, [r, i] = (0, nu.useState)("select"), [a, o] = (0, nu.useState)({
 		world: {
 			selected: !1,
 			date: !0,
@@ -15846,11 +15858,11 @@ function Ul() {
 			events: !1
 		},
 		chars: {}
-	}), [i, a] = (0, Wl.useState)(""), [o, s] = (0, Wl.useState)(!1), [c, l] = (0, Wl.useState)("{}"), u = t?.historicalData || e;
-	(0, Wl.useEffect)(() => {
-		if (t?.isOpen && u.characters) {
+	}), [s, c] = (0, nu.useState)(null), [l, u] = (0, nu.useState)(""), [d, f] = (0, nu.useState)(!1), [p, m] = (0, nu.useState)("{}"), h = t?.historicalData || e;
+	(0, nu.useEffect)(() => {
+		if (t?.isOpen && h && h.characters) {
 			let e = {};
-			u.characters.forEach((t) => {
+			h.characters.forEach((t) => {
 				e[t.id] = {
 					selected: !1,
 					status: !1,
@@ -15867,16 +15879,19 @@ function Ul() {
 				weather: !0,
 				location: !0,
 				events: !1
-			}, i = "", o = t.existingPayload;
-			o && (o.note && (i = o.note), o.world && (n = {
+			}, r = "", a = JSON.parse(JSON.stringify(h)), s = t.existingPayload;
+			s && (s.note && (r = s.note), s.world && (n = {
 				selected: !0,
-				date: o.world.date !== void 0,
-				time: o.world.time !== void 0,
-				weather: o.world.weather !== void 0,
-				location: o.world.location !== void 0,
-				events: o.world.events !== void 0
-			}), o.chars && Object.entries(o.chars).forEach(([t, n]) => {
-				let r = u.characters.find((e) => e.name === t);
+				date: s.world.date !== void 0,
+				time: s.world.time !== void 0,
+				weather: s.world.weather !== void 0,
+				location: s.world.location !== void 0,
+				events: s.world.events !== void 0
+			}, a.worldState = {
+				...a.worldState || {},
+				...s.world
+			}), s.chars && Object.entries(s.chars).forEach(([t, n]) => {
+				let r = a.characters.find((e) => e.name === t);
 				r && (e[r.id] = {
 					selected: !0,
 					status: !!n.status,
@@ -15884,30 +15899,89 @@ function Ul() {
 					relations: !!n.relations,
 					inventory: !!n.inventory,
 					quests: !!n.quests
-				});
-			})), r({
+				}, n.status && (r.status = {
+					...r.status || {},
+					...n.status
+				}), n.profile && (r.profile = {
+					...r.profile || {},
+					...n.profile
+				}), n.relations && (r.relations = {
+					...r.relations || {},
+					...n.relations
+				}), n.inventory && (r.inventory = {
+					...r.inventory || {},
+					...n.inventory
+				}), n.quests && (r.quests = {
+					...r.quests || {},
+					...n.quests
+				}));
+			})), o({
 				world: n,
 				chars: e
-			}), a(i), s(!1);
+			}), c(a), u(r), f(!1), i("select");
 		}
 	}, [
 		t?.isOpen,
-		u,
+		h,
 		t?.existingPayload
 	]);
-	let d = (0, Wl.useMemo)(() => Bl(u, n, i), [
-		u,
-		n,
-		i
+	let g = (e, t, n, r) => {
+		c((i) => {
+			if (!i || !i.characters) return i;
+			let a = i.characters.map((i) => {
+				if (i.id === e) {
+					let e = { ...i[t] || {} };
+					return e[n] = r, {
+						...i,
+						[t]: e
+					};
+				}
+				return i;
+			});
+			return {
+				...i,
+				characters: a
+			};
+		});
+	}, _ = () => {
+		if (window.confirm("Overwrite the editor with the current live sidebar status? This will sync values and reset options.")) {
+			let t = JSON.parse(JSON.stringify(e));
+			c(t);
+			let n = {};
+			t.characters.forEach((e) => {
+				n[e.id] = {
+					selected: !0,
+					status: !0,
+					profile: !0,
+					relations: !0,
+					inventory: e.activePlayer,
+					quests: e.activePlayer
+				};
+			}), o({
+				world: {
+					selected: !0,
+					date: !0,
+					time: !0,
+					weather: !0,
+					location: !0,
+					events: !0
+				},
+				chars: n
+			}), i("editor");
+		}
+	}, v = (0, nu.useMemo)(() => s ? Ql(s, a, l) : {}, [
+		s,
+		a,
+		l
 	]);
-	if ((0, Wl.useEffect)(() => {
-		o || l(JSON.stringify(d, null, 2) || "{}");
-	}, [d, o]), !t?.isOpen) return null;
-	let f = () => {
+	if ((0, nu.useEffect)(() => {
+		d || m(JSON.stringify(v, null, 2) || "{}");
+	}, [v, d]), !t?.isOpen) return null;
+	let y = () => {
 		window.RPGBridge && window.RPGBridge.closeSnapshotModal();
-	}, p = () => {
+	}, b = () => {
 		let e = {};
-		u.characters && u.characters.forEach((t) => {
+		h && h.characters && h.characters.forEach((t) => {
 			e[t.id] = {
 				selected: !1,
 				status: !1,
@@ -15916,7 +15990,7 @@ function Ul() {
 				inventory: !1,
 				quests: !1
 			};
-		}), r({
+		}), o({
 			world: {
 				selected: !1,
 				date: !1,
@@ -15926,9 +16000,9 @@ function Ul() {
 				events: !1
 			},
 			chars: e
-		}), a("");
-	}, m = (e, t) => {
-		r((n) => {
+		}), u("");
+	}, x = (e, t) => {
+		o((n) => {
 			let r = n.world || {
 				selected: !1,
 				date: !0,
@@ -15945,8 +16019,8 @@ function Ul() {
 				}
 			};
 		});
-	}, h = (e, t, n) => {
-		r((r) => {
+	}, ee = (e, t, n) => {
+		o((r) => {
 			let i = r.chars[e] || {
 				selected: !1,
 				status: !1,
@@ -15955,19 +16029,25 @@ function Ul() {
 				inventory: !1,
 				quests: !1
 			};
-			return t === "selected" && n ? {
-				...r,
-				chars: {
-					...r.chars,
-					[e]: {
-						...i,
-						selected: !0,
-						status: !0,
-						profile: !0,
-						relations: !0
+			if (t === "selected" && n) {
+				let t = h?.characters?.find((t) => t.id === e), n = t ? t.activePlayer : !1;
+				return {
+					...r,
+					chars: {
+						...r.chars,
+						[e]: {
+							...i,
+							selected: !0,
+							status: !0,
+							profile: !0,
+							relations: !0,
+							inventory: n,
+							quests: n
+						}
 					}
-				}
-			} : {
+				};
+			}
+			return {
 				...r,
 				chars: {
 					...r.chars,
@@ -15978,56 +16058,7 @@ function Ul() {
 				}
 			};
 		});
-	}, g = () => {
-		let e = window.SillyTavern?.getContext?.();
-		if (!e || !e.chat) return;
-		let n;
-		try {
-			n = JSON.parse(c);
-		} catch {
-			alert("Invalid JSON format! Please correct the syntax before saving.");
-			return;
-		}
-		let r = parseInt(t.mesId, 10), i = e.chat.find((t) => String(t.mesId) === String(r) || String(e.chat.indexOf(t)) === String(r));
-		if (!i) return;
-		let a = /(?:\n\n)?(?:<!--\s*)?(?:(?:<|&lt;)rpgmt(?:>|&gt;)|<div class="rpgmt-data">)[\s\S]*?(?:(?:<|&lt;)\/rpgmt(?:>|&gt;)|<\/div>)(?:\s*-->)?/gi;
-		if (Object.keys(n).length === 0) i.mes = i.mes.replace(a, "").trim();
-		else {
-			let e = Vl(n);
-			a.test(i.mes) ? i.mes = i.mes.replace(new RegExp(a.source, "i"), e) : i.mes += e;
-		}
-		let o = i.swipe_id || 0;
-		if (i.swipes && i.swipes.length > 0 && typeof i.mes == "string") {
-			let e = i.swipes.findIndex((e) => e === i.mes);
-			e !== -1 && (o = e);
-		}
-		if (i.swipe_info && i.swipe_info[o]?.extra?.rpgTrackerData) {
-			let e = i.swipe_info[o].extra.rpgTrackerData;
-			n.world && e.worldState && Object.assign(e.worldState, n.world), n.chars && e.characters && Object.entries(n.chars).forEach(([t, n]) => {
-				let r = e.characters.find((e) => e.name === t);
-				r && (n.status && Object.assign(r.status, n.status), n.profile && Object.assign(r.profile, n.profile), n.relations && (r.relations = {
-					...r.relations || {},
-					...n.relations
-				}), n.inventory && (r.inventory = {
-					...r.inventory,
-					equipment: {
-						...r.inventory?.equipment || {},
-						...n.inventory.equipment || {}
-					},
-					storage: {
-						...r.inventory?.storage || {},
-						...n.inventory.storage || {}
-					}
-				}), n.quests && (r.quests = {
-					...r.quests,
-					main: n.quests.main === void 0 ? r.quests?.main : n.quests.main,
-					sides: n.quests.sides === void 0 ? r.quests?.sides : n.quests.sides
-				}));
-			});
-		}
-		let s = e.chat.indexOf(i);
-		window.RPGBridge && (typeof window.RPGBridge.updateMessageBlock == "function" && window.RPGBridge.updateMessageBlock(s, i), typeof window.RPGBridge.saveChat == "function" && window.RPGBridge.saveChat(), typeof window.RPGBridge.triggerSnapshotRender == "function" && window.RPGBridge.triggerSnapshotRender()), f();
-	}, _ = !!t.historicalData;
+	};
 	return /* @__PURE__ */ (0, Q.jsx)("div", {
 		className: Z.overlay,
 		children: /* @__PURE__ */ (0, Q.jsxs)("div", {
@@ -16038,163 +16069,227 @@ function Ul() {
 					className: Z.header,
 					children: [/* @__PURE__ */ (0, Q.jsx)("h4", { children: "Message Tracker" }), /* @__PURE__ */ (0, Q.jsx)("button", {
 						className: Z.closeBtn,
-						onClick: f,
+						onClick: y,
 						children: "×"
 					})]
 				}),
 				/* @__PURE__ */ (0, Q.jsxs)("div", {
+					className: Z.tabNav,
+					children: [
+						/* @__PURE__ */ (0, Q.jsx)("button", {
+							type: "button",
+							className: `${Z.tabBtn} ${r === "select" ? Z.tabActive : ""}`,
+							onClick: () => i("select"),
+							children: "Select Targets"
+						}),
+						/* @__PURE__ */ (0, Q.jsx)("button", {
+							type: "button",
+							className: `${Z.tabBtn} ${r === "editor" ? Z.tabActive : ""}`,
+							onClick: () => i("editor"),
+							children: "Edit Parameters"
+						}),
+						/* @__PURE__ */ (0, Q.jsx)("button", {
+							type: "button",
+							className: `${Z.tabBtn} ${r === "preview" ? Z.tabActive : ""}`,
+							onClick: () => i("preview"),
+							children: "Preview JSON"
+						})
+					]
+				}),
+				/* @__PURE__ */ (0, Q.jsxs)("div", {
 					className: Z.body,
 					children: [
-						/* @__PURE__ */ (0, Q.jsx)("div", {
-							style: {
-								fontSize: "11px",
-								color: _ ? "#2ecc71" : "#f39c12"
-							},
-							children: _ ? "✓ Loaded historical state from this turn." : "⚠️ No historical data found. Using current live data."
-						}),
 						/* @__PURE__ */ (0, Q.jsxs)("div", {
-							className: Z.section,
-							children: [
-								/* @__PURE__ */ (0, Q.jsxs)("div", {
-									className: Z.sectionTitleRow,
-									children: [/* @__PURE__ */ (0, Q.jsx)("div", {
-										className: Z.sectionTitle,
-										children: "Entities & Options"
-									}), /* @__PURE__ */ (0, Q.jsx)("button", {
-										type: "button",
-										className: Z.deselectAllBtn,
-										onClick: p,
-										title: "Deselect all elements & notes",
-										children: "Deselect All"
-									})]
-								}),
-								/* @__PURE__ */ (0, Q.jsxs)("div", {
-									className: `${Z.charRow} ${Z.worldRow}`,
-									children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
-										className: Z.checkboxItem,
-										style: { marginTop: "2px" },
-										children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-											type: "checkbox",
-											checked: n.world?.selected || !1,
-											onChange: (e) => m("selected", e.target.checked)
-										}), /* @__PURE__ */ (0, Q.jsx)("span", {
-											className: Z.charNameLabel,
-											children: "World State"
+							style: {
+								display: "flex",
+								justifyContent: "space-between",
+								alignItems: "center",
+								flexShrink: 0
+							},
+							children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+								style: {
+									fontSize: "11px",
+									opacity: .8,
+									fontWeight: "bold"
+								},
+								children: n ? "✓ Loaded historical state from this turn." : "⚠️ No historical data found. Using current live data."
+							}), /* @__PURE__ */ (0, Q.jsx)("button", {
+								type: "button",
+								className: Z.syncLiveBtn,
+								onClick: _,
+								title: "Pull values and check options from the active live sidebar tracker panel",
+								children: "Copy Live Status"
+							})]
+						}),
+						r === "select" && /* @__PURE__ */ (0, Q.jsxs)("div", {
+							className: Z.tabContentFadeIn,
+							children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
+								className: Z.section,
+								children: [
+									/* @__PURE__ */ (0, Q.jsxs)("div", {
+										className: Z.sectionTitleRow,
+										children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+											className: Z.sectionTitle,
+											children: "Entities & Options"
+										}), /* @__PURE__ */ (0, Q.jsx)("button", {
+											type: "button",
+											className: Z.deselectAllBtn,
+											onClick: b,
+											title: "Deselect all elements & notes",
+											children: "Deselect All"
 										})]
-									}), /* @__PURE__ */ (0, Q.jsxs)("div", {
-										className: `${Z.worldOptionsContainer} ${n.world?.selected ? Z.activeOps : Z.disabledOps}`,
-										children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
-											className: Z.worldOptionsRow,
-											children: [
-												/* @__PURE__ */ (0, Q.jsxs)("label", {
-													className: Z.checkboxItem,
-													children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-														type: "checkbox",
-														disabled: !n.world?.selected,
-														checked: n.world?.date ?? !0,
-														onChange: (e) => m("date", e.target.checked)
-													}), " Date"]
-												}),
-												/* @__PURE__ */ (0, Q.jsxs)("label", {
-													className: Z.checkboxItem,
-													children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-														type: "checkbox",
-														disabled: !n.world?.selected,
-														checked: n.world?.time ?? !0,
-														onChange: (e) => m("time", e.target.checked)
-													}), " Time"]
-												}),
-												/* @__PURE__ */ (0, Q.jsxs)("label", {
-													className: Z.checkboxItem,
-													children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-														type: "checkbox",
-														disabled: !n.world?.selected,
-														checked: n.world?.weather ?? !0,
-														onChange: (e) => m("weather", e.target.checked)
-													}), " Weather"]
-												})
-											]
-										}), /* @__PURE__ */ (0, Q.jsxs)("div", {
-											className: Z.worldOptionsRow,
+									}),
+									/* @__PURE__ */ (0, Q.jsx)("div", {
+										className: `${Z.charRow} ${Z.worldRow}`,
+										children: /* @__PURE__ */ (0, Q.jsxs)("div", {
+											style: {
+												display: "flex",
+												flexDirection: "column",
+												gap: "8px",
+												width: "100%"
+											},
 											children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
 												className: Z.checkboxItem,
+												style: { marginTop: "2px" },
 												children: [/* @__PURE__ */ (0, Q.jsx)("input", {
 													type: "checkbox",
-													disabled: !n.world?.selected,
-													checked: n.world?.location ?? !0,
-													onChange: (e) => m("location", e.target.checked)
-												}), " Location"]
-											}), /* @__PURE__ */ (0, Q.jsxs)("label", {
-												className: Z.checkboxItem,
-												children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-													type: "checkbox",
-													disabled: !n.world?.selected,
-													checked: n.world?.events ?? !1,
-													onChange: (e) => m("events", e.target.checked)
-												}), " Events"]
+													checked: a.world?.selected || !1,
+													onChange: (e) => x("selected", e.target.checked)
+												}), /* @__PURE__ */ (0, Q.jsx)("span", {
+													className: Z.charNameLabel,
+													children: "World State"
+												})]
+											}), /* @__PURE__ */ (0, Q.jsxs)("div", {
+												className: `${Z.worldOptionsContainer} ${a.world?.selected ? Z.activeOps : Z.disabledOps}`,
+												children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
+													className: Z.worldOptionsRow,
+													children: [
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !a.world?.selected,
+																checked: a.world?.date ?? !0,
+																onChange: (e) => x("date", e.target.checked)
+															}), " Date"]
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !a.world?.selected,
+																checked: a.world?.time ?? !0,
+																onChange: (e) => x("time", e.target.checked)
+															}), " Time"]
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !a.world?.selected,
+																checked: a.world?.weather ?? !0,
+																onChange: (e) => x("weather", e.target.checked)
+															}), " Weather"]
+														})
+													]
+												}), /* @__PURE__ */ (0, Q.jsxs)("div", {
+													className: Z.worldOptionsRow,
+													style: { marginTop: "4px" },
+													children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
+														className: Z.checkboxItem,
+														children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+															type: "checkbox",
+															disabled: !a.world?.selected,
+															checked: a.world?.location ?? !0,
+															onChange: (e) => x("location", e.target.checked)
+														}), " Location"]
+													}), /* @__PURE__ */ (0, Q.jsxs)("label", {
+														className: Z.checkboxItem,
+														children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+															type: "checkbox",
+															disabled: !a.world?.selected,
+															checked: a.world?.events ?? !1,
+															onChange: (e) => x("events", e.target.checked)
+														}), " World Events"]
+													})]
+												})]
 											})]
-										})]
-									})]
-								}),
-								u.characters?.map((e) => {
-									let t = n.chars[e.id] || {};
-									return /* @__PURE__ */ (0, Q.jsxs)("div", {
-										className: Z.charRow,
-										style: { alignItems: "flex-start" },
-										children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
-											className: Z.checkboxItem,
-											style: { marginTop: "4px" },
-											children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-												type: "checkbox",
-												checked: t.selected || !1,
-												onChange: (t) => h(e.id, "selected", t.target.checked)
-											}), /* @__PURE__ */ (0, Q.jsx)("span", {
-												className: Z.charNameLabel,
-												children: e.name
-											})]
-										}), /* @__PURE__ */ (0, Q.jsxs)("div", {
-											className: `${Z.charOptionsColumn} ${t.selected ? Z.activeOps : Z.disabledOps}`,
+										})
+									}),
+									h && h.characters?.map((e) => {
+										let t = a.chars[e.id] || {};
+										return /* @__PURE__ */ (0, Q.jsxs)("div", {
+											className: Z.charRow,
+											style: {
+												flexDirection: "column",
+												alignItems: "stretch"
+											},
 											children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
-												className: Z.charOptionsRow,
-												children: [
-													/* @__PURE__ */ (0, Q.jsxs)("label", {
-														className: Z.checkboxItem,
-														children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-															type: "checkbox",
-															disabled: !t.selected,
-															checked: t.status || !1,
-															onChange: (t) => h(e.id, "status", t.target.checked)
-														}), " Status"]
-													}),
-													/* @__PURE__ */ (0, Q.jsxs)("label", {
-														className: Z.checkboxItem,
-														children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-															type: "checkbox",
-															disabled: !t.selected,
-															checked: t.profile || !1,
-															onChange: (t) => h(e.id, "profile", t.target.checked)
-														}), " Profile"]
-													}),
-													/* @__PURE__ */ (0, Q.jsxs)("label", {
-														className: Z.checkboxItem,
-														children: [/* @__PURE__ */ (0, Q.jsx)("input", {
-															type: "checkbox",
-															disabled: !t.selected,
-															checked: t.relations || !1,
-															onChange: (t) => h(e.id, "relations", t.target.checked)
-														}), " Relations"]
-													})
-												]
+												style: {
+													display: "flex",
+													alignItems: "center",
+													width: "100%"
+												},
+												children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
+													className: Z.checkboxItem,
+													children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+														type: "checkbox",
+														checked: t.selected || !1,
+														onChange: (t) => ee(e.id, "selected", t.target.checked)
+													}), /* @__PURE__ */ (0, Q.jsx)("span", {
+														className: Z.charNameLabel,
+														children: e.name
+													})]
+												}), /* @__PURE__ */ (0, Q.jsxs)("div", {
+													className: `${Z.charOptionsRow} ${t.selected ? Z.activeOps : Z.disabledOps}`,
+													style: {
+														marginLeft: "auto",
+														gap: "10px"
+													},
+													children: [
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !t.selected,
+																checked: t.status || !1,
+																onChange: (t) => ee(e.id, "status", t.target.checked)
+															}), " Status"]
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !t.selected,
+																checked: t.profile || !1,
+																onChange: (t) => ee(e.id, "profile", t.target.checked)
+															}), " Profile"]
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("label", {
+															className: Z.checkboxItem,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																disabled: !t.selected,
+																checked: t.relations || !1,
+																onChange: (t) => ee(e.id, "relations", t.target.checked)
+															}), " Relations"]
+														})
+													]
+												})]
 											}), e.activePlayer && /* @__PURE__ */ (0, Q.jsxs)("div", {
-												className: Z.charOptionsRow,
-												style: { marginTop: "6px" },
+												className: `${Z.charOptionsRow} ${t.selected ? Z.activeOps : Z.disabledOps}`,
+												style: {
+													paddingLeft: "18px",
+													marginTop: "4px",
+													gap: "10px"
+												},
 												children: [/* @__PURE__ */ (0, Q.jsxs)("label", {
 													className: Z.checkboxItem,
 													children: [/* @__PURE__ */ (0, Q.jsx)("input", {
 														type: "checkbox",
 														disabled: !t.selected,
 														checked: t.inventory || !1,
-														onChange: (t) => h(e.id, "inventory", t.target.checked)
+														onChange: (t) => ee(e.id, "inventory", t.target.checked)
 													}), " Inventory"]
 												}), /* @__PURE__ */ (0, Q.jsxs)("label", {
 													className: Z.checkboxItem,
@@ -16202,64 +16297,491 @@ function Ul() {
 														type: "checkbox",
 														disabled: !t.selected,
 														checked: t.quests || !1,
-														onChange: (t) => h(e.id, "quests", t.target.checked)
+														onChange: (t) => ee(e.id, "quests", t.target.checked)
 													}), " Quests"]
 												})]
 											})]
-										})]
-									}, e.id);
-								})
-							]
-						}),
-						/* @__PURE__ */ (0, Q.jsxs)("div", {
-							className: Z.section,
-							children: [/* @__PURE__ */ (0, Q.jsx)("div", {
-								className: Z.sectionTitle,
-								children: "Custom Note (Optional)"
-							}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
-								className: Z.textarea,
-								placeholder: "e.g. Received the mysterious key from the merchant.",
-								value: i,
-								onChange: (e) => a(e.target.value),
-								disabled: o
-							})]
-						}),
-						/* @__PURE__ */ (0, Q.jsxs)("div", {
-							className: Z.section,
-							children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
-								style: {
-									display: "flex",
-									justifyContent: "space-between",
-									alignItems: "center",
-									marginBottom: "8px"
-								},
+										}, e.id);
+									})
+								]
+							}), /* @__PURE__ */ (0, Q.jsxs)("div", {
+								className: Z.section,
+								style: { marginTop: "12px" },
 								children: [/* @__PURE__ */ (0, Q.jsx)("div", {
 									className: Z.sectionTitle,
-									style: { margin: 0 },
-									children: "Preview"
-								}), /* @__PURE__ */ (0, Q.jsx)("button", {
-									type: "button",
-									className: o ? Z.viewBtnActive : Z.viewBtn,
-									onClick: () => {
-										if (o) try {
-											JSON.parse(c), s(!1);
-										} catch {
-											alert("Syntax error inside JSON. Please fix it before locking.");
-										}
-										else s(!0);
-									},
-									children: o ? "🔒 Lock Data" : "🔓 Edit JSON"
+									children: "Custom Note (Optional)"
+								}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
+									className: Z.textarea,
+									placeholder: "e.g. Received the mysterious key from the merchant.",
+									value: l,
+									onChange: (e) => u(e.target.value)
 								})]
-							}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
-								className: `${Z.jsonEditor} ${o ? Z.jsonEditorWritable : ""}`,
-								value: c,
-								onChange: (e) => {
-									o && l(e.target.value);
-								},
-								readOnly: !o,
-								placeholder: "Select entities above or click 'Edit' to enter custom JSON data...",
-								spellCheck: "false"
 							})]
+						}),
+						r === "editor" && /* @__PURE__ */ (0, Q.jsx)("div", {
+							className: Z.tabContentFadeIn,
+							children: /* @__PURE__ */ (0, Q.jsxs)("div", {
+								className: Z.section,
+								children: [
+									/* @__PURE__ */ (0, Q.jsx)("div", {
+										className: Z.sectionTitle,
+										style: { marginBottom: "8px" },
+										children: "Active Values Tuning"
+									}),
+									a.world?.selected && s?.worldState && /* @__PURE__ */ (0, Q.jsxs)("div", {
+										className: Z.editorGroupBlock,
+										children: [
+											/* @__PURE__ */ (0, Q.jsx)("div", {
+												className: Z.editorGroupTitle,
+												children: "World Parameters"
+											}),
+											a.world.date && /* @__PURE__ */ (0, Q.jsxs)("div", {
+												className: Z.visualEditorRow,
+												children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+													className: Z.visualEditorLabel,
+													children: "Date"
+												}), /* @__PURE__ */ (0, Q.jsx)("input", {
+													type: "text",
+													className: Z.visualEditorInput,
+													value: s.worldState.date || "",
+													onChange: (e) => c((t) => ({
+														...t,
+														worldState: {
+															...t.worldState || {},
+															date: e.target.value
+														}
+													}))
+												})]
+											}),
+											a.world.time && /* @__PURE__ */ (0, Q.jsxs)("div", {
+												className: Z.visualEditorRow,
+												children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+													className: Z.visualEditorLabel,
+													children: "Time"
+												}), /* @__PURE__ */ (0, Q.jsx)("input", {
+													type: "text",
+													className: Z.visualEditorInput,
+													value: s.worldState.time || "",
+													onChange: (e) => c((t) => ({
+														...t,
+														worldState: {
+															...t.worldState || {},
+															time: e.target.value
+														}
+													}))
+												})]
+											}),
+											a.world.weather && /* @__PURE__ */ (0, Q.jsxs)("div", {
+												className: Z.visualEditorRow,
+												children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+													className: Z.visualEditorLabel,
+													children: "Weather"
+												}), /* @__PURE__ */ (0, Q.jsx)("input", {
+													type: "text",
+													className: Z.visualEditorInput,
+													value: s.worldState.weather || "",
+													onChange: (e) => c((t) => ({
+														...t,
+														worldState: {
+															...t.worldState || {},
+															weather: e.target.value
+														}
+													}))
+												})]
+											}),
+											a.world.location && /* @__PURE__ */ (0, Q.jsxs)("div", {
+												className: Z.visualEditorRow,
+												children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+													className: Z.visualEditorLabel,
+													children: "Location"
+												}), /* @__PURE__ */ (0, Q.jsx)("input", {
+													type: "text",
+													className: Z.visualEditorInput,
+													value: s.worldState.location || "",
+													onChange: (e) => c((t) => ({
+														...t,
+														worldState: {
+															...t.worldState || {},
+															location: e.target.value
+														}
+													}))
+												})]
+											}),
+											a.world.events && s.worldState?.events && s.worldState.events.length > 0 && /* @__PURE__ */ (0, Q.jsxs)("div", {
+												style: {
+													display: "flex",
+													flexDirection: "column",
+													gap: "8px",
+													marginTop: "6px",
+													borderTop: "1px dashed rgba(255,255,255,0.05)",
+													paddingTop: "6px"
+												},
+												children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+													className: Z.visualEditorSubLabel,
+													children: "Active World Events"
+												}), s.worldState.events.map((e, t) => {
+													let n = typeof e == "string" ? {
+														name: "",
+														desc: e
+													} : e;
+													return /* @__PURE__ */ (0, Q.jsxs)("div", {
+														style: {
+															display: "flex",
+															flexDirection: "column",
+															gap: "4px",
+															background: "rgba(0,0,0,0.1)",
+															padding: "6px",
+															borderRadius: "4px"
+														},
+														children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
+															className: Z.visualEditorRow,
+															children: [/* @__PURE__ */ (0, Q.jsxs)("span", {
+																className: Z.visualEditorLabel,
+																children: ["Event ", t + 1]
+															}), /* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "text",
+																className: Z.visualEditorInput,
+																value: n.name || "",
+																onChange: (e) => {
+																	let r = [...s.worldState.events || []];
+																	r[t] = {
+																		...n,
+																		name: e.target.value
+																	}, c((e) => ({
+																		...e,
+																		worldState: {
+																			...e.worldState || {},
+																			events: r
+																		}
+																	}));
+																},
+																placeholder: "Event Title..."
+															})]
+														}), /* @__PURE__ */ (0, Q.jsxs)("div", {
+															className: Z.visualEditorRow,
+															children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+																className: Z.visualEditorLabel,
+																children: "Desc"
+															}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
+																rows: 1,
+																className: Z.visualEditorTextarea,
+																value: n.desc || "",
+																onChange: (e) => {
+																	let r = [...s.worldState.events || []];
+																	r[t] = {
+																		...n,
+																		desc: e.target.value
+																	}, c((e) => ({
+																		...e,
+																		worldState: {
+																			...e.worldState || {},
+																			events: r
+																		}
+																	}));
+																},
+																placeholder: "Event Description..."
+															})]
+														})]
+													}, n.id || t);
+												})]
+											})
+										]
+									}),
+									s && s.characters?.map((e) => {
+										let t = a.chars[e.id] || {};
+										return t.selected ? /* @__PURE__ */ (0, Q.jsxs)("div", {
+											className: Z.editorGroupBlock,
+											children: [
+												/* @__PURE__ */ (0, Q.jsxs)("div", {
+													className: Z.editorGroupTitle,
+													children: [e.name, " Parameters"]
+												}),
+												t.status && e.statusSchema?.map((t) => {
+													let n = e.status?.[t.id] ?? "";
+													return /* @__PURE__ */ (0, Q.jsxs)("div", {
+														className: Z.visualEditorRow,
+														children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+															className: Z.visualEditorLabel,
+															children: t.name
+														}), /* @__PURE__ */ (0, Q.jsx)("input", {
+															type: t.type === "text" ? "text" : "number",
+															className: Z.visualEditorInput,
+															value: n,
+															onChange: (n) => {
+																let r = t.type === "text" ? n.target.value : Number(n.target.value);
+																g(e.id, "status", t.id, r);
+															}
+														})]
+													}, t.id);
+												}),
+												t.profile && Object.keys(e.profile || {}).map((t) => {
+													let n = e.profile[t] ?? "";
+													return /* @__PURE__ */ (0, Q.jsxs)("div", {
+														className: Z.visualEditorRow,
+														style: { alignItems: "flex-start" },
+														children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+															className: Z.visualEditorLabel,
+															style: { marginTop: "5px" },
+															children: t
+														}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
+															rows: 1,
+															className: Z.visualEditorTextarea,
+															value: n,
+															onChange: (n) => g(e.id, "profile", t, n.target.value)
+														})]
+													}, t);
+												}),
+												t.inventory && e.inventory?.equipment && /* @__PURE__ */ (0, Q.jsxs)("div", {
+													style: {
+														marginTop: "6px",
+														borderTop: "1px dashed rgba(255,255,255,0.05)",
+														paddingTop: "6px"
+													},
+													children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+														className: Z.visualEditorSubLabel,
+														children: "Equipment Items"
+													}), Object.entries(e.inventory.equipment).map(([t, n]) => /* @__PURE__ */ (0, Q.jsxs)("div", {
+														className: Z.visualEditorRow,
+														children: [/* @__PURE__ */ (0, Q.jsxs)("span", {
+															className: Z.visualEditorLabel,
+															children: [
+																"[",
+																t,
+																"]"
+															]
+														}), /* @__PURE__ */ (0, Q.jsx)("input", {
+															type: "text",
+															className: Z.visualEditorInput,
+															value: n?.name || "",
+															onChange: (n) => {
+																let r = { ...e.inventory.equipment || {} };
+																n.target.value.trim() === "" ? r[t] = null : r[t] = {
+																	...r[t] || { id: `item_${Date.now()}` },
+																	name: n.target.value
+																}, g(e.id, "inventory", "equipment", r);
+															},
+															placeholder: "Empty"
+														})]
+													}, t))]
+												}),
+												t.inventory && e.inventory?.storage && /* @__PURE__ */ (0, Q.jsxs)("div", {
+													style: {
+														marginTop: "6px",
+														borderTop: "1px dashed rgba(255,255,255,0.05)",
+														paddingTop: "6px"
+													},
+													children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+														className: Z.visualEditorSubLabel,
+														children: "Storage Container Items"
+													}), Object.entries(e.inventory.storage).map(([t, n]) => /* @__PURE__ */ (0, Q.jsxs)("div", {
+														style: {
+															display: "flex",
+															flexDirection: "column",
+															gap: "4px",
+															marginBottom: "6px"
+														},
+														children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
+															style: {
+																fontSize: "10px",
+																opacity: .5,
+																fontWeight: "bold"
+															},
+															children: [t, " items"]
+														}), (Array.isArray(n) ? n : []).map((n, r) => /* @__PURE__ */ (0, Q.jsxs)("div", {
+															className: Z.visualEditorRow,
+															children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "text",
+																className: Z.visualEditorInput,
+																style: { flex: 3 },
+																value: n.name || "",
+																onChange: (n) => {
+																	let i = { ...e.inventory.storage || {} }, a = [...i[t] || []];
+																	a[r] = {
+																		...a[r],
+																		name: n.target.value
+																	}, i[t] = a, g(e.id, "inventory", "storage", i);
+																},
+																placeholder: "Item Name"
+															}), /* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "number",
+																className: Z.visualEditorInput,
+																style: {
+																	flex: 1,
+																	maxWidth: "60px",
+																	textAlign: "center"
+																},
+																value: n.quantity === void 0 ? 1 : n.quantity,
+																onChange: (n) => {
+																	let i = { ...e.inventory.storage || {} }, a = [...i[t] || []];
+																	a[r] = {
+																		...a[r],
+																		quantity: Number(n.target.value) || 1
+																	}, i[t] = a, g(e.id, "inventory", "storage", i);
+																}
+															})]
+														}, n.id || r))]
+													}, t))]
+												}),
+												t.quests && e.quests && /* @__PURE__ */ (0, Q.jsxs)("div", {
+													style: {
+														marginTop: "6px",
+														borderTop: "1px dashed rgba(255,255,255,0.05)",
+														paddingTop: "6px",
+														display: "flex",
+														flexDirection: "column",
+														gap: "6px"
+													},
+													children: [
+														/* @__PURE__ */ (0, Q.jsx)("div", {
+															className: Z.visualEditorSubLabel,
+															children: "Quest State"
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("div", {
+															className: Z.visualEditorRow,
+															children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+																className: Z.visualEditorLabel,
+																children: "Main Title"
+															}), /* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "text",
+																className: Z.visualEditorInput,
+																value: e.quests.main?.name || "",
+																onChange: (t) => {
+																	let n = {
+																		...e.quests.main || {},
+																		name: t.target.value
+																	};
+																	g(e.id, "quests", "main", n);
+																}
+															})]
+														}),
+														/* @__PURE__ */ (0, Q.jsxs)("div", {
+															className: Z.visualEditorRow,
+															children: [/* @__PURE__ */ (0, Q.jsx)("span", {
+																className: Z.visualEditorLabel,
+																children: "Completed"
+															}), /* @__PURE__ */ (0, Q.jsx)("input", {
+																type: "checkbox",
+																checked: e.quests.main?.isCompleted || !1,
+																onChange: (t) => {
+																	let n = {
+																		...e.quests.main || {},
+																		isCompleted: t.target.checked
+																	};
+																	g(e.id, "quests", "main", n);
+																}
+															})]
+														}),
+														e.quests.sides && e.quests.sides.length > 0 && /* @__PURE__ */ (0, Q.jsxs)("div", {
+															style: {
+																display: "flex",
+																flexDirection: "column",
+																gap: "4px",
+																marginTop: "4px"
+															},
+															children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+																style: {
+																	fontSize: "10px",
+																	opacity: .5,
+																	fontWeight: "bold"
+																},
+																children: "Side Quests"
+															}), e.quests.sides.map((t, n) => /* @__PURE__ */ (0, Q.jsxs)("div", {
+																className: Z.visualEditorRow,
+																children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																	type: "text",
+																	className: Z.visualEditorInput,
+																	style: { flex: 3 },
+																	value: t.name || "",
+																	onChange: (t) => {
+																		let r = [...e.quests.sides || []];
+																		r[n] = {
+																			...r[n],
+																			name: t.target.value
+																		}, g(e.id, "quests", "sides", r);
+																	},
+																	placeholder: "Side Quest Title"
+																}), /* @__PURE__ */ (0, Q.jsxs)("label", {
+																	className: Z.checkboxItem,
+																	style: {
+																		fontSize: "11px",
+																		flex: 1,
+																		minWidth: "70px",
+																		justifyContent: "center"
+																	},
+																	children: [/* @__PURE__ */ (0, Q.jsx)("input", {
+																		type: "checkbox",
+																		checked: t.isCompleted || !1,
+																		onChange: (t) => {
+																			let r = [...e.quests.sides || []];
+																			r[n] = {
+																				...r[n],
+																				isCompleted: t.target.checked
+																			}, g(e.id, "quests", "sides", r);
+																		}
+																	}), " Clear"]
+																})]
+															}, t.id || n))]
+														})
+													]
+												})
+											]
+										}, e.id) : null;
+									}),
+									s && !a.world?.selected && !Object.values(a.chars).some((e) => e.selected) && /* @__PURE__ */ (0, Q.jsxs)("div", {
+										style: {
+											padding: "24px 0",
+											opacity: .4,
+											fontSize: "12px",
+											textAlign: "center"
+										},
+										children: [
+											"No entities are selected.",
+											/* @__PURE__ */ (0, Q.jsx)("br", {}),
+											"Please check entities to edit in 'Select Targets' tab."
+										]
+									})
+								]
+							})
+						}),
+						r === "preview" && /* @__PURE__ */ (0, Q.jsx)("div", {
+							className: Z.tabContentFadeIn,
+							children: /* @__PURE__ */ (0, Q.jsxs)("div", {
+								className: Z.section,
+								children: [/* @__PURE__ */ (0, Q.jsxs)("div", {
+									style: {
+										display: "flex",
+										justifyContent: "space-between",
+										alignItems: "center",
+										marginBottom: "8px"
+									},
+									children: [/* @__PURE__ */ (0, Q.jsx)("div", {
+										className: Z.sectionTitle,
+										style: { margin: 0 },
+										children: "Payload Code"
+									}), /* @__PURE__ */ (0, Q.jsx)("button", {
+										type: "button",
+										className: d ? Z.viewBtnActive : Z.viewBtn,
+										onClick: () => {
+											if (d) try {
+												JSON.parse(p), f(!1);
+											} catch {
+												alert("Syntax error inside JSON. Please fix it before locking.");
+											}
+											else f(!0);
+										},
+										children: d ? "🔒 Lock Data" : "🔓 Edit JSON"
+									})]
+								}), /* @__PURE__ */ (0, Q.jsx)("textarea", {
+									className: `${Z.jsonEditor} ${d ? Z.jsonEditorWritable : ""}`,
+									value: p,
+									onChange: (e) => {
+										d && m(e.target.value);
+									},
+									readOnly: !d,
+									placeholder: "Select entities in Tab 1 or type custom JSON direct...",
+									spellCheck: "false"
+								})]
+							})
 						})
 					]
 				}),
@@ -16267,11 +16789,60 @@ function Ul() {
 					className: Z.footer,
 					children: [/* @__PURE__ */ (0, Q.jsx)("button", {
 						className: Z.cancelBtn,
-						onClick: f,
+						onClick: y,
 						children: "Cancel"
 					}), /* @__PURE__ */ (0, Q.jsx)("button", {
 						className: Z.saveBtn,
-						onClick: g,
+						onClick: () => {
+							let e = window.SillyTavern?.getContext?.();
+							if (!e || !e.chat) return;
+							let n;
+							try {
+								n = JSON.parse(p);
+							} catch {
+								alert("Invalid JSON format! Please correct the syntax before saving.");
+								return;
+							}
+							let r = parseInt(t.mesId, 10), i = e.chat.find((t) => String(t.mesId) === String(r) || String(e.chat.indexOf(t)) === String(r));
+							if (!i) return;
+							let a = /(?:\n\n)?(?:<!--\s*)?(?:(?:<|&lt;)rpgmt(?:>|&gt;)|<div class="rpgmt-data">)[\s\S]*?(?:(?:<|&lt;)\/rpgmt(?:>|&gt;)|<\/div>)(?:\s*-->)?/gi;
+							if (Object.keys(n).length === 0) i.mes = i.mes.replace(a, "").trim();
+							else {
+								let e = $l(n);
+								a.test(i.mes) ? i.mes = i.mes.replace(new RegExp(a.source, "i"), e) : i.mes += e;
+							}
+							let o = i.swipe_id || 0;
+							if (i.swipes && i.swipes.length > 0 && typeof i.mes == "string") {
+								let e = i.swipes.findIndex((e) => e === i.mes);
+								e !== -1 && (o = e);
+							}
+							if (i.swipe_info && i.swipe_info[o]?.extra?.rpgTrackerData) {
+								let e = i.swipe_info[o].extra.rpgTrackerData;
+								n.world && e.worldState && Object.assign(e.worldState, n.world), n.chars && e.characters && Object.entries(n.chars).forEach(([t, n]) => {
+									let r = e.characters.find((e) => e.name === t);
+									r && (n.status && Object.assign(r.status, n.status), n.profile && Object.assign(r.profile, n.profile), n.relations && (r.relations = {
+										...r.relations || {},
+										...n.relations
+									}), n.inventory && (r.inventory = {
+										...r.inventory,
+										equipment: {
+											...r.inventory?.equipment || {},
+											...n.inventory.equipment || {}
+										},
+										storage: {
+											...r.inventory?.storage || {},
+											...n.inventory.storage || {}
+										}
+									}), n.quests && (r.quests = {
+										...r.quests,
+										main: n.quests.main === void 0 ? r.quests?.main : n.quests.main,
+										sides: n.quests.sides === void 0 ? r.quests?.sides : n.quests.sides
+									}));
+								});
+							}
+							let s = e.chat.indexOf(i);
+							window.RPGBridge && (typeof window.RPGBridge.updateMessageBlock == "function" && window.RPGBridge.updateMessageBlock(s, i), typeof window.RPGBridge.saveChat == "function" && window.RPGBridge.saveChat(), typeof window.RPGBridge.triggerSnapshotRender == "function" && window.RPGBridge.triggerSnapshotRender()), y();
+						},
 						children: "Attach Tracker"
 					})]
 				})
@@ -16279,19 +16850,19 @@ function Ul() {
 		})
 	});
 }
-var Wl, Q, Gl = o((() => {
-	Wl = /* @__PURE__ */ l(d()), Ge(), zl(), Hl(), Q = Le();
+var nu, Q, ru = o((() => {
+	nu = /* @__PURE__ */ l(d()), Ge(), Zl(), eu(), Q = Le();
 }));
 //#endregion
 //#region src/App.jsx
-function Kl() {
+function iu() {
 	let { isEnabled: e, settings: t } = ze();
-	if ((0, Jl.useEffect)(() => {
+	if ((0, ou.useEffect)(() => {
 		let t = document.getElementById("my-rpg-react-root");
 		t && (e ? (t.style.setProperty("display", "block", "important"), t.style.setProperty("background", "transparent", "important"), t.style.setProperty("border", "none", "important"), t.style.setProperty("box-shadow", "none", "important"), t.style.setProperty("padding", "0", "important"), t.style.setProperty("width", "0", "important"), t.style.setProperty("height", "0", "important"), t.style.setProperty("position", "fixed", "important"), t.style.setProperty("top", "0", "important"), t.style.setProperty("left", "0", "important"), t.style.setProperty("pointer-events", "auto", "important")) : t.style.setProperty("display", "none", "important"));
 	}, [e]), !e) return null;
 	let n = t.theme === "custom";
-	return /* @__PURE__ */ (0, Yl.jsxs)("div", {
+	return /* @__PURE__ */ (0, su.jsxs)("div", {
 		style: {
 			"--rpg-bg": n && t.customColors?.bg ? t.customColors.bg : "var(--SmartThemeBlurTintColor, var(--bg-color, rgba(26, 26, 46, 0.95)))",
 			"--rpg-accent": n && t.customColors?.accent ? t.customColors.accent : "var(--black30a, rgba(0, 0, 0, 0.3))",
@@ -16303,27 +16874,27 @@ function Kl() {
 			height: "100%"
 		},
 		children: [
-			/* @__PURE__ */ (0, Yl.jsx)("div", {
+			/* @__PURE__ */ (0, su.jsx)("div", {
 				style: { pointerEvents: "auto" },
-				children: /* @__PURE__ */ (0, Yl.jsx)(pl, { children: /* @__PURE__ */ (0, Yl.jsx)(vt, {}) })
+				children: /* @__PURE__ */ (0, su.jsx)(pl, { children: /* @__PURE__ */ (0, su.jsx)(vt, {}) })
 			}),
-			/* @__PURE__ */ (0, Yl.jsx)("div", {
+			/* @__PURE__ */ (0, su.jsx)("div", {
 				style: { pointerEvents: "auto" },
-				children: /* @__PURE__ */ (0, Yl.jsx)(pl, { children: /* @__PURE__ */ (0, Yl.jsx)(cl, {}) })
+				children: /* @__PURE__ */ (0, su.jsx)(pl, { children: /* @__PURE__ */ (0, su.jsx)(cl, {}) })
 			}),
-			/* @__PURE__ */ (0, Yl.jsx)("div", {
+			/* @__PURE__ */ (0, su.jsx)("div", {
 				style: { pointerEvents: "auto" },
-				children: /* @__PURE__ */ (0, Yl.jsx)(pl, { children: /* @__PURE__ */ (0, Yl.jsx)(Ul, {}) })
+				children: /* @__PURE__ */ (0, su.jsx)(pl, { children: /* @__PURE__ */ (0, su.jsx)(tu, {}) })
 			})
 		]
 	});
 }
-function ql() {
-	return /* @__PURE__ */ (0, Yl.jsx)(Re, { children: /* @__PURE__ */ (0, Yl.jsx)(Kl, {}) });
+function au() {
+	return /* @__PURE__ */ (0, su.jsx)(Re, { children: /* @__PURE__ */ (0, su.jsx)(iu, {}) });
 }
-var Jl, Yl, Xl = o((() => {
-	Jl = /* @__PURE__ */ l(d()), Ge(), xt(), ul(), ml(), Gl(), Yl = Le();
-})), Zl = /* @__PURE__ */ s(((e, t) => {
+var ou, su, cu = o((() => {
+	ou = /* @__PURE__ */ l(d()), Ge(), xt(), ul(), ml(), ru(), su = Le();
+})), lu = /* @__PURE__ */ s(((e, t) => {
 	(function(n, r) {
 		typeof e == "object" && t !== void 0 ? r(e) : typeof define == "function" && define.amd ? define(["exports"], r) : r(n.MobileDragDrop = n.MobileDragDrop || {});
 	})(e, function(e) {
@@ -16632,19 +17203,19 @@ var Jl, Yl, Xl = o((() => {
 			return S.holdToDrag ? s("touchstart", te, !1) : s("touchstart", C, !1), !0;
 		}, e.supportsPassiveEventListener = i, Object.defineProperty(e, "G", { value: !0 });
 	});
-})), Ql = o((() => {})), $l = /* @__PURE__ */ s((() => {
+})), uu = o((() => {})), du = /* @__PURE__ */ s((() => {
 	var e = /* @__PURE__ */ l(d()), t = /* @__PURE__ */ l(_());
-	Xl();
-	var n = Zl();
-	Ql();
+	cu();
+	var n = lu();
+	uu();
 	var r = Le();
 	(0, n.polyfill)({ dragImageCenterOnTouch: !0 });
 	var i = document.getElementById("my-rpg-react-root");
 	if (i) try {
-		t.createRoot(i).render(/* @__PURE__ */ (0, r.jsx)(e.StrictMode, { children: /* @__PURE__ */ (0, r.jsx)(ql, {}) }));
+		t.createRoot(i).render(/* @__PURE__ */ (0, r.jsx)(e.StrictMode, { children: /* @__PURE__ */ (0, r.jsx)(au, {}) }));
 	} catch (e) {
 		console.error("[RPG Tracker] React rendering error:", e);
 	}
 }));
 //#endregion
-export default $l();
+export default du();

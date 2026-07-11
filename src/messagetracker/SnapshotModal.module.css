@@ -1,3 +1,5 @@
+/* src/messagetracker/SnapshotModal.module.css */
+
 .overlay {
   position: fixed; 
   top: 0; 
@@ -65,6 +67,42 @@
   opacity: 1; 
 }
 
+/* 탭 메뉴 바 */
+.tabNav {
+  display: flex;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid var(--rpg-border);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.tabBtn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--rpg-text);
+  opacity: 0.6;
+  padding: 12px 0;
+  font-size: 11.5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+  outline: none;
+}
+
+.tabBtn:hover {
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tabActive {
+  opacity: 1 !important;
+  border-color: var(--rpg-highlight) !important;
+  color: var(--rpg-highlight) !important;
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .body { 
   padding: 16px; 
   overflow-y: auto;
@@ -72,6 +110,16 @@
   flex-direction: column; 
   gap: 14px; 
   flex: 1;
+}
+
+/* 트랜지션 애니메이션 */
+.tabContentFadeIn {
+  animation: tabFadeIn 0.18s ease-out forwards;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .section {
@@ -114,7 +162,7 @@
 }
 
 .deselectAllBtn:hover {
-  background: rgba(231, 76, 60, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-color: #e74c3c;
   color: #ff6b6b;
 }
@@ -145,14 +193,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--rpg-text);
-}
-
-.charOptionsColumn {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  transition: opacity 0.2s;
-  gap: 2px;
 }
 
 .charOptionsRow {
@@ -202,18 +242,13 @@
   color: var(--rpg-text); 
   font-size: 12px;
   resize: vertical; 
-  min-height: 50px; 
+  min-height: 60px; 
   outline: none; 
   box-sizing: border-box;
 }
 
 .textarea:focus:not(:disabled) { 
   border-color: var(--rpg-highlight); 
-}
-
-.textarea:disabled { 
-  opacity: 0.4; 
-  cursor: not-allowed; 
 }
 
 .viewBtn {
@@ -258,7 +293,7 @@
 
 .jsonEditor {
   width: 100%; 
-  height: 160px; 
+  height: 280px; 
   background: rgba(0, 0, 0, 0.35); 
   color: #8892b0; 
   border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -327,4 +362,122 @@
 
 .saveBtn:hover {
   opacity: 0.9;
+}
+
+/* 폼 시각 에디터 컴포넌트 추가 스타일 */
+
+.syncLiveBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  font-size: 10.5px;
+  font-weight: bold;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.syncLiveBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--rpg-highlight);
+  color: var(--rpg-highlight);
+}
+
+.editorGroupBlock {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.editorGroupBlock:last-child {
+  margin-bottom: 0;
+}
+
+.editorGroupTitle {
+  font-size: 11.5px;
+  font-weight: bold;
+  color: var(--rpg-highlight);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+}
+
+.visualEditorRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.visualEditorLabel {
+  font-size: 11px;
+  font-weight: bold;
+  opacity: 0.6;
+  width: 75px;
+  flex-shrink: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--rpg-text, #ffffff);
+}
+
+.visualEditorSubLabel {
+  font-size: 10.5px;
+  font-weight: bold;
+  opacity: 0.55;
+  margin-top: 4px;
+  color: var(--rpg-text, #ffffff);
+}
+
+.visualEditorInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.visualEditorInput:focus {
+  border-color: var(--rpg-highlight);
+}
+
+.visualEditorTextarea {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--rpg-border);
+  color: var(--rpg-text);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 24px;
+  box-sizing: border-box;
+  line-height: 1.4;
+  transition: border-color 0.15s;
+}
+
+.visualEditorTextarea:focus {
+  border-color: var(--rpg-highlight);
 }
