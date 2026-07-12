@@ -9,7 +9,8 @@ export const defaultSettings = {
     theme: "default",
     updateMode: "merged",
     showDeltaLog: true,
-    presets: []
+    presets: [],
+    croppedAvatars: {} // 캐릭터 ID 또는 아바타 파일명을 키로 하여 Base64 데이터를 전역으로 저장할 공간
 };
 
 export function backupSettingsToLocalStorage(extensionName) {

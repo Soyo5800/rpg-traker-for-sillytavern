@@ -63,7 +63,7 @@ export function migrateCharacterSchema(char) {
         return migrated;
     }
 
-    // 구버전 세이브 파일 로딩 시 인벤토리 하위의 미세 제어 자물쇠 객체 부재 대응
+    // 구버전 세이브 데이터에서 누락된 미세 제어 자물쇠 보완
     if (char && char.inventory) {
         if (!char.inventory.equipmentLocks) {
             char.inventory.equipmentLocks = {};
@@ -83,6 +83,30 @@ export function sanitizeTrackerData(trackerData) {
     if (!trackerData) return trackerData;
 
     const data = trackerData;
+
+    // 월드 이벤트 데이터 정규화 필터 적용
+    if (data.worldState && Array.isArray(data.worldState.events)) {
+        data.worldState.events = data.worldState.events.map((evt, idx) => {
+            if (typeof evt === 'string') {
+                const trimmed = evt.trim();
+                if (!trimmed) return null;
+                return {
+                    id: `event_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 5)}`,
+                    name: '',
+                    desc: trimmed
+                };
+            }
+            if (evt && typeof evt === 'object') {
+                return {
+                    id: evt.id || `event_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 5)}`,
+                    name: evt.name || '',
+                    desc: evt.desc || evt.description || ''
+                };
+            }
+            return null;
+        }).filter(Boolean);
+    }
+
     const nextGlobalDefs = data.globalDefinitions ? { ...data.globalDefinitions } : null;
 
     if (Array.isArray(data.characters)) {

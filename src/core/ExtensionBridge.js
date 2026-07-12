@@ -1,6 +1,6 @@
 // src/core/ExtensionBridge.js
-import { getContext, extension_settings } from "../../../../../extensions.js";
-import { saveSettingsDebounced, saveChat, saveChatConditional, updateMessageBlock, getRequestHeaders, generateQuietPrompt } from "../../../../../../script.js";
+import { getContext, extension_settings, writeExtensionField } from "../../../../../extensions.js";
+import { saveSettingsDebounced, saveChat, saveChatConditional, updateMessageBlock, getRequestHeaders, generateQuietPrompt, getThumbnailUrl, user_avatar } from "../../../../../../script.js";
 import { SlashCommandParser } from "../../../../../slash-commands/SlashCommandParser.js";
 import { backupToMessage, rehydrateFromHistory, rehydrateFromHistoryAsync, applyLLMPatch, extractNormalizedPatch } from "./JSONTracker.js";
 import { parseResponse } from "./ResponseParser.js";
@@ -8,7 +8,64 @@ import { buildDefinitionPromptWrapper, buildStatusPromptWrapper } from "./Active
 import { DEFAULT_PROMPT_HEADER_SEP, DEFAULT_PROMPT_FOOTER_SEP } from "./PromptSchema.js";
 import { setDeltaLog } from "../tracker/DeltaLogRenderer.js";
 
-// 안전한 updateMessageBlock 래퍼
+window.SillyTavern = {
+    getContext: () => {
+        try {
+            const ctx = getContext();
+            return {
+                ...ctx,
+                user_avatar: user_avatar
+            };
+        } catch (e) {
+            return { user_avatar: user_avatar };
+        }
+    }
+};
+
+function resolveSillyTavernAvatarUrl(avatarFile, type = 'Card') {
+    if (!avatarFile || typeof avatarFile !== 'string') return '/img/user.png';
+    if (avatarFile.startsWith('http://') || avatarFile.startsWith('https://') || avatarFile.startsWith('data:')) {
+        return avatarFile;
+    }
+
+    if (type === 'Card' && typeof window.getAvatarPath === 'function') {
+        const resolved = window.getAvatarPath(avatarFile);
+        if (resolved && (resolved.startsWith('http') || resolved.startsWith('/') || resolved.startsWith('.'))) {
+            return resolved;
+        }
+    }
+
+    let filename = String(avatarFile);
+    if (filename.includes('/')) {
+        filename = filename.split('/').pop();
+    }
+
+    if (type === 'Persona') {
+        try { filename = decodeURIComponent(filename); } catch (e) {}
+        const lower = filename.toLowerCase();
+        if (lower === 'default.png' || lower === 'ghost.png' || lower === 'user.png' || lower === 'system.png' || lower === 'default-user' || lower === 'default') {
+            return '/img/user.png';
+        }
+
+        try {
+            if (typeof getThumbnailUrl === 'function') {
+                const url = getThumbnailUrl('persona', filename) || getThumbnailUrl('avatar', filename);
+                if (url) return url;
+            }
+        } catch (e) {
+            console.warn("[RPG Tracker] Native getThumbnailUrl call failed, falling back to static path resolution.", e);
+        }
+
+        if (!/\.[a-zA-Z0-9]{2,5}$/.test(filename)) {
+            filename += '.png';
+        }
+        return `/api/images/avatars/${encodeURIComponent(filename)}`;
+    }
+
+    const encoded = encodeURIComponent(filename);
+    return `/characters/${encoded}`;
+}
+
 export function safeUpdateMessageBlock(index, messageObject) {
     if (typeof updateMessageBlock !== 'function') return;
     try {
@@ -29,9 +86,62 @@ export function establishBridgeConnection(extensionName) {
         if (window.RPGBridge && typeof window.RPGBridge.syncSettings === 'function') {
             clearInterval(connectionInterval);
 
+            // React 비동기 렌더링 루프 실행 전 최신 세팅 정보를 동기식으로 캐싱 보관하기 위한 전역 프로퍼티 선언
+            window.RPGBridge.latestSettings = extension_settings[extensionName] || null;
+
+            // Expose native writeExtensionField API to window.RPGBridge
+            window.RPGBridge.writeExtensionFieldNatively = async (characterId, key, value) => {
+                if (typeof writeExtensionField === 'function') {
+                    try {
+                        await writeExtensionField(characterId, key, value);
+                        return true;
+                    } catch (err) {
+                        console.error("[RPG Tracker] writeExtensionField failed:", err);
+                        return false;
+                    }
+                }
+                console.warn("[RPG Tracker] writeExtensionField is not available on SillyTavern's extensions.js");
+                return false;
+            };
+
+            // React 비동기 렌더사이클 지연을 방지하기 위해 실리터번 메모리 내부의 세팅 값을 직접 반환하는 동기화용 API
+            window.RPGBridge.getSTSettingsCharacterSyncs = (chatId) => {
+                if (!chatId) return null;
+                const targetSrc = window.RPGBridge.latestSettings || extension_settings[extensionName];
+                return targetSrc?.characterSyncs?.[chatId] || null;
+            };
+
+            const nativeSyncSettings = window.RPGBridge.syncSettings;
+            window.RPGBridge.syncSettings = (stSettings) => {
+                if (stSettings) {
+                    window.RPGBridge.latestSettings = {
+                        ...(window.RPGBridge.latestSettings || {}),
+                        ...stSettings
+                    };
+                    nativeSyncSettings(stSettings);
+                }
+            };
+
+            window.RPGBridge.getThumbnailUrl = (type, filename) => {
+                try {
+                    if (typeof getThumbnailUrl === 'function') {
+                        let url = getThumbnailUrl(type, filename);
+                        if (!url) {
+                            const fallbackType = type === 'persona' ? 'avatar' : 'persona';
+                            url = getThumbnailUrl(fallbackType, filename);
+                        }
+                        return url;
+                    }
+                } catch (e) {
+                    console.warn("[RPG Tracker] Failed to retrieve native thumbnail URL:", e);
+                }
+                return null;
+            };
+
             window.RPGBridge.saveSettings = (updatedSettings) => {
                 extension_settings[extensionName] = extension_settings[extensionName] || {};
                 Object.assign(extension_settings[extensionName], updatedSettings);
+                window.RPGBridge.latestSettings = extension_settings[extensionName];
                 saveSettingsDebounced();
             };
 
@@ -86,13 +196,17 @@ export function establishBridgeConnection(extensionName) {
                         else if (!context.groupId && typeof saveChat === 'function') saveChat();
                     }
 
+                    $('#rpg-snapshot-styles').remove();
+                    $('#rpg-delta-log-styles').remove();
+                    $('.rpg-delta-log-container').remove();
+                    $('.rpg-snapshot-container').remove();
+
                     if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
                         window.RPGBridge.setChatConnectionStatus(false);
                     }
                 }
             };
             
-            // ST 메시지 블록 업데이트 및 채팅 저장용 안전 래퍼 노출
             window.RPGBridge.updateMessageBlock = (index, messageObject) => {
                 safeUpdateMessageBlock(index, messageObject);
             };
@@ -105,7 +219,6 @@ export function establishBridgeConnection(extensionName) {
                 }
             };
 
-            // 캐릭터 자동 생성 트리거
             window.RPGBridge.triggerCharacterGeneration = async (promptText, isPlayer = false) => {
                 const trackerData = window.RPGBridge?.currentTrackerData;
                 if (!trackerData) return;
@@ -121,7 +234,6 @@ export function establishBridgeConnection(extensionName) {
                     const { patch } = parseResponse(rawOutput);
 
                     if (patch && Object.keys(patch).length > 0) {
-                        // 입력 데이터 정규화 후 패치 적용
                         const normPatch = extractNormalizedPatch(patch);
                         const updatedData = applyLLMPatch(trackerData, normPatch, isPlayer);
                         if (typeof window.RPGBridge.syncChatData === 'function') window.RPGBridge.syncChatData(updatedData);
@@ -163,7 +275,6 @@ export function establishBridgeConnection(extensionName) {
                 }
             };
 
-            // 수동 업데이트 트리거
             window.RPGBridge.triggerManualUpdate = async () => {
                 const trackerData = window.RPGBridge?.currentTrackerData;
                 if (!trackerData || !Array.isArray(trackerData.characters)) return;
@@ -180,7 +291,6 @@ export function establishBridgeConnection(extensionName) {
                     const { patch } = parseResponse(rawOutput);
 
                     if (patch && Object.keys(patch).length > 0) {
-                        // 입력 데이터 정규화 후 패치 적용
                         const normPatch = extractNormalizedPatch(patch);
                         const updatedData = applyLLMPatch(trackerData, normPatch);
                         if (typeof window.RPGBridge.syncChatData === 'function') window.RPGBridge.syncChatData(updatedData);
@@ -248,6 +358,47 @@ export function establishBridgeConnection(extensionName) {
                 }
 
                 if (trackerData && typeof window.RPGBridge.syncChatData === 'function') {
+                    if (Array.isArray(trackerData.characters)) {
+                        trackerData.characters.forEach((c, index) => {
+                            // 가변 ID 대신 정적 슬롯 인덱스로 대조하여 매핑 소실 방지
+                            const chatSyncs = window.RPGBridge.latestSettings?.characterSyncs?.[context.chatId] || extension_settings[extensionName]?.characterSyncs?.[context.chatId] || {};
+                            const savedSync = chatSyncs[index];
+                            if (savedSync) {
+                                c.syncedCardAvatar = savedSync.syncedCardAvatar;
+                                c.syncedCardType = savedSync.syncedCardType;
+                                c.name = savedSync.name;
+                                c.avatarUrl = savedSync.avatarUrl;
+                            }
+
+                            if (c.syncedCardType === 'Persona') {
+                                const liveName = context.name1 || window.name1;
+                                if (liveName && c.name !== liveName) {
+                                    c.name = liveName;
+                                }
+                                const userAvatarFile = user_avatar || context.user_avatar || window.user_avatar || 'default.png';
+                                const globalCrop = extension_settings[extensionName]?.croppedAvatars?.[c.id];
+                                const targetAvatarUrl = globalCrop || resolveSillyTavernAvatarUrl(userAvatarFile, 'Persona');
+                                if (c.syncedCardAvatar !== userAvatarFile || c.avatarUrl !== targetAvatarUrl) {
+                                    c.syncedCardAvatar = userAvatarFile;
+                                    c.avatarUrl = targetAvatarUrl;
+                                }
+                            } else if (c.syncedCardType === 'Card' && c.syncedCardAvatar) {
+                                const allChars = Array.isArray(context.characters) ? context.characters : (Array.isArray(window.characters) ? window.characters : []);
+                                const matched = allChars.find(stChar => stChar.avatar === c.syncedCardAvatar);
+                                if (matched) {
+                                    if (c.name !== matched.name) {
+                                        c.name = matched.name;
+                                    }
+                                    const globalCrop = extension_settings[extensionName]?.croppedAvatars?.[c.id];
+                                    const targetAvatarUrl = globalCrop || resolveSillyTavernAvatarUrl(matched.avatar, 'Card');
+                                    if (c.avatarUrl !== targetAvatarUrl) {
+                                        c.avatarUrl = targetAvatarUrl;
+                                    }
+                                }
+                            }
+                        });
+                    }
+
                     window.RPGBridge.syncChatData(trackerData);
                     if (typeof window.RPGBridge.setChatConnectionStatus === 'function') {
                         window.RPGBridge.setChatConnectionStatus(true);

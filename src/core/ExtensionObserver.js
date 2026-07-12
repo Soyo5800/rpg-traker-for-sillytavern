@@ -2,8 +2,6 @@
 import { getContext, extension_settings } from "../../../../../extensions.js";
 import { eventSource, event_types } from "../../../../../../script.js";
 import { injectAllDeltaLogs } from "../tracker/DeltaLogRenderer.js";
-
-// 의존성 경로 수정 적용 (src/core/에서 한 단계 올라가 messagetracker로 접근)
 import { renderMessageTrackers } from "../messagetracker/SnapshotRenderer.js";
 import { injectSnapshotButtons } from "../messagetracker/SnapshotButtonManager.js";
 
@@ -53,6 +51,14 @@ export function registerChatEvents() {
     });
 
     eventSource.on(event_types.CHAT_CHANGED, () => {
+        if (window.RPGBridge && typeof window.RPGBridge.syncFromHistoryOrMeta === 'function') {
+            window.RPGBridge.syncFromHistoryOrMeta();
+        }
+        setTimeout(triggerObserverNow, 100);
+    });
+
+    // Synchronize tracker instantly when settings or active persona changes
+    eventSource.on(event_types.SETTINGS_UPDATED, () => {
         if (window.RPGBridge && typeof window.RPGBridge.syncFromHistoryOrMeta === 'function') {
             window.RPGBridge.syncFromHistoryOrMeta();
         }

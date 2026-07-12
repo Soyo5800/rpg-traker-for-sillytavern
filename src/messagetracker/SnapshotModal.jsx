@@ -534,12 +534,11 @@ export default function SnapshotModal() {
                       </div>
                     )}
 
-                    {/* 월드 이벤트 폼 편집 복구 */}
+                    {/* 월드 이벤트 폼 편집 구역 */}
                     {selections.world.events && workingData.worldState?.events && workingData.worldState.events.length > 0 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px', borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '6px' }}>
                         <div className={styles.visualEditorSubLabel}>Active World Events</div>
-                        {workingData.worldState.events.map((evt, idx) => {
-                          const evtObj = typeof evt === 'string' ? { name: '', desc: evt } : evt;
+                        {workingData.worldState.events.map((evtObj, idx) => {
                           return (
                             <div key={evtObj.id || idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(0,0,0,0.1)', padding: '6px', borderRadius: '4px' }}>
                               <div className={styles.visualEditorRow}>
@@ -628,7 +627,7 @@ export default function SnapshotModal() {
                         );
                       })}
 
-                      {/* 플레이어 캐릭터 전용: 인벤토리 세부 편집 복구 및 에러 예방 보완 */}
+                      {/* 플레이어 캐릭터 전용: 인벤토리 세부 편집 */}
                       {charSel.inventory && char.inventory?.equipment && (
                         <div style={{ marginTop: '6px', borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '6px' }}>
                           <div className={styles.visualEditorSubLabel}>Equipment Items</div>
@@ -700,7 +699,7 @@ export default function SnapshotModal() {
                         </div>
                       )}
 
-                      {/* 플레이어 캐릭터 전용: 퀘스트 편집 복구 및 에러 예방 보완 */}
+                      {/* 플레이어 캐릭터 전용: 퀘스트 편집 */}
                       {charSel.quests && char.quests && (
                         <div style={{ marginTop: '6px', borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <div className={styles.visualEditorSubLabel}>Quest State</div>

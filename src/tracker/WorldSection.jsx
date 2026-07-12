@@ -1,3 +1,5 @@
+// src/tracker/WorldSection.jsx
+
 import React, { useRef, useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './WorldSection.module.css';
@@ -98,13 +100,8 @@ export default function WorldSection() {
 
   const handleEventChange = (index, key, value) => {
     const newEvents = [...events];
-    if (typeof newEvents[index] === 'string') {
-      newEvents[index] = { id: `event_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`, name: '', desc: newEvents[index] };
-    }
-
-    const updatedEvt = { ...newEvents[index], [key]: value };
-
-    newEvents[index] = updatedEvt;
+    // 정규화된 이벤트를 기준으로 간결하게 프로퍼티를 변경합니다.
+    newEvents[index] = { ...newEvents[index], [key]: value };
     handleUpdate({ events: newEvents });
   };
 
@@ -223,9 +220,7 @@ export default function WorldSection() {
             {events.length === 0 ? (
               <p className={styles.emptyPlaceholder}>No recorded events.</p>
             ) : (
-              events.map((evt, idx) => {
-                const evtObj = typeof evt === 'string' ? { name: '', desc: evt } : evt;
-
+              events.map((evtObj, idx) => {
                 return (
                   <div key={evtObj.id || idx} className={styles.eventBlock}>
                     <div className={styles.eventHeaderRow}>

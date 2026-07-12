@@ -1,6 +1,5 @@
 // src/tracker/StatusSection.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './StatusSection.module.css';
 import StatusComponent from './StatusComponent';
@@ -8,29 +7,126 @@ import PlayerComponent from './PlayerComponent';
 import CharListEditor from '../editor/CharListEditor';
 import { DEFAULT_STATUS_SCHEMAS, DEFAULT_STATUS, getDefaultCharacters } from '../core/PromptSchema';
 import { LockIcon, GearIcon, ProfileTabIcon, RelationsTabIcon, InventoryTabIcon, QuestsTabIcon } from '../Icons';
-import { AutoGrowingTextArea } from '../utils';
+import { AutoGrowingTextArea, resolveSillyTavernAvatarUrl } from '../utils';
+
+async function ensureCropperLoaded() {
+  if (window.Cropper) return true;
+
+  const paths = [
+    { js: '/libs/cropperjs/cropper.min.js', css: '/libs/cropperjs/cropper.min.css' },
+    { js: '/libs/cropper/cropper.min.js', css: '/libs/cropper/cropper.min.css' },
+    { js: '/libs/cropper/cropper.js', css: '/libs/cropper/cropper.css' }
+  ];
+
+  for (const path of paths) {
+    try {
+      if (!document.querySelector('link[href*="cropper"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = path.css;
+        document.head.appendChild(link);
+      }
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = path.js;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+      if (window.Cropper) {
+        return true;
+      }
+    } catch (e) {
+      // Fallback path attempt
+    }
+  }
+  return false;
+}
+
+const CameraIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
+  </svg>
+);
 
 export default function StatusSection({ onOpenEditor }) {
-  // UI 보존 상태를 불러오기 위해 uiState, updateUiState 추가 구독
-  const { trackerData, updateTrackerData, settings, patchCharacterField, uiState, updateUiState } = useRPG();
+  const { trackerData, updateTrackerData, settings, updateSettings, patchCharacterField, uiState, updateUiState } = useRPG();
+  
+  const fileInputRef = useRef(null);
+  const cropperImgRef = useRef(null);
+  const cropperInstanceRef = useRef(null);
+  
+  const activeUploadIdRef = useRef(null);
+
+  const [showCharList, setShowCharList] = useState(false);
+  const [isCropperLibraryReady, setIsCropperLibraryReady] = useState(!!window.Cropper);
+
+  const [cropModal, setCropModal] = useState({
+    isOpen: false,
+    imageSrc: '',
+    charId: null
+  });
 
   const characters = (trackerData.characters && trackerData.characters.length > 0)
     ? trackerData.characters
     : getDefaultCharacters();
 
-  // 로컬 useState 상태 대신 전역 uiState 바인딩
   const collapsedChars = uiState.collapsedChars || {};
   const activeInlineTabs = uiState.activeInlineTabs || {};
-  const [showCharList, setShowCharList] = useState(false);
 
-  // 캐릭터 배열 전체를 교체할 때 사용되는 내부 도우미 함수
+  useEffect(() => {
+    if (cropModal.isOpen) {
+      if (window.Cropper) {
+        setIsCropperLibraryReady(true);
+      } else {
+        ensureCropperLoaded().then((success) => {
+          setIsCropperLibraryReady(success);
+        });
+      }
+    }
+  }, [cropModal.isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (cropperInstanceRef.current) {
+        cropperInstanceRef.current.destroy();
+        cropperInstanceRef.current = null;
+      }
+    };
+  }, [cropModal.isOpen]);
+
+  useEffect(() => {
+    if (cropModal.isOpen && isCropperLibraryReady) {
+      const timer = setTimeout(() => {
+        initCropperInstance();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [cropModal.isOpen, isCropperLibraryReady]);
+
+  const initCropperInstance = () => {
+    if (cropperImgRef.current && window.Cropper && isCropperLibraryReady) {
+      if (cropperInstanceRef.current) {
+        cropperInstanceRef.current.destroy();
+      }
+      cropperInstanceRef.current = new window.Cropper(cropperImgRef.current, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        responsive: true,
+        restore: false,
+        checkCrossOrigin: false
+      });
+    }
+  };
+
   const handleUpdateCharacters = (nextChars) => {
     if (updateTrackerData) {
       updateTrackerData({ ...trackerData, characters: nextChars });
     }
   };
 
-  // 개별 능력치(Status) 값 정밀 업데이트 핸들러
   const handleValueChange = (charId, statId, newVal) => {
     const char = characters.find(c => c.id === charId);
     if (!char) return;
@@ -42,77 +138,191 @@ export default function StatusSection({ onOpenEditor }) {
       const maxLimit = schemaItem.max || 100;
       finalVal = Math.min(maxLimit, Math.max(minLimit, newVal));
     }
-
-    // status 객체 내부의 특정 능력치 값만 정밀 업데이트 경로로 주입
     patchCharacterField(charId, ['status', statId], finalVal);
   };
 
-  // 접기 상태 토글 시 전역 상태 업데이트 함수 호출 (지정 값이 없으면 기본 접힘 상태)
   const toggleCollapse = (charId) => {
     const currentCollapsed = collapsedChars[charId] !== false;
     updateUiState({
-      collapsedChars: {
-        ...collapsedChars,
-        [charId]: !currentCollapsed
-      }
+      collapsedChars: { ...collapsedChars, [charId]: !currentCollapsed }
     });
   };
 
-  // 다중 서브 탭 변경 시 전역 상태 업데이트 함수 호출
   const handleToggleInlineTab = (charId, tabName) => {
     const charTabs = activeInlineTabs[charId] || {
-      profile: false,
-      relations: false,
-      inventory: false,
-      quests: false
+      profile: false, relations: false, inventory: false, quests: false
     };
     updateUiState({
       activeInlineTabs: {
         ...activeInlineTabs,
-        [charId]: {
-          ...charTabs,
-          [tabName]: !charTabs[tabName]
-        }
+        [charId]: { ...charTabs, [tabName]: !charTabs[tabName] }
       }
     });
   };
 
+  const handleAvatarClick = (charId, avatarUrl) => {
+    const char = characters.find(c => c.id === charId);
+    if (!char) return;
+
+    if (char.syncedCardType === 'Persona') {
+      return;
+    }
+
+    if (char.syncedCardType === 'Card' && char.syncedCardAvatar) {
+      const cropSource = resolveSillyTavernAvatarUrl(char.syncedCardAvatar, 'Card');
+      setCropModal({
+        isOpen: true,
+        imageSrc: cropSource,
+        charId: charId
+      });
+      return;
+    }
+
+    activeUploadIdRef.current = charId;
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    const targetCharId = activeUploadIdRef.current;
+    if (!file || !targetCharId) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCropModal({
+        isOpen: true,
+        imageSrc: event.target.result,
+        charId: targetCharId
+      });
+    };
+    reader.readAsDataURL(file);
+
+    e.target.value = '';
+    activeUploadIdRef.current = null;
+  };
+
+  const handleCropperImageLoad = () => {
+    initCropperInstance();
+  };
+
+  const handleSaveCrop = () => {
+    if (cropperInstanceRef.current && window.Cropper) {
+      const canvas = cropperInstanceRef.current.getCroppedCanvas({
+        width: 128,
+        height: 128,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+
+      if (canvas) {
+        const croppedBase64 = canvas.toDataURL('image/webp', 0.85);
+        
+        const currentCropped = settings.croppedAvatars || {};
+        updateSettings({
+          croppedAvatars: {
+            ...currentCropped,
+            [cropModal.charId]: croppedBase64
+          }
+        });
+
+        patchCharacterField(cropModal.charId, ['avatarUrl'], croppedBase64);
+      }
+    } else {
+      const img = cropperImgRef.current;
+      if (img) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const size = Math.min(img.naturalWidth, img.naturalHeight);
+          const sx = (img.naturalWidth - size) / 2;
+          const sy = (img.naturalHeight - size) / 2;
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, 128, 128);
+          const croppedBase64 = canvas.toDataURL('image/webp', 0.85);
+          
+          const currentCropped = settings.croppedAvatars || {};
+          updateSettings({
+            croppedAvatars: {
+              ...currentCropped,
+              [cropModal.charId]: croppedBase64
+            }
+          });
+
+          patchCharacterField(cropModal.charId, ['avatarUrl'], croppedBase64);
+        }
+      }
+    }
+    setCropModal({ isOpen: false, imageSrc: '', charId: null });
+  };
+
+  const handleResetToOriginalImage = () => {
+    const charId = cropModal.charId;
+    const char = characters.find(c => c.id === charId);
+    if (!char) return;
+
+    const nextCropped = { ...(settings.croppedAvatars || {}) };
+    delete nextCropped[charId];
+    updateSettings({ croppedAvatars: nextCropped });
+
+    const context = window.SillyTavern?.getContext?.();
+    let originalUrl = null;
+
+    if (char.syncedCardType === 'Persona') {
+      const userAvatarFile = char.syncedCardAvatar || context?.user_avatar || window.user_avatar || 'default.png';
+      originalUrl = resolveSillyTavernAvatarUrl(userAvatarFile, 'Persona');
+    } else if (char.syncedCardType === 'Card' && char.syncedCardAvatar) {
+      originalUrl = resolveSillyTavernAvatarUrl(char.syncedCardAvatar, 'Card');
+    } else if (char.id === 'char_user' || char.activePlayer) {
+      const userAvatarFile = context?.user_avatar || window.user_avatar || 'default.png';
+      originalUrl = resolveSillyTavernAvatarUrl(userAvatarFile, 'Persona');
+    }
+
+    if (originalUrl) {
+      patchCharacterField(charId, ['avatarUrl'], originalUrl);
+      alert("Profile photo has been reset to the original card image.");
+    }
+    setCropModal({ isOpen: false, imageSrc: '', charId: null });
+  };
+
+  const targetCharCard = characters.find(c => c.id === cropModal.charId);
+
   return (
     <div className={styles.container}>
-      {/* 캐릭터 목록 편집 및 일괄 추가 영역 */}
       <div className={styles.topActionBar}>
         <button
           className={styles.topActionBtn}
           onClick={() => {
-            const newChar = {
-              id: `char_${Date.now()}`,
-              name: "New Character",
-              activePlayer: false,
-              activeInjection: true,
-              statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
-              status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
-              relations: {}
-            };
-            let nextChars;
-            if (characters.length === 1 && characters[0].id === 'char_user' && characters[0].name === 'New') {
-              nextChars = [newChar];
-            } else {
-              nextChars = [...characters, newChar];
-            }
+            // Clone standard template character to ensure complete schema support
+            const newChar = JSON.parse(JSON.stringify(getDefaultCharacters()[0]));
+            newChar.id = `char_${Date.now()}`;
+            newChar.name = "New Character";
+            newChar.activePlayer = false;
+            newChar.activeInjection = true;
+            
+            let nextChars = (characters.length === 1 && characters[0].id === 'char_user' && characters[0].name === 'New')
+              ? [newChar]
+              : [...characters, newChar];
             handleUpdateCharacters(nextChars);
           }}
         >
           + Add Character
         </button>
-        <button
-          className={styles.topActionBtn}
-          onClick={() => setShowCharList(true)}
-        >
+        <button className={styles.topActionBtn} onClick={() => setShowCharList(true)}>
           Character List
         </button>
       </div>
 
-      {/* 캐릭터 카드 목록 루프 */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
       {characters.map((char) => {
         const schema = (char.statusSchema || []).filter(s => s.type !== 'relation_schema');
         const dynamicStatus = char.status || {};
@@ -121,7 +331,6 @@ export default function StatusSection({ onOpenEditor }) {
         const integerFields = schema.filter(item => item.type === 'integer');
         const textFields = schema.filter(item => item.type === 'text');
 
-        // 상태 기록이 등록되지 않았거나 값이 없으면 기본값을 접힘(true) 상태로 설정
         const isCollapsed = collapsedChars[char.id] !== false;
         const charTabs = activeInlineTabs[char.id] || {};
         const isPlayerActive = char.activePlayer === true;
@@ -129,10 +338,46 @@ export default function StatusSection({ onOpenEditor }) {
 
         const hasActiveTab = Object.values(charTabs).some(v => v === true);
 
+        let liveName = char.name;
+        let liveAvatarUrl = char.avatarUrl;
+
+        const globalCrop = settings.croppedAvatars?.[char.id];
+        if (globalCrop) {
+          liveAvatarUrl = globalCrop;
+        }
+
+        const isCropped = liveAvatarUrl && liveAvatarUrl.startsWith('data:');
+
+        const context = window.SillyTavern?.getContext?.();
+        if (context) {
+          if (char.syncedCardType === 'Card' && char.syncedCardAvatar) {
+            const matched = context.characters?.find(stChar => stChar.avatar === char.syncedCardAvatar);
+            if (matched) {
+              liveName = matched.name;
+              if (!isCropped) {
+                liveAvatarUrl = resolveSillyTavernAvatarUrl(matched.avatar, 'Card');
+              }
+            }
+          } else if (char.syncedCardType === 'Persona') {
+            liveName = context.name1 || window.name1 || char.name;
+            if (!isCropped) {
+              const userAvatarFile = context.user_avatar || window.user_avatar || 'default.png';
+              liveAvatarUrl = resolveSillyTavernAvatarUrl(userAvatarFile, 'Persona');
+            }
+          }
+        }
+
+        const hasValidAvatar = liveAvatarUrl && 
+                               typeof liveAvatarUrl === 'string' && 
+                               liveAvatarUrl.trim() !== '' && 
+                               liveAvatarUrl !== 'null' && 
+                               liveAvatarUrl !== 'undefined';
+
+        const isPersona = char.syncedCardType === 'Persona';
+
         return (
           <div key={char.id} className={styles.charBlock}>
 
-            {/* 카드 상단 제어 바 */}
             <header className={styles.blockHeader}>
               <div className={styles.headerLeft} onClick={() => toggleCollapse(char.id)}>
                 <button
@@ -141,7 +386,7 @@ export default function StatusSection({ onOpenEditor }) {
                 >
                   ▶
                 </button>
-                <span className={styles.charName}>{char.name}</span>
+                <span className={styles.charName}>{liveName}</span>
               </div>
 
               <div className={styles.headerSwitches}>
@@ -186,7 +431,6 @@ export default function StatusSection({ onOpenEditor }) {
             {!isCollapsed && (
               <div className={styles.dashboardContainer}>
 
-                {/* 탭 다중 전개용 내비게이션 그리드 */}
                 <div className={styles.uniformControlGrid}>
                   <button
                     type="button"
@@ -225,23 +469,25 @@ export default function StatusSection({ onOpenEditor }) {
                       >
                         <QuestsTabIcon />
                       </button>
-
-                      <div className={styles.avatarGridCell}>
-                        {char.avatarUrl ? (
-                          <img src={char.avatarUrl} alt={char.name} className={styles.avatarGridImage} />
-                        ) : (
-                          <div className={styles.avatarGridFallback}>
-                            {char.name ? char.name.charAt(0).toUpperCase() : '?'}
-                          </div>
-                        )}
-                      </div>
                     </>
                   )}
+
+                  <div
+                    className={`${styles.avatarContainer} ${isPersona ? styles.readOnlyAvatar : ''}`}
+                    onClick={() => handleAvatarClick(char.id, liveAvatarUrl)}
+                    title={isPersona ? "" : "Change Photo / Crop"}
+                  >
+                    {hasValidAvatar ? (
+                      <img src={liveAvatarUrl} alt={liveName} className={styles.avatarImg} />
+                    ) : (
+                      <div className={styles.avatarFallback}>
+                        <CameraIcon />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* 자식 서브 탭 뷰 */}
                 <div className={`${styles.statusComponentContainer} ${hasActiveTab ? styles.tabActive : ''}`}>
-                  {/* StatusComponent는 Profile과 Relations 담당 */}
                   <StatusComponent
                     char={char}
                     characters={characters}
@@ -249,7 +495,6 @@ export default function StatusSection({ onOpenEditor }) {
                     onOpenEditor={(tab) => onOpenEditor && onOpenEditor(char.id, tab)}
                   />
 
-                  {/* PlayerComponent는 Inventory와 Quests 담당 */}
                   {isPlayerActive && (
                     <PlayerComponent
                       char={char}
@@ -259,7 +504,6 @@ export default function StatusSection({ onOpenEditor }) {
                   )}
                 </div>
 
-                {/* 1. 소모성 & 게이지형 스탯 필드 (HP, Fatigue 등) */}
                 {gaugeFields.length > 0 && (
                   <div className={styles.gaugeGrid}>
                     {gaugeFields.map((item) => {
@@ -315,7 +559,6 @@ export default function StatusSection({ onOpenEditor }) {
                   </div>
                 )}
 
-                {/* 2. 정수형 변수 스탯 필드 (Lv, 스탯 등) */}
                 {integerFields.length > 0 && (
                   <div className={styles.integerRowGrid}>
                     {integerFields.map((item) => {
@@ -328,11 +571,11 @@ export default function StatusSection({ onOpenEditor }) {
                             <LockIcon
                               isLocked={item.isLocked}
                               onClick={() => {
-                                const newSchema = (char.statusSchema || []).map(s =>
-                                  s.id === item.id ? { ...s, isLocked: !s.isLocked } : s
-                                );
-                                patchCharacterField(char.id, ['statusSchema'], newSchema);
-                              }}
+                                  const newSchema = (char.statusSchema || []).map(s =>
+                                    s.id === item.id ? { ...s, isLocked: !s.isLocked } : s
+                                  );
+                                  patchCharacterField(char.id, ['statusSchema'], newSchema);
+                                }}
                               className={`${styles.lockIcon} ${item.isLocked ? styles.lockIconActive : ''}`}
                             />
                             <span className={styles.integerFieldName} title={item.name}>{item.name || 'Unnamed'}</span>
@@ -340,7 +583,7 @@ export default function StatusSection({ onOpenEditor }) {
                           <div className={styles.integerFieldControlGroup}>
                             <button
                               type="button"
-                              onClick={(e) => { e.stopPropagation(); handleValueChange(char.id, item.id, Number(currentValue) - 1); }}
+                              onClick={(e) => { e.stopPropagation(); handleValueChange(char.id, Number(currentValue) - 1); }}
                               className={styles.integerRowBtn}
                             >
                               -
@@ -353,7 +596,7 @@ export default function StatusSection({ onOpenEditor }) {
                             />
                             <button
                               type="button"
-                              onClick={(e) => { e.stopPropagation(); handleValueChange(char.id, item.id, Number(currentValue) + 1); }}
+                              onClick={(e) => { e.stopPropagation(); handleValueChange(char.id, Number(currentValue) + 1); }}
                               className={styles.integerRowBtn}
                             >
                               +
@@ -365,7 +608,6 @@ export default function StatusSection({ onOpenEditor }) {
                   </div>
                 )}
 
-                {/* 3. 단순 텍스트 서술형 스탯 필드 (Condition 등) */}
                 {textFields.length > 0 && (
                   <div className={styles.textStack}>
                     {textFields.map((item) => {
@@ -406,7 +648,59 @@ export default function StatusSection({ onOpenEditor }) {
         );
       })}
 
-      {/* 캐릭터 목록 에디터 모달 오버레이 */}
+      {cropModal.isOpen && (
+        <div className={styles.cropOverlay}>
+          <div className={styles.cropModal}>
+            <header className={styles.cropHeader}>
+              <span className={styles.cropTitle}>Set the crop position of the avatar image</span>
+              <button 
+                type="button" 
+                className={styles.cropCloseBtn} 
+                onClick={() => setCropModal({ isOpen: false, imageSrc: '', charId: null })}
+              >
+                ×
+              </button>
+            </header>
+            <div className={styles.cropBody}>
+              <div className={styles.cropperCanvasWrapper}>
+                <img 
+                  ref={cropperImgRef} 
+                  src={cropModal.imageSrc} 
+                  onLoad={handleCropperImageLoad}
+                  alt="Source" 
+                  style={{ maxWidth: '100%', maxHeight: '420px', display: 'block' }} 
+                />
+              </div>
+            </div>
+            <footer className={styles.cropFooter}>
+              {(targetCharCard?.syncedCardAvatar || targetCharCard?.id === 'char_user' || targetCharCard?.activePlayer) && (
+                <button 
+                  type="button" 
+                  className={styles.cropResetBtn} 
+                  onClick={handleResetToOriginalImage}
+                >
+                  Reset to Original Card
+                </button>
+              )}
+              <button 
+                type="button" 
+                className={styles.cropCancelBtn} 
+                onClick={() => setCropModal({ isOpen: false, imageSrc: '', charId: null })}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                className={styles.cropSaveBtn} 
+                onClick={handleSaveCrop}
+              >
+                Save Crop
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
       {showCharList && (
         <CharListEditor
           onClose={() => setShowCharList(false)}

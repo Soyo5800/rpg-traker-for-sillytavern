@@ -7,6 +7,20 @@ import { applyLLMPatch } from './JSONTracker_Patcher.js';
 const DEFAULT_MAX_KEEP = 4;
 
 /**
+ * Remove large Base64 image data from the backup object to prevent chat file size bloat
+ */
+function stripBase64Avatars(data) {
+    if (data && Array.isArray(data.characters)) {
+        data.characters.forEach(char => {
+            if (typeof char.avatarUrl === 'string' && char.avatarUrl.startsWith('data:')) {
+                delete char.avatarUrl;
+            }
+        });
+    }
+    return data;
+}
+
+/**
  * Merge UI state changes directly into active tracker schemas
  */
 export function defensiveMerge(masterSchema, backupData) {
@@ -85,7 +99,10 @@ export function backupToMessage(chat, index, trackerData, updateMessageFn, saveC
     if (!Array.isArray(chat) || index < 0 || !chat[index]) return;
 
     const targetMessage = chat[index];
-    const strippedData = JSON.parse(JSON.stringify(trackerData));
+    
+    // Deep clone and clean up Base64 values to avoid saving heavy image payloads
+    let strippedData = JSON.parse(JSON.stringify(trackerData));
+    strippedData = stripBase64Avatars(strippedData);
 
     let swipeId = targetMessage.swipe_id || 0;
     if (targetMessage.swipes && targetMessage.swipes.length > 0 && typeof targetMessage.mes === 'string') {

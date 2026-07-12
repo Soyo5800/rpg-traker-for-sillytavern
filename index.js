@@ -5,7 +5,7 @@ import { establishBridgeConnection } from "./src/core/ExtensionBridge.js";
 import { registerLifecycleEvents } from "./src/core/ExtensionLifecycle.js";
 import { startChatObserver, registerChatEvents, triggerObserverNow } from "./src/core/ExtensionObserver.js";
 
-// 렌더러 이벤트 리스너 임포트
+// Import renderer event listeners
 import { registerSnapshotClickEvent } from "./src/messagetracker/SnapshotRenderer.js";
 import { registerDeltaLogClickEvent } from "./src/tracker/DeltaLogRenderer.js";
 
@@ -24,7 +24,7 @@ async function initReactApp() {
 }
 
 jQuery(async () => {
-    // 1. ST UI 세팅 영역 주입
+    // 1. Inject ST UI settings area
     try {
         const extensionsettingsHtml = await $.get(`${extensionFolderPath}/extension-settings.html`);
         $("#extensions_settings2").append(extensionsettingsHtml);
@@ -32,7 +32,24 @@ jQuery(async () => {
             const isChecked = Boolean($(event.target).prop("checked"));
             extension_settings[extensionName] = extension_settings[extensionName] || {};
             extension_settings[extensionName].enabled = isChecked;
-            if (!isChecked) backupSettingsToLocalStorage(extensionName);
+            
+            if (!isChecked) {
+                backupSettingsToLocalStorage(extensionName);
+                
+                // 전역 설정 크기 증가 방지를 위해 비활성화 시 세션 싱크 및 자른 아바타 캐시 완전히 초기화
+                if (extension_settings[extensionName].characterSyncs) {
+                    delete extension_settings[extensionName].characterSyncs;
+                }
+                if (extension_settings[extensionName].croppedAvatars) {
+                    delete extension_settings[extensionName].croppedAvatars;
+                }
+                
+                $('#rpg-snapshot-styles').remove();
+                $('#rpg-delta-log-styles').remove();
+                $('.rpg-delta-log-container').remove();
+                $('.rpg-snapshot-container').remove();
+            }
+            
             if (window.RPGBridge && typeof window.RPGBridge.syncSettings === 'function') {
                 window.RPGBridge.syncSettings(extension_settings[extensionName]);
             }
@@ -42,25 +59,25 @@ jQuery(async () => {
         console.error("[RPG Tracker] Failed to load settings template", err);
     }
 
-    // 2. 확장 초기화 및 부팅
+    // 2. Initialize and boot extension
     await loadSettings(extensionName);
     establishBridgeConnection(extensionName);
     await initReactApp();
 
-    // 3. UI 클릭 이벤트 일괄 위임 등록
+    // 3. Register UI click event delegations
     registerSnapshotClickEvent();
     registerDeltaLogClickEvent();
 
-    // 4. 시스템/채팅 이벤트 모듈 등록
+    // 4. Register system and chat event modules
     registerLifecycleEvents(extensionName);
     registerChatEvents();
     startChatObserver(extensionName);
 
-    // 초기 화면 렌더링 트리거
+    // Trigger initial render
     setTimeout(() => triggerObserverNow(), 500);
 });
 
-// 파일 업로드(드롭) 방어막
+// Prevent file drag and drop anomalies
 window.addEventListener('drop', function (e) {
     const rxRoot = document.getElementById('my-rpg-react-root');
     if (rxRoot && rxRoot.contains(e.target)) return;

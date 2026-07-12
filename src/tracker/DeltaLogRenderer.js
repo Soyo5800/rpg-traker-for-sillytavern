@@ -367,9 +367,8 @@ export function buildDeltaLogHtml(delta) {
             if (updates.weather) items.push(`<li><span class="rpg-delta-key">Weather:</span> <span class="rpg-delta-val">${updates.weather}</span></li>`);
             if (Array.isArray(updates.events)) {
                 updates.events.forEach((e, idx) => {
-                    if (typeof e === 'string') {
-                        items.push(`<li><span class="rpg-delta-key">Event ${idx + 1}:</span> <span class="rpg-delta-val">${e}</span></li>`);
-                    } else if (e && typeof e === 'object') {
+                    // 이벤트 요소 정규화가 완료되었으므로 타입 분기 없이 안전하게 객체로 접근합니다.
+                    if (e && typeof e === 'object') {
                         const nameStr = e.name ? `<strong>${e.name}</strong>` : '';
                         const descStr = e.desc || e.description || '';
                         const valStr = [nameStr, descStr].filter(Boolean).join(': ');

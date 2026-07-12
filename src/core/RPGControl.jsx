@@ -1,5 +1,4 @@
 // src/core/RPGControl.jsx
-
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { defensiveMerge, reconstructTurnState } from './JSONTracker';
 import { getDefaultCharacters, DEFAULT_GUIDE_PROMPTS, getInitialTrackerData } from './PromptSchema';
@@ -20,6 +19,7 @@ const DEFAULT_SETTINGS = {
   showInventory: true,
   showQuests: true,
   presets: [],
+  characterSyncs: {}, // 채팅방 ID별 캐릭터 싱크 매핑 정보 영구 저장
   customColors: {
     bg: '#1a1a2e',
     accent: '#4a7ba7',
@@ -37,6 +37,15 @@ export function RPGControlProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [trackerData, setTrackerData] = useState(getDefaultTrackerData);
   const [isChatConnected, setIsChatConnected] = useState(false);
+
+  // 실시간 최신 설정 상태를 캡처하여 클로저 결함을 방지하는 참조 객체
+  const settingsRef = useRef(settings);
+  useEffect(() => {
+    settingsRef.current = settings;
+    if (window.RPGBridge) {
+      window.RPGBridge.latestSettings = settings;
+    }
+  }, [settings]);
 
   // 스냅샷 모달
   const [snapshotModalData, setSnapshotModalData] = useState({ isOpen: false, mesId: null, historicalData: null });
@@ -109,6 +118,9 @@ export function RPGControlProvider({ children }) {
   const updateSettings = useCallback((newSettings) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
+      if (window.RPGBridge) {
+        window.RPGBridge.latestSettings = updated;
+      }
       saveSettingsToST(updated);
       return updated;
     });
@@ -158,6 +170,65 @@ export function RPGControlProvider({ children }) {
       return updatedData;
     });
   }, [saveTrackerDataToST]);
+
+  // 캐릭터 동기화 이벤트를 전역 설정에 즉시 및 직접 보존 처리하는 제어기 (안정적인 배열 순서 색인으로 매핑)
+  const syncCharacterToCard = useCallback((charId, target) => {
+    const context = window.SillyTavern?.getContext?.() || {};
+    const chatId = context.chatId;
+    if (!chatId) return;
+
+    setTrackerData(prev => {
+      const charIndex = prev.characters.findIndex(c => c.id === charId);
+      if (charIndex === -1) return prev;
+
+      // 1. ST 백엔드 전역 설정 및 동기식 브릿지 캐시에 즉시 보존
+      setSettings(prevSettings => {
+        const nextSyncs = { ...(prevSettings.characterSyncs || {}) };
+        nextSyncs[chatId] = { ...(nextSyncs[chatId] || {}) };
+
+        if (!target || target.type === 'Unsync') {
+          delete nextSyncs[chatId][charIndex];
+          if (Object.keys(nextSyncs[chatId]).length === 0) {
+            delete nextSyncs[chatId];
+          }
+        } else {
+          nextSyncs[chatId][charIndex] = {
+            syncedCardAvatar: target.avatarFile,
+            syncedCardType: target.type,
+            name: target.name,
+            avatarUrl: target.avatarUrl
+          };
+        }
+
+        const updated = { ...prevSettings, characterSyncs: nextSyncs };
+        if (window.RPGBridge) {
+          window.RPGBridge.latestSettings = updated;
+        }
+        saveSettingsToST(updated);
+        return updated;
+      });
+
+      // 2. 현재 활성 메모리 세션의 타겟 상태에도 즉시 영구화 처리
+      const updatedChars = prev.characters.map((c, idx) => {
+        if (idx === charIndex) {
+          if (!target || target.type === 'Unsync') {
+            return { ...c, syncedCardAvatar: null, syncedCardType: null };
+          }
+          return {
+            ...c,
+            name: target.name,
+            avatarUrl: target.avatarUrl,
+            syncedCardAvatar: target.avatarFile,
+            syncedCardType: target.type
+          };
+        }
+        return c;
+      });
+      const updatedData = { ...prev, characters: updatedChars };
+      saveTrackerDataToST(updatedData);
+      return updatedData;
+    });
+  }, [saveSettingsToST, saveTrackerDataToST]);
 
   const revertToOriginalTurnState = useCallback(async () => {
     if (!window.RPGBridge) return;
@@ -217,7 +288,26 @@ export function RPGControlProvider({ children }) {
               globalDefinitions: prev.globalDefinitions,
               addons: prev.addons
             };
-            return defensiveMerge(cleanBase, stChatData);
+            const merged = defensiveMerge(cleanBase, stChatData);
+            
+            // 세션 데이터 복원 시 지연 없는 브릿지 동기화 설정 오버레이 적용
+            const context = window.SillyTavern?.getContext?.() || {};
+            const chatId = context.chatId;
+            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+              || settingsRef.current.characterSyncs?.[chatId];
+
+            if (chatId && savedSyncs && Array.isArray(merged.characters)) {
+              merged.characters.forEach((c, index) => {
+                const saved = savedSyncs[index];
+                if (saved) {
+                  c.syncedCardAvatar = saved.syncedCardAvatar;
+                  c.syncedCardType = saved.syncedCardType;
+                  c.name = saved.name;
+                  c.avatarUrl = saved.avatarUrl;
+                }
+              });
+            }
+            return merged;
           });
         }
       },
@@ -238,7 +328,25 @@ export function RPGControlProvider({ children }) {
               globalDefinitions: prev.globalDefinitions,
               addons: prev.addons
             };
-            return recovered ? defensiveMerge(cleanBase, recovered) : cleanBase;
+            const merged = recovered ? defensiveMerge(cleanBase, recovered) : cleanBase;
+
+            const context = window.SillyTavern?.getContext?.() || {};
+            const chatId = context.chatId;
+            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+              || settingsRef.current.characterSyncs?.[chatId];
+
+            if (chatId && savedSyncs && Array.isArray(merged.characters)) {
+              merged.characters.forEach((c, index) => {
+                const saved = savedSyncs[index];
+                if (saved) {
+                  c.syncedCardAvatar = saved.syncedCardAvatar;
+                  c.syncedCardType = saved.syncedCardType;
+                  c.name = saved.name;
+                  c.avatarUrl = saved.avatarUrl;
+                }
+              });
+            }
+            return merged;
           });
         }
       },
@@ -252,11 +360,30 @@ export function RPGControlProvider({ children }) {
         }
       },
       resetToDefault: () => {
-        setTrackerData(getDefaultTrackerData());
+        setTrackerData(() => {
+          const defaultData = getDefaultTrackerData();
+          const context = window.SillyTavern?.getContext?.() || {};
+          const chatId = context.chatId;
+          const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+            || settingsRef.current.characterSyncs?.[chatId];
+
+          if (chatId && savedSyncs && Array.isArray(defaultData.characters)) {
+            defaultData.characters.forEach((c, index) => {
+              const saved = savedSyncs[index];
+              if (saved) {
+                c.syncedCardAvatar = saved.syncedCardAvatar;
+                c.syncedCardType = saved.syncedCardType;
+                c.name = saved.name;
+                c.avatarUrl = saved.avatarUrl;
+              }
+            });
+          }
+          return defaultData;
+        });
       },
       //스냅샷
-      openSnapshotModal: (mesId, histData, existingPayload = null) => {
-        setSnapshotModalData({ isOpen: true, mesId, historicalData: histData, existingPayload });
+      openSnapshotModal: (mesId, historicalData, existingPayload = null) => {
+        setSnapshotModalData({ isOpen: true, mesId, historicalData, existingPayload });
       },
       closeSnapshotModal: () => {
         setSnapshotModalData({ isOpen: false, mesId: null, historicalData: null, existingPayload: null });
@@ -296,6 +423,7 @@ export function RPGControlProvider({ children }) {
     patchCharacterField,
     deleteCharacterField,
     patchWorldField,
+    syncCharacterToCard, // UI 컴포넌트에서 직접 호출 가능한 동기화 API 바인딩
     revertToOriginalTurnState
   };
 

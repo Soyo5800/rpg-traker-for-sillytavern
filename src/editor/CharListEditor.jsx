@@ -1,3 +1,4 @@
+// src/editor/CharListEditor.jsx
 import React, { useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './CharListEditor.module.css';
@@ -110,15 +111,12 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   const handleAddCharacter = () => {
     const existingIds = characters.map(c => c.id);
     const newId = getNextAvailableId(existingIds);
-    const newChar = {
-      id: newId,
-      name: "New Character",
-      activePlayer: false,
-      activeInjection: true,
-      statusSchema: JSON.parse(JSON.stringify(DEFAULT_STATUS_SCHEMAS)),
-      status: JSON.parse(JSON.stringify(DEFAULT_STATUS)),
-      relations: {}
-    };
+    // Clone standard template character to ensure complete schema support
+    const newChar = JSON.parse(JSON.stringify(getDefaultCharacters()[0]));
+    newChar.id = newId;
+    newChar.name = "New Character";
+    newChar.activePlayer = false;
+    newChar.activeInjection = true;
 
     let newChars;
     if (characters.length === 1 && characters[0].id === 'char_user' && characters[0].name === 'New') {
