@@ -1,11 +1,11 @@
 // src/core/ExtensionBridge.js
 import { getContext, extension_settings, writeExtensionField } from "../../../../../extensions.js";
-import { saveSettingsDebounced, saveChat, saveChatConditional, updateMessageBlock, getRequestHeaders, generateQuietPrompt, getThumbnailUrl, user_avatar } from "../../../../../../script.js";
+import { saveSettingsDebounced, saveChat, saveChatConditional, updateMessageBlock, getRequestHeaders, generateQuietPrompt, getThumbnailUrl, user_avatar, setExtensionPrompt, extension_prompt_types, extension_prompt_roles } from "../../../../../../script.js";
 import { SlashCommandParser } from "../../../../../slash-commands/SlashCommandParser.js";
 import { backupToMessage, rehydrateFromHistory, rehydrateFromHistoryAsync, applyLLMPatch, extractNormalizedPatch } from "./JSONTracker.js";
 import { parseResponse } from "./ResponseParser.js";
-import { buildDefinitionPromptWrapper, buildStatusPromptWrapper } from "./ActivePrompt.js";
-import { DEFAULT_PROMPT_HEADER_SEP, DEFAULT_PROMPT_FOOTER_SEP } from "./PromptSchema.js";
+import { buildDefinitionPromptWrapper, getDynamicSchemaExample, buildStaticDefinitionsPrompt, buildDynamicValuesPrompt, buildAddonSection } from "./ActivePrompt.js";
+import { DEFAULT_PROMPT_HEADER_SEP, DEFAULT_PROMPT_FOOTER_SEP, DEFAULT_READONLY_CONTEXT_HEADER } from "./PromptSchema.js";
 import { setDeltaLog } from "../tracker/DeltaLogRenderer.js";
 
 window.SillyTavern = {
@@ -22,17 +22,11 @@ window.SillyTavern = {
     }
 };
 
+// Resolves SillyTavern avatar filenames to URLs, returning null for default/unsynced files
 function resolveSillyTavernAvatarUrl(avatarFile, type = 'Card') {
-    if (!avatarFile || typeof avatarFile !== 'string') return '/img/user.png';
+    if (!avatarFile || typeof avatarFile !== 'string') return null;
     if (avatarFile.startsWith('http://') || avatarFile.startsWith('https://') || avatarFile.startsWith('data:')) {
         return avatarFile;
-    }
-
-    if (type === 'Card' && typeof window.getAvatarPath === 'function') {
-        const resolved = window.getAvatarPath(avatarFile);
-        if (resolved && (resolved.startsWith('http') || resolved.startsWith('/') || resolved.startsWith('.'))) {
-            return resolved;
-        }
     }
 
     let filename = String(avatarFile);
@@ -40,20 +34,36 @@ function resolveSillyTavernAvatarUrl(avatarFile, type = 'Card') {
         filename = filename.split('/').pop();
     }
 
-    if (type === 'Persona') {
-        try { filename = decodeURIComponent(filename); } catch (e) {}
-        const lower = filename.toLowerCase();
-        if (lower === 'default.png' || lower === 'ghost.png' || lower === 'user.png' || lower === 'system.png' || lower === 'default-user' || lower === 'default') {
-            return '/img/user.png';
-        }
+    try { filename = decodeURIComponent(filename); } catch (e) { }
 
+    const lower = filename.toLowerCase();
+    if (
+        lower === 'default.png' || lower === 'ghost.png' || lower === 'user.png' ||
+        lower === 'system.png' || lower === 'default-user' || lower === 'default' ||
+        lower === 'user-default.png' || lower === 'user-default' || lower === 'none' ||
+        lower === ''
+    ) {
+        return null;
+    }
+
+    if (type === 'Card') {
+        if (typeof window.getAvatarPath === 'function') {
+            const resolved = window.getAvatarPath(avatarFile);
+            if (resolved && (resolved.startsWith('http') || resolved.startsWith('/') || resolved.startsWith('.'))) {
+                return resolved;
+            }
+        }
+        return `/characters/${encodeURIComponent(filename)}`;
+    }
+
+    if (type === 'Persona') {
         try {
             if (typeof getThumbnailUrl === 'function') {
                 const url = getThumbnailUrl('persona', filename) || getThumbnailUrl('avatar', filename);
                 if (url) return url;
             }
         } catch (e) {
-            console.warn("[RPG Tracker] Native getThumbnailUrl call failed, falling back to static path resolution.", e);
+            console.warn("[RPG Tracker] Native getThumbnailUrl call failed:", e);
         }
 
         if (!/\.[a-zA-Z0-9]{2,5}$/.test(filename)) {
@@ -62,8 +72,7 @@ function resolveSillyTavernAvatarUrl(avatarFile, type = 'Card') {
         return `/api/images/avatars/${encodeURIComponent(filename)}`;
     }
 
-    const encoded = encodeURIComponent(filename);
-    return `/characters/${encoded}`;
+    return null;
 }
 
 export function safeUpdateMessageBlock(index, messageObject) {
@@ -82,14 +91,84 @@ export function safeUpdateMessageBlock(index, messageObject) {
 }
 
 export function establishBridgeConnection(extensionName) {
+    async function executeQuietPromptWithModelOverride(prompt, customModel, sendChat = true, clearExtensionPrompt = true) {
+        globalThis.rpgTracker_isQuietUpdating = true;
+        if (window.RPGBridge) {
+            window.RPGBridge.isQuietUpdating = true;
+        }
+
+        const settings = window.RPGBridge?.latestSettings || extension_settings[extensionName] || {};
+        const shouldUseCustom = settings.useCustomModel && typeof customModel === 'string' && customModel.trim() !== '';
+
+        if (clearExtensionPrompt) {
+            if (extension_settings.extension_prompts) {
+                delete extension_settings.extension_prompts[`${extensionName}_def`];
+                delete extension_settings.extension_prompts[`${extensionName}_status`];
+            }
+            if (typeof setExtensionPrompt === 'function' && typeof extension_prompt_types !== 'undefined') {
+                try {
+                    setExtensionPrompt(`${extensionName}_def`, '', extension_prompt_types.IN_PROMPT, 0, false);
+                } catch (e) {
+                    console.warn("[RPG Tracker] Clearing active extension prompt failed:", e);
+                }
+            }
+        }
+
+        const targetModel = customModel ? customModel.trim() : null;
+
+        try {
+            if (shouldUseCustom && targetModel) {
+                return await generateQuietPrompt(prompt, sendChat, false, targetModel);
+            } else {
+                return await generateQuietPrompt(prompt, sendChat, false);
+            }
+        } finally {
+            globalThis.rpgTracker_isQuietUpdating = false;
+            if (window.RPGBridge) {
+                window.RPGBridge.isQuietUpdating = false;
+            }
+
+            restoreExtensionPromptForCurrentMode(extensionName);
+        }
+    }
+
+    function restoreExtensionPromptForCurrentMode(extName) {
+        if (typeof setExtensionPrompt !== 'function' || typeof extension_prompt_types === 'undefined') return;
+
+        const currentSettings = extension_settings[extName] || {};
+        const mode = currentSettings.updateMode || 'merged';
+        const trackerData = window.RPGBridge?.currentTrackerData;
+
+        if (!currentSettings.enabled || mode === 'isolated' || !trackerData) {
+            setExtensionPrompt(`${extName}_def`, '', extension_prompt_types.IN_PROMPT, 0, false);
+            return;
+        }
+
+        if (mode === 'separated') {
+            const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
+            const statusPrompt = buildDynamicValuesPrompt(trackerData);
+            const readOnlyHeader = trackerData.systemPrompt_readonly !== undefined ? trackerData.systemPrompt_readonly : DEFAULT_READONLY_CONTEXT_HEADER;
+            const addonSection = buildAddonSection(trackerData);
+            const readOnlyPrompt = `${readOnlyHeader}\n\n${statusPrompt}\n${staticDefs}\n${addonSection}`;
+
+            setExtensionPrompt(`${extName}_def`, readOnlyPrompt, extension_prompt_types.IN_CHAT, 0, false, extension_prompt_roles.SYSTEM || 0);
+        } else if (mode === 'merged') {
+            const header = trackerData.systemPromptHeader_merged !== undefined ? trackerData.systemPromptHeader_merged : DEFAULT_PROMPT_HEADER_SEP;
+            const footer = trackerData.systemPromptFooter_merged !== undefined ? trackerData.systemPromptFooter_merged : DEFAULT_PROMPT_FOOTER_SEP;
+            const finalPrompt = buildDefinitionPromptWrapper(trackerData, header, footer);
+
+            setExtensionPrompt(`${extName}_def`, finalPrompt, extension_prompt_types.IN_PROMPT, 0, false, extension_prompt_roles.SYSTEM || 0);
+        }
+    }
+
     const connectionInterval = setInterval(() => {
         if (window.RPGBridge && typeof window.RPGBridge.syncSettings === 'function') {
             clearInterval(connectionInterval);
 
-            // React 비동기 렌더링 루프 실행 전 최신 세팅 정보를 동기식으로 캐싱 보관하기 위한 전역 프로퍼티 선언
             window.RPGBridge.latestSettings = extension_settings[extensionName] || null;
+            window.RPGBridge.isQuietUpdating = false;
+            window.RPGBridge.extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
-            // Expose native writeExtensionField API to window.RPGBridge
             window.RPGBridge.writeExtensionFieldNatively = async (characterId, key, value) => {
                 if (typeof writeExtensionField === 'function') {
                     try {
@@ -104,7 +183,6 @@ export function establishBridgeConnection(extensionName) {
                 return false;
             };
 
-            // React 비동기 렌더사이클 지연을 방지하기 위해 실리터번 메모리 내부의 세팅 값을 직접 반환하는 동기화용 API
             window.RPGBridge.getSTSettingsCharacterSyncs = (chatId) => {
                 if (!chatId) return null;
                 const targetSrc = window.RPGBridge.latestSettings || extension_settings[extensionName];
@@ -138,6 +216,105 @@ export function establishBridgeConnection(extensionName) {
                 return null;
             };
 
+            window.RPGBridge.getAvailableModels = () => {
+                try {
+                    const context = getContext();
+                    const mainApi = ($('#main_api').val() || window.main_api || context?.main_api || '').toLowerCase();
+
+                    let activeSource = '';
+                    let $container = null;
+
+                    if (mainApi === 'openai') {
+                        activeSource = ($('#chat_completion_source').val() || '').toLowerCase();
+                        $container = activeSource
+                            ? $(`#openai_api [data-source="${activeSource}"], #openai_api #${activeSource}_form`).first()
+                            : $('#openai_api');
+                    } else if (mainApi === 'textgenerationwebui') {
+                        activeSource = ($('#textgen_type').val() || '').toLowerCase();
+                        $container = activeSource
+                            ? $(`#textgenerationwebui_api [data-tg-type="${activeSource}"]`).first()
+                            : $('#textgenerationwebui_api');
+                    } else if (mainApi === 'novel') {
+                        $container = $('#novel_api');
+                    } else if (mainApi === 'koboldhorde') {
+                        $container = $('#kobold_horde');
+                    } else if (mainApi === 'kobold') {
+                        $container = $('#kobold_api');
+                    }
+
+                    if (!$container || $container.length === 0) {
+                        $container = $('#top-settings-holder');
+                    }
+
+                    const modelMap = new Map();
+                    let currentModel = '';
+
+                    const $selects = $container.find('select').filter(function () {
+                        const id = (this.id || '').toLowerCase();
+                        if (!id.includes('model')) return false;
+                        const blacklist = ['auth', 'proxy', 'preset', 'sort', 'region', 'provider', 'quantization', 'format', 'type', 'strategy', 'middleout', 'resolution', 'aspect_ratio'];
+                        return !blacklist.some(keyword => id.includes(keyword));
+                    });
+
+                    $selects.each(function () {
+                        const val = $(this).val();
+                        if (val && typeof val === 'string' && !currentModel) {
+                            currentModel = val.trim();
+                        }
+
+                        $(this).find('option').each(function () {
+                            const optVal = ($(this).val() || $(this).text() || '').trim();
+                            const optLabel = ($(this).text() || optVal).trim();
+                            const lowerVal = optVal.toLowerCase();
+
+                            if (optVal &&
+                                !lowerVal.includes('connect to') &&
+                                !lowerVal.includes('click \'connect\'') &&
+                                !lowerVal.includes('not loaded') &&
+                                !lowerVal.includes('express mode') &&
+                                !lowerVal.includes('full version')) {
+                                if (!modelMap.has(optVal)) {
+                                    modelMap.set(optVal, optLabel || optVal);
+                                }
+                            }
+                        });
+                    });
+
+                    if (modelMap.size === 0) {
+                        const $inputs = $container.find('input[list], input[id*="model"]').filter(function () {
+                            const id = (this.id || '').toLowerCase();
+                            return !id.includes('proxy') && !id.includes('key');
+                        });
+
+                        $inputs.each(function () {
+                            const listId = $(this).attr('list');
+                            if (listId) {
+                                $(`#${listId} option`).each(function () {
+                                    const optVal = ($(this).val() || $(this).text() || '').trim();
+                                    if (optVal) modelMap.set(optVal, optVal);
+                                });
+                            }
+                            const inputVal = $(this).val();
+                            if (inputVal && typeof inputVal === 'string' && !currentModel) {
+                                currentModel = inputVal.trim();
+                            }
+                        });
+                    }
+
+                    return {
+                        api: activeSource || mainApi || 'default',
+                        currentModel: currentModel,
+                        models: Array.from(modelMap.entries()).map(([value, label]) => ({
+                            value,
+                            label: label && label !== value ? label : value
+                        }))
+                    };
+                } catch (e) {
+                    console.warn("[RPG Tracker] Failed to extract API models:", e);
+                    return { api: 'default', currentModel: '', models: [] };
+                }
+            };
+
             window.RPGBridge.saveSettings = (updatedSettings) => {
                 extension_settings[extensionName] = extension_settings[extensionName] || {};
                 Object.assign(extension_settings[extensionName], updatedSettings);
@@ -155,8 +332,19 @@ export function establishBridgeConnection(extensionName) {
                     else if (!context.groupId && typeof saveChat === 'function') saveChat();
                 };
 
+                const settings = window.RPGBridge?.latestSettings || {};
+                let effectiveMaxKeep = 20;
+
+                if (settings.keepAllBackups === true) {
+                    effectiveMaxKeep = -1;
+                } else if (settings.maxBackupCount !== undefined) {
+                    effectiveMaxKeep = settings.maxBackupCount;
+                } else if (maxBackupCount !== undefined) {
+                    effectiveMaxKeep = maxBackupCount;
+                }
+
                 if (currentChat && lastIndex >= 0) {
-                    backupToMessage(currentChat, lastIndex, updatedTracker, safeUpdateMessageBlock, safeSaveChat, maxBackupCount);
+                    backupToMessage(currentChat, lastIndex, updatedTracker, safeUpdateMessageBlock, safeSaveChat, effectiveMaxKeep);
                 }
             };
 
@@ -167,7 +355,7 @@ export function establishBridgeConnection(extensionName) {
                 const context = getContext();
                 if (context && context.chatId) {
                     if (typeof window.RPGBridge.saveChatData === 'function') {
-                        window.RPGBridge.saveChatData(currentTrackerData, 20);
+                        window.RPGBridge.saveChatData(currentTrackerData);
                     }
                     if (typeof saveChatConditional === 'function') saveChatConditional();
                     else if (!context.groupId && typeof saveChat === 'function') saveChat();
@@ -192,8 +380,13 @@ export function establishBridgeConnection(extensionName) {
                                 safeUpdateMessageBlock(i, msg);
                             }
                         }
-                        if (typeof saveChatConditional === 'function') saveChatConditional();
-                        else if (!context.groupId && typeof saveChat === 'function') saveChat();
+                        if (typeof saveChatConditional === "function") saveChatConditional();
+                        else if (!context.groupId && typeof saveChat === "function") saveChat();
+                    }
+
+                    if (extension_settings.extension_prompts) {
+                        delete extension_settings.extension_prompts[`${extensionName}_def`];
+                        delete extension_settings.extension_prompts[`${extensionName}_status`];
                     }
 
                     $('#rpg-snapshot-styles').remove();
@@ -206,7 +399,7 @@ export function establishBridgeConnection(extensionName) {
                     }
                 }
             };
-            
+
             window.RPGBridge.updateMessageBlock = (index, messageObject) => {
                 safeUpdateMessageBlock(index, messageObject);
             };
@@ -223,14 +416,22 @@ export function establishBridgeConnection(extensionName) {
                 const trackerData = window.RPGBridge?.currentTrackerData;
                 if (!trackerData) return;
 
+                const settings = window.RPGBridge?.latestSettings || extension_settings[extensionName] || {};
+                const targetModel = settings.useCustomModel ? settings.customModel : null;
+
                 const header = trackerData.systemPromptHeader_separated !== undefined ? trackerData.systemPromptHeader_separated : DEFAULT_PROMPT_HEADER_SEP;
                 const footer = trackerData.systemPromptFooter_separated !== undefined ? trackerData.systemPromptFooter_separated : DEFAULT_PROMPT_FOOTER_SEP;
 
                 const defPrompt = buildDefinitionPromptWrapper(trackerData, header, footer, isPlayer);
-                const combinedPrompt = `${defPrompt}\n\n[USER INSTRUCTION]\n${promptText}\n\n${footer}\n\nOutput the generated character's status JSON block only.`;
 
                 try {
-                    const rawOutput = await generateQuietPrompt(combinedPrompt);
+                    if (typeof setExtensionPrompt === 'function' && typeof extension_prompt_types !== 'undefined') {
+                        setExtensionPrompt(`${extensionName}_def`, defPrompt, extension_prompt_types.IN_PROMPT, 0, false, extension_prompt_roles.SYSTEM || 0);
+                    }
+
+                    const instructionText = `[USER INSTRUCTION]\n${promptText}\n\nOutput the generated character's status JSON block only.`;
+
+                    const rawOutput = await executeQuietPromptWithModelOverride(instructionText, targetModel, true, false);
                     const { patch } = parseResponse(rawOutput);
 
                     if (patch && Object.keys(patch).length > 0) {
@@ -261,9 +462,9 @@ export function establishBridgeConnection(extensionName) {
                             if (typeof saveChatConditional === "function") saveChatConditional();
                             else if (typeof saveChat === "function") saveChat();
 
-                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData, 20);
+                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData);
                         } catch (err) {
-                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData, 20);
+                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData);
                         }
                     } else {
                         try {
@@ -279,15 +480,34 @@ export function establishBridgeConnection(extensionName) {
                 const trackerData = window.RPGBridge?.currentTrackerData;
                 if (!trackerData || !Array.isArray(trackerData.characters)) return;
 
+                const settings = window.RPGBridge?.latestSettings || extension_settings[extensionName] || {};
+                const targetModel = settings.useCustomModel ? settings.customModel : null;
+
                 const header = trackerData.systemPromptHeader_separated !== undefined ? trackerData.systemPromptHeader_separated : DEFAULT_PROMPT_HEADER_SEP;
                 const footer = trackerData.systemPromptFooter_separated !== undefined ? trackerData.systemPromptFooter_separated : DEFAULT_PROMPT_FOOTER_SEP;
 
-                const defPrompt = buildDefinitionPromptWrapper(trackerData, header, footer);
-                const statusPrompt = buildStatusPromptWrapper(trackerData);
-                const combinedPrompt = `${defPrompt}\n\n${statusPrompt}\n\nAnalyze the current situation and output the updated status JSON block only.`;
+                const schemaExample = getDynamicSchemaExample(trackerData) || '';
+                const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
+                const statusReference = buildDynamicValuesPrompt(trackerData) || '';
+
+                const systemPromptParts = [
+                    header,
+                    schemaExample,
+                    staticDefs,
+                    statusReference,
+                    footer
+                ].filter(part => part && part.trim() !== '');
+
+                const systemPromptText = systemPromptParts.join('\n\n');
 
                 try {
-                    const rawOutput = await generateQuietPrompt(combinedPrompt);
+                    if (typeof setExtensionPrompt === 'function' && typeof extension_prompt_types !== 'undefined') {
+                        setExtensionPrompt(`${extensionName}_def`, systemPromptText, extension_prompt_types.IN_PROMPT, 0, false, extension_prompt_roles.SYSTEM || 0);
+                    }
+
+                    const instructionText = "Analyze the recent chat log above and current status, then output the updated status JSON block only.";
+
+                    const rawOutput = await executeQuietPromptWithModelOverride(instructionText, targetModel, true, false);
                     const { patch } = parseResponse(rawOutput);
 
                     if (patch && Object.keys(patch).length > 0) {
@@ -299,18 +519,19 @@ export function establishBridgeConnection(extensionName) {
                             const sysText = `[RPG Tracker] Status has been manually updated. <!--RPG_DELTA:${JSON.stringify(normPatch)}-->`;
                             await SlashCommandParser.commands['sys'].callback({}, sysText);
 
-                            const newContext = getContext();
-                            if (newContext && newContext.chat) {
+                            const freshContext = getContext();
+                            const activeChat = freshContext?.chat;
+                            if (activeChat) {
                                 let lastSysMsgIdx = -1;
-                                for (let i = newContext.chat.length - 1; i >= 0; i--) {
-                                    if (newContext.chat[i] && typeof newContext.chat[i].mes === 'string' && newContext.chat[i].mes.includes('[RPG Tracker] Status has been manually updated')) {
+                                for (let i = activeChat.length - 1; i >= 0; i--) {
+                                    if (activeChat[i] && typeof activeChat[i].mes === 'string' && activeChat[i].mes.includes('[RPG Tracker] Status has been manually updated')) {
                                         lastSysMsgIdx = i;
                                         break;
                                     }
                                 }
 
                                 if (lastSysMsgIdx !== -1) {
-                                    const lastSysMsg = newContext.chat[lastSysMsgIdx];
+                                    const lastSysMsg = activeChat[lastSysMsgIdx];
                                     setDeltaLog(lastSysMsg, normPatch);
                                     safeUpdateMessageBlock(lastSysMsgIdx, lastSysMsg);
                                 }
@@ -318,9 +539,9 @@ export function establishBridgeConnection(extensionName) {
                             if (typeof saveChatConditional === "function") saveChatConditional();
                             else if (typeof saveChat === "function") saveChat();
 
-                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData, 20);
+                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData);
                         } catch (err) {
-                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData, 20);
+                            if (typeof window.RPGBridge.saveChatData === 'function') window.RPGBridge.saveChatData(updatedData);
                         }
                     } else {
                         try {
@@ -360,7 +581,6 @@ export function establishBridgeConnection(extensionName) {
                 if (trackerData && typeof window.RPGBridge.syncChatData === 'function') {
                     if (Array.isArray(trackerData.characters)) {
                         trackerData.characters.forEach((c, index) => {
-                            // 가변 ID 대신 정적 슬롯 인덱스로 대조하여 매핑 소실 방지
                             const chatSyncs = window.RPGBridge.latestSettings?.characterSyncs?.[context.chatId] || extension_settings[extensionName]?.characterSyncs?.[context.chatId] || {};
                             const savedSync = chatSyncs[index];
                             if (savedSync) {
@@ -368,6 +588,9 @@ export function establishBridgeConnection(extensionName) {
                                 c.syncedCardType = savedSync.syncedCardType;
                                 c.name = savedSync.name;
                                 c.avatarUrl = savedSync.avatarUrl;
+                            } else {
+                                c.syncedCardAvatar = null;
+                                c.syncedCardType = null;
                             }
 
                             if (c.syncedCardType === 'Persona') {
@@ -375,13 +598,11 @@ export function establishBridgeConnection(extensionName) {
                                 if (liveName && c.name !== liveName) {
                                     c.name = liveName;
                                 }
-                                const userAvatarFile = user_avatar || context.user_avatar || window.user_avatar || 'default.png';
+                                const userAvatarFile = user_avatar || context.user_avatar || window.user_avatar;
                                 const globalCrop = extension_settings[extensionName]?.croppedAvatars?.[c.id];
                                 const targetAvatarUrl = globalCrop || resolveSillyTavernAvatarUrl(userAvatarFile, 'Persona');
-                                if (c.syncedCardAvatar !== userAvatarFile || c.avatarUrl !== targetAvatarUrl) {
-                                    c.syncedCardAvatar = userAvatarFile;
-                                    c.avatarUrl = targetAvatarUrl;
-                                }
+                                c.syncedCardAvatar = userAvatarFile || null;
+                                c.avatarUrl = targetAvatarUrl;
                             } else if (c.syncedCardType === 'Card' && c.syncedCardAvatar) {
                                 const allChars = Array.isArray(context.characters) ? context.characters : (Array.isArray(window.characters) ? window.characters : []);
                                 const matched = allChars.find(stChar => stChar.avatar === c.syncedCardAvatar);
@@ -391,10 +612,11 @@ export function establishBridgeConnection(extensionName) {
                                     }
                                     const globalCrop = extension_settings[extensionName]?.croppedAvatars?.[c.id];
                                     const targetAvatarUrl = globalCrop || resolveSillyTavernAvatarUrl(matched.avatar, 'Card');
-                                    if (c.avatarUrl !== targetAvatarUrl) {
-                                        c.avatarUrl = targetAvatarUrl;
-                                    }
+                                    c.avatarUrl = targetAvatarUrl;
                                 }
+                            } else if (!c.syncedCardType) {
+                                const globalCrop = extension_settings[extensionName]?.croppedAvatars?.[c.id];
+                                c.avatarUrl = globalCrop || null;
                             }
                         });
                     }

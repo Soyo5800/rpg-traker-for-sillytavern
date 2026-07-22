@@ -8,9 +8,14 @@ export const defaultSettings = {
     enabled: true,
     theme: "default",
     updateMode: "merged",
+    contextMessageLimit: 4,
     showDeltaLog: true,
+    keepAllBackups: false,
+    maxBackupCount: 20,
     presets: [],
-    croppedAvatars: {} // 캐릭터 ID 또는 아바타 파일명을 키로 하여 Base64 데이터를 전역으로 저장할 공간
+    croppedAvatars: {},
+    useCustomModel: false,
+    customModel: ""
 };
 
 export function backupSettingsToLocalStorage(extensionName) {
@@ -46,13 +51,15 @@ export function syncRpgTrackerRegex(enabled) {
         return true;
     });
 
-    // 1. JSON Stripper (대소문자 환각 완벽 방어형 정규식)
+    // 백틱(```)이 있든 없든 <!--RPG_TRACKER ... --> 형태의 모든 JSON 블록을 감지하는 통합 정규식
+    const flexibleJsonRegex = '<!--RPG_TRACKER\\s*(?:```(?:json|markdown)?\\s*\\n?)?\\{[\\s\\S]*?(?:\"[sS]tatus\"|\"[sS]tatus[sS]chema\"|\"[sS]tats\"|\"[pP]rofile\"|\"[iI]nventory\"|\"[qQ]uests\"|\"[cC]haracter [nN]ame\"|\"[wW]orld\"|\"[rR]elations\"|\"[eE]vents\")[\\s\\S]*?\\}(?:\\s*\\n?```)?\\s*-->\\s*';
+
     let script = extension_settings.regex.find(s => s.id === 'rpg_tracker_json_stripper');
     if (!script) {
         script = {
             id: 'rpg_tracker_json_stripper',
             scriptName: 'RPG Tracker JSON Stripper',
-            findRegex: '<!--RPG_TRACKER\\s*```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"[sS]tatus\"|\"[sS]tatus[sS]chema\"|\"[sS]tats\"|\"[pP]rofile\"|\"[iI]nventory\"|\"[qQ]uests\"|\"[cC]haracter [nN]ame\"|\"[wW]orld\"|\"[rR]elations\"|\"[eE]vents\")[\\s\\S]*?\\}\\s*\\n?```\\s*-->\\s*',
+            findRegex: flexibleJsonRegex,
             replaceString: '',
             trimStrings: [],
             placement: [1, 2],
@@ -63,10 +70,10 @@ export function syncRpgTrackerRegex(enabled) {
         };
         extension_settings.regex.push(script);
     } else {
+        script.findRegex = flexibleJsonRegex;
         script.disabled = !enabled;
     }
 
-    // 2. Delta Stripper
     let deltaScript = extension_settings.regex.find(s => s.id === 'rpg_tracker_delta_stripper');
     if (!deltaScript) {
         deltaScript = {
@@ -86,13 +93,12 @@ export function syncRpgTrackerRegex(enabled) {
         deltaScript.disabled = !enabled;
     }
 
-    // 3. Comment Stripper (대소문자 환각 완벽 방어형 정규식)
     let commentScript = extension_settings.regex.find(s => s.id === 'rpg_tracker_comment_stripper');
     if (!commentScript) {
         commentScript = {
             id: 'rpg_tracker_comment_stripper',
             scriptName: 'RPG Tracker Comment Stripper',
-            findRegex: '<!--RPG_TRACKER\\s*```(?:json|markdown)?\\s*\\n?\\{[\\s\\S]*?(?:\"[sS]tatus\"|\"[sS]tatus[sS]chema\"|\"[sS]tats\"|\"[pP]rofile\"|\"[iI]nventory\"|\"[qQ]uests\"|\"[cC]haracter [nN]ame\"|\"[wW]orld\"|\"[rR]elations\"|\"[eE]vents\")[\\s\\S]*?\\}\\s*\\n?```\\s*-->\\s*',
+            findRegex: flexibleJsonRegex,
             replaceString: '',
             trimStrings: [],
             placement: [1, 2],
@@ -103,6 +109,7 @@ export function syncRpgTrackerRegex(enabled) {
         };
         extension_settings.regex.push(commentScript);
     } else {
+        commentScript.findRegex = flexibleJsonRegex;
         commentScript.disabled = !enabled;
     }
 
@@ -119,10 +126,17 @@ export async function loadSettings(extensionName) {
         } else {
             Object.assign(extension_settings[extensionName], defaultSettings);
         }
+    } else {
+        Object.keys(defaultSettings).forEach(key => {
+            if (extension_settings[extensionName][key] === undefined) {
+                extension_settings[extensionName][key] = defaultSettings[key];
+            }
+        });
     }
 
-    const enabled = extension_settings[extensionName].enabled;
-    $("#rpg_tracker_enabled").prop("checked", enabled).trigger("input");
+    const enabled = extension_settings[extensionName].enabled !== false;
+    extension_settings[extensionName].enabled = enabled;
 
+    $("#rpg_tracker_enabled").prop("checked", enabled);
     syncRpgTrackerRegex(enabled);
 }

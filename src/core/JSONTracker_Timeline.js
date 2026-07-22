@@ -4,7 +4,7 @@ import { getDefaultCharacters, getInitialTrackerData } from './PromptSchema.js';
 import { sanitizeTrackerData } from './JSONTracker_Migrator.js';
 import { applyLLMPatch } from './JSONTracker_Patcher.js';
 
-const DEFAULT_MAX_KEEP = 4;
+const DEFAULT_MAX_KEEP = 20;
 
 /**
  * Remove large Base64 image data from the backup object to prevent chat file size bloat
@@ -63,10 +63,13 @@ export function defensiveMerge(masterSchema, backupData) {
 }
 
 /**
- * Remove older timeline backups to keep save files lightweight
+ * Remove older timeline backups to keep save files lightweight unless unlimited mode is enabled
  */
 export function purgeOldBackups(chat, maxKeep = DEFAULT_MAX_KEEP) {
     if (!Array.isArray(chat)) return;
+
+    // maxKeep이 -1 이하이거나 Infinity이면 무제한 보관 모드이므로 백업 정리를 스킵합니다.
+    if (maxKeep < 0 || maxKeep === Infinity) return;
 
     let foundCount = 0;
 
@@ -99,8 +102,7 @@ export function backupToMessage(chat, index, trackerData, updateMessageFn, saveC
     if (!Array.isArray(chat) || index < 0 || !chat[index]) return;
 
     const targetMessage = chat[index];
-    
-    // Deep clone and clean up Base64 values to avoid saving heavy image payloads
+
     let strippedData = JSON.parse(JSON.stringify(trackerData));
     strippedData = stripBase64Avatars(strippedData);
 
@@ -148,60 +150,102 @@ export function rehydrateFromHistory(chat) {
 }
 
 /**
- * Deep asynchronous restoration with markdown comment parsing
+ * Deep asynchronous restoration with swipe_info delta patch replaying
  */
 export async function rehydrateFromHistoryAsync(chat) {
     if (!Array.isArray(chat) || chat.length === 0) return null;
 
-    const fastData = rehydrateFromHistory(chat);
-    if (fastData) return fastData;
+    const lastMsg = chat[chat.length - 1];
+    if (lastMsg) {
+        let lastSwipeId = lastMsg.swipe_id || 0;
+        if (lastMsg.swipes && lastMsg.swipes.length > 0 && typeof lastMsg.mes === 'string') {
+            const foundIdx = lastMsg.swipes.findIndex(s => s === lastMsg.mes);
+            if (foundIdx !== -1) lastSwipeId = foundIdx;
+        }
+        if (lastMsg.swipe_info?.[lastSwipeId]?.extra?.rpgTrackerData) {
+            return sanitizeTrackerData(lastMsg.swipe_info[lastSwipeId].extra.rpgTrackerData);
+        }
+    }
 
+    let baseIndex = -1;
     let accumulatedData = null;
-    let anyUpdateApplied = false;
-    const SEARCH_LIMIT = 100;
-    const startIndex = Math.max(0, chat.length - SEARCH_LIMIT);
 
-    for (let i = startIndex; i < chat.length; i++) {
-        if (i % 10 === 0) {
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const message = chat[i];
+        if (!message) continue;
+
+        let swipeId = message.swipe_id || 0;
+        if (message.swipes && message.swipes.length > 0 && typeof message.mes === 'string') {
+            const foundIdx = message.swipes.findIndex(s => s === message.mes);
+            if (foundIdx !== -1) swipeId = foundIdx;
+        }
+
+        if (message.swipe_info?.[swipeId]?.extra?.rpgTrackerData) {
+            accumulatedData = JSON.parse(JSON.stringify(message.swipe_info[swipeId].extra.rpgTrackerData));
+            baseIndex = i;
+            break;
+        }
+    }
+
+    if (!accumulatedData) {
+        accumulatedData = getInitialTrackerData();
+        baseIndex = -1;
+    }
+
+    let anyUpdateApplied = baseIndex !== -1;
+
+    for (let i = baseIndex + 1; i < chat.length; i++) {
+        if (i % 15 === 0) {
             await new Promise(resolve => setTimeout(resolve, 0));
         }
 
         const message = chat[i];
-        if (!message || typeof message.mes !== 'string') continue;
+        if (!message) continue;
 
-        const extractJsonFromComment = (text) => {
-            const trackerRegex = /<!--RPG_TRACKER:?([\s\S]*?)-->/g;
-            let match;
-            while ((match = trackerRegex.exec(text)) !== null) {
-                let innerText = match[1].trim();
-                const markdownJsonRegex = /```(?:json|markdown)?\s*\n?(\{[\s\S]*?\})\s*\n?```/i;
-                const mdMatch = innerText.match(markdownJsonRegex);
-                if (mdMatch) innerText = mdMatch[1].trim();
-                try {
-                    const parsed = JSON.parse(innerText);
-                    if (parsed && typeof parsed === 'object') return parsed;
-                } catch (e) { }
-            }
+        let swipeId = message.swipe_id || 0;
+        if (message.swipes && message.swipes.length > 0 && typeof message.mes === 'string') {
+            const foundIdx = message.swipes.findIndex(s => s === message.mes);
+            if (foundIdx !== -1) swipeId = foundIdx;
+        }
 
-            const legacyRegex = /<!--RPG_DATA:([\s\S]*?)-->/g;
-            let legacyMatch;
-            while ((legacyMatch = legacyRegex.exec(text)) !== null) {
-                try {
-                    const parsed = JSON.parse(legacyMatch[1]);
-                    if (parsed && typeof parsed === 'object') return parsed;
-                } catch (e) { }
-            }
-            return null;
-        };
+        const deltaPatch = message.swipe_info?.[swipeId]?.extra?.rpgTrackerDelta || message.extra?.rpgTrackerDelta;
 
-        const parsed = extractJsonFromComment(message.mes);
-        if (parsed) {
-            if (parsed.characters !== undefined) {
-                accumulatedData = JSON.parse(JSON.stringify(parsed));
-                anyUpdateApplied = true;
-            } else {
-                if (!accumulatedData) accumulatedData = getInitialTrackerData();
-                accumulatedData = applyLLMPatch(accumulatedData, parsed, false, 'patch', true);
+        if (deltaPatch && typeof deltaPatch === 'object' && Object.keys(deltaPatch).length > 0) {
+            accumulatedData = applyLLMPatch(accumulatedData, deltaPatch, false, 'patch', true);
+            anyUpdateApplied = true;
+        } else if (typeof message.mes === 'string') {
+            const extractJsonFromComment = (text) => {
+                const trackerRegex = /<!--RPG_TRACKER:?([\s\S]*?)-->/g;
+                let match;
+                while ((match = trackerRegex.exec(text)) !== null) {
+                    let innerText = match[1].trim();
+                    const markdownJsonRegex = /```(?:json|markdown)?\s*\n?(\{[\s\S]*?\})\s*\n?```/i;
+                    const mdMatch = innerText.match(markdownJsonRegex);
+                    if (mdMatch) innerText = mdMatch[1].trim();
+                    try {
+                        const parsed = JSON.parse(innerText);
+                        if (parsed && typeof parsed === 'object') return parsed;
+                    } catch (e) { }
+                }
+
+                const legacyRegex = /<!--RPG_DATA:([\s\S]*?)-->/g;
+                let legacyMatch;
+                while ((legacyMatch = legacyRegex.exec(text)) !== null) {
+                    try {
+                        const parsed = JSON.parse(legacyMatch[1]);
+                        if (parsed && typeof parsed === 'object') return parsed;
+                    } catch (e) { }
+                }
+                return null;
+            };
+
+            const parsed = extractJsonFromComment(message.mes);
+            if (parsed) {
+                if (parsed.characters !== undefined) {
+                    accumulatedData = JSON.parse(JSON.stringify(parsed));
+                } else {
+                    accumulatedData = applyLLMPatch(accumulatedData, parsed, false, 'patch', true);
+                }
                 anyUpdateApplied = true;
             }
         }

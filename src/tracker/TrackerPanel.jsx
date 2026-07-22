@@ -10,6 +10,7 @@ import StatusEditor from '../editor/StatusEditor';
 import PromptEditor from '../editor/PromptEditor';
 import SettingsEditor from '../editor/SettingsEditor';
 import WorldSection from './WorldSection';
+import FuncSection from './FuncSection';
 
 export default function TrackerPanel() {
   const {
@@ -18,11 +19,10 @@ export default function TrackerPanel() {
     trackerData,
     isChatConnected,
     revertToOriginalTurnState,
-    uiState,          // UI 보존 전역 상태 참조
-    updateUiState     // UI 전역 상태 업데이트 함수 참조
+    uiState,
+    updateUiState
   } = useRPG();
 
-  // 글로벌 uiState 바인딩
   const activeTab = uiState.activeTab || 'status';
   const setActiveTab = (tab) => updateUiState({ activeTab: tab });
 
@@ -64,7 +64,6 @@ export default function TrackerPanel() {
         }}
       >
         <header className={styles.panelHeader}>
-          {/* 좌측 영역: 브랜드 정보 수직 중앙 정렬 */}
           <div className={styles.headerLeftArea}>
             <div className={styles.brand}>
               <BrandIcon className={styles.headerIcon} />
@@ -76,9 +75,7 @@ export default function TrackerPanel() {
             </div>
           </div>
 
-          {/* 우측 영역: 그리드 정렬된 버튼 그룹 */}
           <div className={styles.headerRightArea}>
-            {/* 첫 번째 줄 버튼 그룹 */}
             <div className={styles.headerButtonRow}>
               <button
                 className={styles.headerBtn}
@@ -96,7 +93,6 @@ export default function TrackerPanel() {
               </button>
             </div>
 
-            {/* 두 번째 줄 버튼 그룹 */}
             <div className={styles.headerButtonRow}>
               {(settings.updateMode === 'isolated' || settings.updateMode === 'separated') && (
                 <button
@@ -134,7 +130,7 @@ export default function TrackerPanel() {
         <div className={styles.scrollContainer}>
           <div className={styles.contentWrapper}>
             <nav className={styles.panelNav}>
-              {['status', 'world'].map((tab) => (
+              {['status', 'world', 'function'].map((tab) => (
                 <button
                   key={tab}
                   className={activeTab === tab ? styles.activeTab : ''}
@@ -142,6 +138,7 @@ export default function TrackerPanel() {
                 >
                   {tab === 'status' && 'Status'}
                   {tab === 'world' && 'World'}
+                  {tab === 'function' && 'Function'}
                 </button>
               ))}
             </nav>
@@ -156,6 +153,10 @@ export default function TrackerPanel() {
 
               {activeTab === 'world' && (
                 <WorldSection />
+              )}
+
+              {activeTab === 'function' && (
+                <FuncSection />
               )}
             </main>
           </div>

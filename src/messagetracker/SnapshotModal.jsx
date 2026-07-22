@@ -228,6 +228,11 @@ export default function SnapshotModal() {
       }
     }
 
+    const activeSwipeId = targetMsg.swipe_id || 0;
+    if (Array.isArray(targetMsg.swipes) && targetMsg.swipes.length > activeSwipeId) {
+      targetMsg.swipes[activeSwipeId] = targetMsg.mes;
+    }
+
     let swipeId = targetMsg.swipe_id || 0;
     if (targetMsg.swipes && targetMsg.swipes.length > 0 && typeof targetMsg.mes === 'string') {
       const foundIdx = targetMsg.swipes.findIndex(s => s === targetMsg.mes);

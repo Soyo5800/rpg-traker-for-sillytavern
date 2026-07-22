@@ -7,19 +7,20 @@ export async function savePresetToSillyTavernCard(avatarFile, presetData) {
   if (!avatarFile) return false;
 
   const context = window.SillyTavern?.getContext?.() || {};
-  const allCharacters = Array.isArray(context.characters) 
-    ? context.characters 
-    : (Array.isArray(window.characters) ? window.characters : []);
+  // 그룹 채팅 내 스코프된 배열이 아닌, 실리터번의 글로벌 캐릭터 전체 배열을 최우선 참조
+  const globalCharacters = Array.isArray(window.characters)
+    ? window.characters
+    : (Array.isArray(context.characters) ? context.characters : []);
 
-  if (allCharacters.length === 0) return false;
+  if (globalCharacters.length === 0) return false;
 
-  const charIndex = allCharacters.findIndex(c => c.avatar === avatarFile);
+  const charIndex = globalCharacters.findIndex(c => c.avatar === avatarFile);
   if (charIndex === -1) return false;
 
-  const char = allCharacters[charIndex];
+  const char = globalCharacters[charIndex];
 
   try {
-    // 1순위: SillyTavern의 공식 writeExtensionField API 사용 시도
+    // 1순위: SillyTavern 공식 writeExtensionField API 사용 (절대 인덱스 charIndex 전달)
     if (window.RPGBridge && typeof window.RPGBridge.writeExtensionFieldNatively === 'function') {
       const success = await window.RPGBridge.writeExtensionFieldNatively(charIndex, 'rpg_tracker', presetData);
       if (success) {
@@ -41,7 +42,7 @@ export async function savePresetToSillyTavernCard(avatarFile, presetData) {
       }
     }
 
-    // 2순위 (폴백): 기존 방식의 전체 속성 수정을 통한 업데이트
+    // 2순위 (폴백): REST API를 이용한 기존 업데이트 방식
     const currentExtensions = JSON.parse(JSON.stringify(char.data?.extensions || char.extensions || {}));
     if (presetData === null) {
       delete currentExtensions.rpg_tracker;
@@ -114,8 +115,8 @@ export default function CardSyncComponent({ onSync, isSynced }) {
     const context = window.SillyTavern?.getContext?.() || {};
     const list = [];
 
-    const allCharacters = Array.isArray(context.characters) 
-      ? context.characters 
+    const allCharacters = Array.isArray(context.characters)
+      ? context.characters
       : (Array.isArray(window.characters) ? window.characters : []);
 
     const currentName2 = context.name2 || window.name2;

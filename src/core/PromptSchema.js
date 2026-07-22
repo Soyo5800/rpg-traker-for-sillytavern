@@ -95,6 +95,10 @@ CRITICAL CONSTRAINT: You MUST separate numerical status parameters and text-base
    Any storage container equipped in an equipment slot must have 'isContainer: true' and a matching 'storageKey' referring to the storage key.
 Create suitable status, profile features, relations, starting inventory, and initial quests that fit their role. Return the result as a JSON block wrapped in an HTML comment with the identifier RPG_TRACKER.`;
 
+export const DEFAULT_CYOA_PROMPT = "CYOA Mode: Act as an interactive adventure where you present choices to the player at the end of each response.";
+export const DEFAULT_WEATHER_PROMPT = "Dynamic Weather: Include weather changes and environmental descriptions.";
+export const DEFAULT_WORLD_EVENTS_PROMPT = "World Events: Generate random world events that affect the current situation.";
+
 export const getInitialTrackerData = () => {
   return {
     characters: getDefaultCharacters(),
@@ -110,7 +114,10 @@ export const getInitialTrackerData = () => {
     systemPromptFooter_separated: DEFAULT_PROMPT_FOOTER_SEP,
     addons: { weather: false, worldEvents: false, cyoa: false },
     addCharPrompt: DEFAULT_ADD_CHAR_PROMPT,
-    addPlayerCharPrompt: DEFAULT_ADD_PLAYER_CHAR_PROMPT
+    addPlayerCharPrompt: DEFAULT_ADD_PLAYER_CHAR_PROMPT,
+    cyoaPrompt: DEFAULT_CYOA_PROMPT,
+    weatherPrompt: DEFAULT_WEATHER_PROMPT,
+    worldEventsPrompt: DEFAULT_WORLD_EVENTS_PROMPT
   };
 };
 

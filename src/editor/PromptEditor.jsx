@@ -12,12 +12,15 @@ import {
   getDefaultCharacters,
   DEFAULT_GUIDE_PROMPTS,
   DEFAULT_ADD_CHAR_PROMPT,
-  DEFAULT_ADD_PLAYER_CHAR_PROMPT
+  DEFAULT_ADD_PLAYER_CHAR_PROMPT,
+  DEFAULT_CYOA_PROMPT,
+  DEFAULT_WEATHER_PROMPT,
+  DEFAULT_WORLD_EVENTS_PROMPT
 } from '../core/PromptSchema';
 import { getDynamicSchemaExample } from '../core/ActivePrompt';
 
 export default function PromptEditor({ onClose }) {
-  const { trackerData, updateTrackerData, isChatConnected } = useRPG();
+  const { trackerData, updateTrackerData } = useRPG();
   const [activeTab, setActiveTab] = useState('system');
 
   const [localMergedHeader, setLocalMergedHeader] = useState('');
@@ -28,15 +31,19 @@ export default function PromptEditor({ onClose }) {
 
   const [localAddCharPrompt, setLocalAddCharPrompt] = useState('');
   const [localAddPlayerCharPrompt, setLocalAddPlayerCharPrompt] = useState('');
-
-  const [charNameInput, setCharNameInput] = useState('');
-  const [playerCharNameInput, setPlayerCharNameInput] = useState('');
+  const [localCyoaPrompt, setLocalCyoaPrompt] = useState('');
+  const [localWeatherPrompt, setLocalWeatherPrompt] = useState('');
+  const [localWorldEventsPrompt, setLocalWorldEventsPrompt] = useState('');
 
   const [isEditMerged, setIsEditMerged] = useState(false);
   const [isEditReadOnly, setIsEditReadOnly] = useState(false);
   const [isEditSep, setIsEditSep] = useState(false);
+
   const [isEditAddChar, setIsEditAddChar] = useState(false);
   const [isEditAddPlayerChar, setIsEditAddPlayerChar] = useState(false);
+  const [isEditCyoa, setIsEditCyoa] = useState(false);
+  const [isEditWeather, setIsEditWeather] = useState(false);
+  const [isEditWorldEvents, setIsEditWorldEvents] = useState(false);
 
   const [isMergedOpen, setIsMergedOpen] = useState(false);
   const [isReadOnlyOpen, setIsReadOnlyOpen] = useState(false);
@@ -45,6 +52,9 @@ export default function PromptEditor({ onClose }) {
   const [isSchemaOpen, setIsSchemaOpen] = useState(true);
   const [isAddCharOpen, setIsAddCharOpen] = useState(false);
   const [isAddPlayerCharOpen, setIsAddPlayerCharOpen] = useState(false);
+  const [isCyoaOpen, setIsCyoaOpen] = useState(false);
+  const [isWeatherOpen, setIsWeatherOpen] = useState(false);
+  const [isWorldEventsOpen, setIsWorldEventsOpen] = useState(false);
 
   const [localGuidePrompts, setLocalGuidePrompts] = useState([]);
   const [localDefObj, setLocalDefObj] = useState({});
@@ -95,6 +105,9 @@ export default function PromptEditor({ onClose }) {
 
     setLocalAddCharPrompt(trackerData.addCharPrompt ?? DEFAULT_ADD_CHAR_PROMPT);
     setLocalAddPlayerCharPrompt(trackerData.addPlayerCharPrompt ?? DEFAULT_ADD_PLAYER_CHAR_PROMPT);
+    setLocalCyoaPrompt(trackerData.cyoaPrompt ?? DEFAULT_CYOA_PROMPT);
+    setLocalWeatherPrompt(trackerData.weatherPrompt ?? DEFAULT_WEATHER_PROMPT);
+    setLocalWorldEventsPrompt(trackerData.worldEventsPrompt ?? DEFAULT_WORLD_EVENTS_PROMPT);
 
     let savedGuides = trackerData.guidePrompts ? [...trackerData.guidePrompts] : JSON.parse(JSON.stringify(DEFAULT_GUIDE_PROMPTS));
 
@@ -126,16 +139,10 @@ export default function PromptEditor({ onClose }) {
     { v: '1', l: '24:00 Format', ex: '14:30' },
     { v: '2', l: '12-hour AM/PM', ex: '02:30 PM' },
     { v: '3', l: 'Dawn/Morning...', ex: 'Dawn/Morning/Noon/Evening/Night' },
-    { v: '4', l: 'Emojis', ex: '🌅/☀️/🕛/🌇/🌙' },
     { v: 'custom', l: 'Custom', ex: '' }
   ];
   const WEATHER_OPTS = [
     { v: '1', l: 'Text', ex: 'Clear/Cloudy/Rain/Snow' },
-    { v: '2', l: 'Emojis', ex: '☀️/☁️/🌧️/❄️' },
-    { v: 'custom', l: 'Custom', ex: '' }
-  ];
-  const LOC_OPTS = [
-    { v: '1', l: 'Default', ex: 'Current Location' },
     { v: 'custom', l: 'Custom', ex: '' }
   ];
 
@@ -162,7 +169,10 @@ export default function PromptEditor({ onClose }) {
       globalDefinitions: localDefObj,
       worldSchema: localWorldSchema,
       addCharPrompt: localAddCharPrompt,
-      addPlayerCharPrompt: localAddPlayerCharPrompt
+      addPlayerCharPrompt: localAddPlayerCharPrompt,
+      cyoaPrompt: localCyoaPrompt,
+      weatherPrompt: localWeatherPrompt,
+      worldEventsPrompt: localWorldEventsPrompt
     });
     alert("Prompt configurations saved successfully.");
     onClose();
@@ -179,7 +189,10 @@ export default function PromptEditor({ onClose }) {
       globalDefinitions: localDefObj,
       worldSchema: localWorldSchema,
       addCharPrompt: localAddCharPrompt,
-      addPlayerCharPrompt: localAddPlayerCharPrompt
+      addPlayerCharPrompt: localAddPlayerCharPrompt,
+      cyoaPrompt: localCyoaPrompt,
+      weatherPrompt: localWeatherPrompt,
+      worldEventsPrompt: localWorldEventsPrompt
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -216,6 +229,9 @@ export default function PromptEditor({ onClose }) {
           if (importedData.worldSchema && typeof importedData.worldSchema === 'object') setLocalWorldSchema(importedData.worldSchema);
           if (importedData.addCharPrompt !== undefined) setLocalAddCharPrompt(importedData.addCharPrompt);
           if (importedData.addPlayerCharPrompt !== undefined) setLocalAddPlayerCharPrompt(importedData.addPlayerCharPrompt);
+          if (importedData.cyoaPrompt !== undefined) setLocalCyoaPrompt(importedData.cyoaPrompt);
+          if (importedData.weatherPrompt !== undefined) setLocalWeatherPrompt(importedData.weatherPrompt);
+          if (importedData.worldEventsPrompt !== undefined) setLocalWorldEventsPrompt(importedData.worldEventsPrompt);
 
           alert("Prompt configurations imported successfully. Click 'Save Changes' to apply.");
         } else {
@@ -228,57 +244,6 @@ export default function PromptEditor({ onClose }) {
       e.target.value = '';
     };
     reader.readAsText(file);
-  };
-
-  const handleSendRequest = async (type) => {
-    if (!isChatConnected) {
-      alert("Not connected to a chat room. Please connect to a chat room to use this feature.");
-      return;
-    }
-    const isPlayer = type === 'player';
-    const name = isPlayer ? playerCharNameInput.trim() : charNameInput.trim();
-    const basePrompt = isPlayer ? localAddPlayerCharPrompt : localAddCharPrompt;
-
-    let cardDescription = "";
-    try {
-      const stContext = window.SillyTavern?.getContext?.();
-      if (stContext && name) {
-        const matchedCard = stContext.characters?.find(
-          c => c.name?.toLowerCase() === name.toLowerCase()
-        );
-
-        if (matchedCard) {
-          cardDescription = `\n\n[ORIGINAL CHARACTER CARD DETAILS FOR '${name}']`;
-          if (matchedCard.description) cardDescription += `\nDescription:\n${matchedCard.description}`;
-          if (matchedCard.personality) cardDescription += `\nPersonality:\n${matchedCard.personality}`;
-        }
-      }
-    } catch (err) {
-      console.warn("SillyTavern context is not fully available or character search failed:", err);
-    }
-
-    const schemaExample = getDynamicSchemaExample({ guidePrompts: localGuidePrompts, characters }, isPlayer);
-
-    let finalPrompt = "";
-    if (name) {
-      finalPrompt = `Based on the chat log, create a profile for '${name}' following these guidelines:\n${basePrompt}`;
-      if (cardDescription) {
-        finalPrompt += cardDescription;
-      }
-      finalPrompt += `\n\nStrictly output the JSON block following this exact schema layout:\n${schemaExample.trim()}`;
-    } else {
-      finalPrompt = `Based on the recent chat log, identify a new or existing character that needs a profile and generate one. Guidelines:\n${basePrompt}\n\nStrictly output the JSON block following this exact schema layout:\n${schemaExample.trim()}`;
-    }
-
-    if (window.RPGBridge && typeof window.RPGBridge.triggerCharacterGeneration === 'function') {
-      alert(`Requesting to add ${isPlayer ? 'Player Character' : 'Character'} '${name || 'Auto-Detect'}'... This may take a moment.`);
-      try {
-        await window.RPGBridge.triggerCharacterGeneration(finalPrompt, isPlayer);
-      } catch (err) {
-        console.error(err);
-        alert("An error occurred during character generation.");
-      }
-    }
   };
 
   const handleGuideToggle = (id, checked) => {
@@ -359,7 +324,7 @@ export default function PromptEditor({ onClose }) {
                 )}
               </div>
 
-              {/* 2. SEPARATED MODE (매턴 상태값 참조 주입 헤더 설정) */}
+              {/* 2. SEPARATED MODE */}
               <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsReadOnlyOpen(!isReadOnlyOpen)}>
@@ -385,7 +350,7 @@ export default function PromptEditor({ onClose }) {
                 )}
               </div>
 
-              {/* 3. MANUAL UPDATE MODE (Separated & Isolated 모드용 수동 갱신 프롬프트) */}
+              {/* 3. MANUAL UPDATE MODE */}
               <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsSepOpen(!isSepOpen)}>
@@ -594,85 +559,132 @@ export default function PromptEditor({ onClose }) {
 
           {activeTab === 'addons' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <p style={{ fontSize: '13px', opacity: 0.8, color: 'var(--rpg-text)' }}>Character Generation</p>
 
-              {/* ADD CHARACTER */}
+              {/* 1. BASE NPC GENERATION PROMPT */}
               <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsAddCharOpen(!isAddCharOpen)}>
                     <span style={{ color: 'var(--rpg-highlight)' }}>{isAddCharOpen ? '▼' : '▶'}</span>
-                    <strong style={{ color: 'var(--rpg-highlight)' }}>Add Character</strong>
+                    <strong style={{ color: 'var(--rpg-highlight)' }}>NPC Generation Base Prompt</strong>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button className={styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setLocalAddCharPrompt(DEFAULT_ADD_CHAR_PROMPT)}>reset</button>
                     <button className={isEditAddChar ? styles.saveBtn : styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setIsEditAddChar(!isEditAddChar)}>edit</button>
-                    <button className={styles.saveBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => handleSendRequest('npc')}>Send Request</button>
                   </div>
                 </div>
                 {isAddCharOpen && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--rpg-text)' }}>Target Name (Optional)</span>
-                      <input
-                        className={styles.defInput}
-                        style={{ padding: '6px' }}
-                        value={charNameInput}
-                        onChange={e => setCharNameInput(e.target.value)}
-                        placeholder="Leave blank to auto-detect from chat log"
-                      />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--rpg-text)' }}>Base Prompt</span>
-                      <textarea
-                        className={styles.textarea}
-                        style={{ minHeight: '80px', opacity: isEditAddChar ? 1 : 0.7 }}
-                        value={localAddCharPrompt}
-                        onChange={e => setLocalAddCharPrompt(e.target.value)}
-                        readOnly={!isEditAddChar}
-                      />
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '100px', opacity: isEditAddChar ? 1 : 0.7 }}
+                      value={localAddCharPrompt}
+                      onChange={e => setLocalAddCharPrompt(e.target.value)}
+                      readOnly={!isEditAddChar}
+                    />
                   </div>
                 )}
               </div>
 
-              {/* ADD PLAYER CHARACTER */}
+              {/* 2. BASE PLAYER GENERATION PROMPT */}
               <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsAddPlayerCharOpen(!isAddPlayerCharOpen)}>
                     <span style={{ color: 'var(--rpg-highlight)' }}>{isAddPlayerCharOpen ? '▼' : '▶'}</span>
-                    <strong style={{ color: 'var(--rpg-highlight)' }}>Add Player Character</strong>
+                    <strong style={{ color: 'var(--rpg-highlight)' }}>Player Generation Base Prompt</strong>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button className={styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setLocalAddPlayerCharPrompt(DEFAULT_ADD_PLAYER_CHAR_PROMPT)}>reset</button>
                     <button className={isEditAddPlayerChar ? styles.saveBtn : styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setIsEditAddPlayerChar(!isEditAddPlayerChar)}>edit</button>
-                    <button className={styles.saveBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => handleSendRequest('player')}>Send Request</button>
                   </div>
                 </div>
                 {isAddPlayerCharOpen && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--rpg-text)' }}>Target Name (Optional)</span>
-                      <input
-                        className={styles.defInput}
-                        style={{ padding: '6px' }}
-                        value={playerCharNameInput}
-                        onChange={e => setPlayerCharNameInput(e.target.value)}
-                        placeholder="Leave blank to auto-detect from chat log"
-                      />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--rpg-text)' }}>Base Prompt</span>
-                      <textarea
-                        className={styles.textarea}
-                        style={{ minHeight: '80px', opacity: isEditAddPlayerChar ? 1 : 0.7 }}
-                        value={localAddPlayerCharPrompt}
-                        onChange={e => setLocalAddPlayerCharPrompt(e.target.value)}
-                        readOnly={!isEditAddPlayerChar}
-                      />
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '100px', opacity: isEditAddPlayerChar ? 1 : 0.7 }}
+                      value={localAddPlayerCharPrompt}
+                      onChange={e => setLocalAddPlayerCharPrompt(e.target.value)}
+                      readOnly={!isEditAddPlayerChar}
+                    />
                   </div>
                 )}
               </div>
+
+              {/* 3. WORLD EVENTS ADDON PROMPT */}
+              <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsWorldEventsOpen(!isWorldEventsOpen)}>
+                    <span style={{ color: 'var(--rpg-highlight)' }}>{isWorldEventsOpen ? '▼' : '▶'}</span>
+                    <strong style={{ color: 'var(--rpg-highlight)' }}>World Events Instruction</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className={styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setLocalWorldEventsPrompt(DEFAULT_WORLD_EVENTS_PROMPT)}>reset</button>
+                    <button className={isEditWorldEvents ? styles.saveBtn : styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setIsEditWorldEvents(!isEditWorldEvents)}>edit</button>
+                  </div>
+                </div>
+                {isWorldEventsOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '80px', opacity: isEditWorldEvents ? 1 : 0.7 }}
+                      value={localWorldEventsPrompt}
+                      onChange={e => setLocalWorldEventsPrompt(e.target.value)}
+                      readOnly={!isEditWorldEvents}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 4. DYNAMIC WEATHER ADDON PROMPT */}
+              <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsWeatherOpen(!isWeatherOpen)}>
+                    <span style={{ color: 'var(--rpg-highlight)' }}>{isWeatherOpen ? '▼' : '▶'}</span>
+                    <strong style={{ color: 'var(--rpg-highlight)' }}>Dynamic Weather Instruction</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className={styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setLocalWeatherPrompt(DEFAULT_WEATHER_PROMPT)}>reset</button>
+                    <button className={isEditWeather ? styles.saveBtn : styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setIsEditWeather(!isEditWeather)}>edit</button>
+                  </div>
+                </div>
+                {isWeatherOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '80px', opacity: isEditWeather ? 1 : 0.7 }}
+                      value={localWeatherPrompt}
+                      onChange={e => setLocalWeatherPrompt(e.target.value)}
+                      readOnly={!isEditWeather}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 5. CYOA MODE ADDON PROMPT */}
+              <div style={{ border: '1px solid var(--rpg-border)', borderRadius: '4px', padding: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsCyoaOpen(!isCyoaOpen)}>
+                    <span style={{ color: 'var(--rpg-highlight)' }}>{isCyoaOpen ? '▼' : '▶'}</span>
+                    <strong style={{ color: 'var(--rpg-highlight)' }}>CYOA Mode Instruction</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className={styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setLocalCyoaPrompt(DEFAULT_CYOA_PROMPT)}>reset</button>
+                    <button className={isEditCyoa ? styles.saveBtn : styles.cancelBtn} style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => setIsEditCyoa(!isEditCyoa)}>edit</button>
+                  </div>
+                </div>
+                {isCyoaOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '80px', opacity: isEditCyoa ? 1 : 0.7 }}
+                      value={localCyoaPrompt}
+                      onChange={e => setLocalCyoaPrompt(e.target.value)}
+                      readOnly={!isEditCyoa}
+                    />
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 

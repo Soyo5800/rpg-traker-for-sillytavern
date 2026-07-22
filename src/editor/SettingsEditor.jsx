@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useRPG } from '../core/RPGControl';
 import styles from './SettingsEditor.module.css';
 
-// rgb/rgba 문자열을 hex6 형식(#rrggbb)으로 파싱하는 도우미 함수
 function rgbToHex(rgbStr) {
   const match = rgbStr.match(/\d+/g);
   if (!match || match.length < 3) return null;
@@ -14,7 +13,6 @@ function rgbToHex(rgbStr) {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-// 실리터번 바디에 적용되어 있는 활성 테마 변수를 동적으로 캡처하는 함수
 function getSillyTavernThemeColors() {
   const bodyStyle = getComputedStyle(document.body);
 
@@ -23,10 +21,10 @@ function getSillyTavernThemeColors() {
       const val = bodyStyle.getPropertyValue(varName).trim();
       if (val) {
         if (val.startsWith('#')) {
-          if (val.length === 4) { // shorthand (#fff -> #ffffff)
+          if (val.length === 4) {
             return `#${val[1]}${val[1]}${val[2]}${val[2]}${val[3]}${val[3]}`;
           }
-          return val.substring(0, 7); // 알파값이 포함된 hex8 규격 대응
+          return val.substring(0, 7);
         }
         if (val.startsWith('rgb')) {
           const hex = rgbToHex(val);
@@ -50,9 +48,12 @@ export default function SettingsEditor({ onClose }) {
   const { settings, updateSettings } = useRPG();
 
   const [localUpdateMode, setLocalUpdateMode] = useState('merged');
-  const [localShowDeltaLog, setLocalShowDeltaLog] = useState(true);
   const [localPanelPosition, setLocalPanelPosition] = useState('left');
   const [localTheme, setLocalTheme] = useState('default');
+  const [localShowDeltaLog, setLocalShowDeltaLog] = useState(true);
+
+  const [localKeepAllBackups, setLocalKeepAllBackups] = useState(false);
+  const [localMaxBackupCount, setLocalMaxBackupCount] = useState(20);
 
   const [localColors, setLocalColors] = useState({
     bg: '#1a1a2e',
@@ -64,9 +65,11 @@ export default function SettingsEditor({ onClose }) {
 
   useEffect(() => {
     setLocalUpdateMode(settings.updateMode || 'merged');
-    setLocalShowDeltaLog(settings.showDeltaLog !== false);
     setLocalPanelPosition(settings.panelPosition || 'left');
     setLocalTheme(settings.theme || 'default');
+    setLocalShowDeltaLog(settings.showDeltaLog !== false);
+    setLocalKeepAllBackups(settings.keepAllBackups === true);
+    setLocalMaxBackupCount(settings.maxBackupCount !== undefined ? settings.maxBackupCount : 20);
 
     if (settings.customColors) {
       setLocalColors(prev => ({ ...prev, ...settings.customColors }));
@@ -100,11 +103,12 @@ export default function SettingsEditor({ onClose }) {
     updateSettings({
       ...settings,
       updateMode: localUpdateMode,
-      showDeltaLog: localShowDeltaLog,
       panelPosition: localPanelPosition,
       theme: localTheme,
+      showDeltaLog: localShowDeltaLog,
       customColors: localColors,
-      maxBackupCount: 20
+      keepAllBackups: localKeepAllBackups,
+      maxBackupCount: Math.max(0, parseInt(localMaxBackupCount, 10) || 0)
     });
     alert("Settings saved successfully.");
     onClose();
@@ -119,8 +123,8 @@ export default function SettingsEditor({ onClose }) {
         </header>
 
         <div className={styles.body}>
-          {/* 1. 업데이트 연산 모드 조정 */}
-          <div className={styles.section} style={{ marginBottom: '16px' }}>
+          {/* 1. Update Mode */}
+          <div className={styles.section}>
             <label className={styles.label}>Update Mode</label>
             <p className={styles.settingsDesc}>
               Choose how the tracker syncs data with the AI.
@@ -136,28 +140,8 @@ export default function SettingsEditor({ onClose }) {
             </select>
           </div>
 
-          {/* 2. 델타 로그 변경 사항 */}
-          <div className={styles.section} style={{ marginBottom: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label className={styles.label} style={{ margin: 0 }}>
-                Show Status Change Log
-              </label>
-              <label className={styles.switch} style={{ margin: 0 }}>
-                <input
-                  type="checkbox"
-                  checked={localShowDeltaLog}
-                  onChange={e => setLocalShowDeltaLog(e.target.checked)}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
-            <p className={styles.settingsDesc}>
-              Show collapsing delta change log at the bottom of AI messages.
-            </p>
-          </div>
-
-          {/* 3. 패널 도크 정렬 옵션 */}
-          <div className={styles.section} style={{ marginBottom: '16px' }}>
+          {/* 2. Panel Position */}
+          <div className={styles.section}>
             <label className={styles.label}>Panel Position</label>
             <p className={styles.settingsDesc}>
               Choose which side of the screen the sidebar panel will dock.
@@ -172,9 +156,9 @@ export default function SettingsEditor({ onClose }) {
             </select>
           </div>
 
-          {/* 4. 테마 모드 셀렉트 및 컬러 편집 그리드 */}
-          <div className={styles.section} style={{ marginBottom: '16px' }}>
-            <label className={styles.label}>Visual Theme Mode</label>
+          {/* 3. Visual Theme */}
+          <div className={styles.section}>
+            <label className={styles.label}>Visual Theme</label>
             <p className={styles.settingsDesc}>
               Choose the interface color palette.
             </p>
@@ -266,6 +250,64 @@ export default function SettingsEditor({ onClose }) {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* 4. Show Status Change Log */}
+          <div className={styles.section}>
+            <div className={styles.sectionHeaderRow}>
+              <label className={styles.label}>
+                Show Status Change Log
+              </label>
+              <label className={styles.switch}>
+                <input
+                  type="checkbox"
+                  checked={localShowDeltaLog}
+                  onChange={e => setLocalShowDeltaLog(e.target.checked)}
+                />
+                <span className={styles.slider}></span>
+              </label>
+            </div>
+            <p className={styles.settingsDesc}>
+              Show collapsing delta change log at the bottom of AI messages.
+            </p>
+          </div>
+
+          {/* 5. History Snapshots */}
+          <div className={styles.section}>
+            <label className={styles.label}>
+              History Snapshots
+            </label>
+
+            <div className={styles.snapshotControlsRow}>
+              <span className={styles.snapshotLabel}>
+                Max Recent Snapshots to Keep
+              </span>
+
+              <div className={styles.snapshotButtonGroup}>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={localKeepAllBackups}
+                  value={localKeepAllBackups ? '' : localMaxBackupCount}
+                  placeholder={localKeepAllBackups ? '∞' : ''}
+                  onChange={e => setLocalMaxBackupCount(e.target.value)}
+                  className={styles.snapshotNumberInput}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setLocalKeepAllBackups(!localKeepAllBackups)}
+                  className={`${styles.unlimitedBtn} ${localKeepAllBackups ? styles.unlimitedBtnActive : ''}`}
+                >
+                  Unlimited {localKeepAllBackups ? 'ON' : 'OFF'}
+                </button>
+              </div>
+            </div>
+
+            <p className={styles.settingsDesc}>
+              Set how many historical state snapshots to keep in chat metadata. Enabling Unlimited stores status snapshots across all turns for complete historical integrity.
+            </p>
           </div>
         </div>
 

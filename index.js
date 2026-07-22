@@ -4,14 +4,18 @@ import { loadSettings, backupSettingsToLocalStorage, syncRpgTrackerRegex } from 
 import { establishBridgeConnection } from "./src/core/ExtensionBridge.js";
 import { registerLifecycleEvents } from "./src/core/ExtensionLifecycle.js";
 import { startChatObserver, registerChatEvents, triggerObserverNow } from "./src/core/ExtensionObserver.js";
+import { registerContextInterceptor } from "./src/core/ContextManager.js";
 
-// Import renderer event listeners
 import { registerSnapshotClickEvent } from "./src/messagetracker/SnapshotRenderer.js";
 import { registerDeltaLogClickEvent } from "./src/tracker/DeltaLogRenderer.js";
+
+export default 'RPGTracker';
 
 const extensionPath = import.meta.url.substring(0, import.meta.url.lastIndexOf('/'));
 const extensionName = extensionPath.substring(extensionPath.lastIndexOf('/') + 1);
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
+
+registerContextInterceptor(extensionName);
 
 async function initReactApp() {
     $('#my-rpg-react-root').remove();
@@ -24,7 +28,6 @@ async function initReactApp() {
 }
 
 jQuery(async () => {
-    // 1. Inject ST UI settings area
     try {
         const extensionsettingsHtml = await $.get(`${extensionFolderPath}/extension-settings.html`);
         $("#extensions_settings2").append(extensionsettingsHtml);
@@ -32,24 +35,16 @@ jQuery(async () => {
             const isChecked = Boolean($(event.target).prop("checked"));
             extension_settings[extensionName] = extension_settings[extensionName] || {};
             extension_settings[extensionName].enabled = isChecked;
-            
+
             if (!isChecked) {
                 backupSettingsToLocalStorage(extensionName);
-                
-                // 전역 설정 크기 증가 방지를 위해 비활성화 시 세션 싱크 및 자른 아바타 캐시 완전히 초기화
-                if (extension_settings[extensionName].characterSyncs) {
-                    delete extension_settings[extensionName].characterSyncs;
-                }
-                if (extension_settings[extensionName].croppedAvatars) {
-                    delete extension_settings[extensionName].croppedAvatars;
-                }
-                
+
                 $('#rpg-snapshot-styles').remove();
                 $('#rpg-delta-log-styles').remove();
                 $('.rpg-delta-log-container').remove();
                 $('.rpg-snapshot-container').remove();
             }
-            
+
             if (window.RPGBridge && typeof window.RPGBridge.syncSettings === 'function') {
                 window.RPGBridge.syncSettings(extension_settings[extensionName]);
             }
@@ -59,25 +54,20 @@ jQuery(async () => {
         console.error("[RPG Tracker] Failed to load settings template", err);
     }
 
-    // 2. Initialize and boot extension
     await loadSettings(extensionName);
     establishBridgeConnection(extensionName);
     await initReactApp();
 
-    // 3. Register UI click event delegations
     registerSnapshotClickEvent();
     registerDeltaLogClickEvent();
 
-    // 4. Register system and chat event modules
     registerLifecycleEvents(extensionName);
     registerChatEvents();
     startChatObserver(extensionName);
 
-    // Trigger initial render
     setTimeout(() => triggerObserverNow(), 500);
 });
 
-// Prevent file drag and drop anomalies
 window.addEventListener('drop', function (e) {
     const rxRoot = document.getElementById('my-rpg-react-root');
     if (rxRoot && rxRoot.contains(e.target)) return;

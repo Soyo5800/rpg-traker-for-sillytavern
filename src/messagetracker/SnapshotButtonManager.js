@@ -1,4 +1,6 @@
 // src/messagetracker/SnapshotButtonManager.js
+import { rehydrateFromHistoryAsync } from "../core/JSONTracker.js";
+
 export function injectSnapshotButtons(getContext) {
     $('#chat .mes').each(function () {
         const $mes = $(this);
@@ -28,31 +30,43 @@ export function injectSnapshotButtons(getContext) {
             </div>
         `);
         
-        $btn.on('click', () => {
+        $btn.on('click', async () => {
             const context = getContext();
-            const msg = context.chat.find(m => String(m.mesId) === String(mesId) || String(context.chat.indexOf(m)) === String(mesId));
+            if (!context || !Array.isArray(context.chat)) return;
+
+            const targetIndex = context.chat.findIndex(m => String(m.mesId) === String(mesId) || String(context.chat.indexOf(m)) === String(mesId));
+            if (targetIndex === -1) return;
+
+            const msg = context.chat[targetIndex];
             
             let histData = null;
             let existingPayload = null;
 
             if (msg) {
-                // 기존 데이터(히스토리) 추출
                 let swipeId = msg.swipe_id || 0;
                 if (msg.swipes && msg.swipes.length > 0 && typeof msg.mes === 'string') {
                     const foundIdx = msg.swipes.findIndex(s => s === msg.mes);
                     if (foundIdx !== -1) swipeId = foundIdx;
                 }
+
+                // 1. Direct metadata lookup inside swipe_info
                 if (msg.swipe_info && msg.swipe_info[swipeId]?.extra?.rpgTrackerData) {
                     histData = msg.swipe_info[swipeId].extra.rpgTrackerData;
                 }
 
-                // 메시지 텍스트에서 기존 <rpgmt> 태그 추출 (양방향 바인딩 용도)
+                // 2. Fallback: If metadata was purged, reconstruct state up to this turn
+                if (!histData) {
+                    const subChatHistory = context.chat.slice(0, targetIndex + 1);
+                    histData = await rehydrateFromHistoryAsync(subChatHistory);
+                }
+
+                // Extract existing <rpgmt> tag payload from message text
                 const rpgmtRegex = /(?:<|&lt;)rpgmt(?:>|&gt;)([\s\S]*?)(?:<|&lt;)\/rpgmt(?:>|&gt;)/i;
                 const match = msg.mes.match(rpgmtRegex);
                 if (match && match[1]) {
                     try {
                         const cleanJson = match[1]
-                            .replace(/<br\s*\/?>/gi, '\n') // 혹시 모를 br 태그 제거
+                            .replace(/<br\s*\/?>/gi, '\n')
                             .replace(/&quot;/g, '"')
                             .replace(/&apos;/g, "'")
                             .replace(/&#x27;/g, "'")

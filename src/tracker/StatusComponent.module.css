@@ -105,6 +105,45 @@
   padding-bottom: 4px;
 }
 
+.targetHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.accordionToggleBtn {
+  background: transparent;
+  border: none;
+  color: var(--rpg-text);
+  font-size: 10px;
+  cursor: pointer;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+  padding: 2px 4px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activeToggle {
+  transform: rotate(90deg);
+}
+
+.syncBadge {
+  font-size: 10px;
+  background: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
 .targetNameText {
   font-size: 12.5px;
   color: var(--rpg-text);
@@ -252,7 +291,7 @@
   min-height: 28px;
   height: auto;
   line-height: 1.4;
-  resize: none; /* 수동 드래그 크기 조절 완전 잠금 */
+  resize: none;
   outline: none;
   overflow-y: hidden;
   display: block;
@@ -263,7 +302,6 @@
   outline: none;
 }
 
-/* 정수값 입력필드 우측 숫자 조절 화살표 소거 */
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -273,7 +311,7 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-/* 읽기 전용 텍스트 및 숫자형 블록 전용 스타일 */
+/* Read-only block styling */
 .readOnlyBlock {
   background: rgba(0, 0, 0, 0.1) !important;
   border-color: rgba(255, 255, 255, 0.05) !important;
@@ -281,7 +319,7 @@ input[type=number] {
   white-space: pre-wrap;
   word-break: break-all;
   overflow-wrap: break-word;
-  resize: none !important; /* 드래그를 통한 인위적 확장 제한 */
+  resize: none !important;
 }
 
 .readOnlyNumberValue {

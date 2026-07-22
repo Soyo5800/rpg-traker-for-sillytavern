@@ -23,7 +23,8 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
   useEffect(() => {
     const loadPackagedPresets = async () => {
       try {
-        const response = await fetch('/scripts/extensions/third-party/rpg-traker-sillytavern/presets.json');
+        const folderPath = window.RPGBridge?.extensionFolderPath || 'scripts/extensions/third-party/rpg-tracker-for-sillytavern';
+        const response = await fetch(`/${folderPath}/presets.json`);
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
@@ -39,7 +40,16 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
 
   const safeSaveToLocalStorage = (id, data) => {
     try {
-      localStorage.setItem(`rpg_tracker_preset_${id}`, JSON.stringify(data));
+      // LocalStorage 용량 초과 방지를 위해 Base64 아바타 이미지 데이터를 제거하고 텍스트/스키마 위주로 저장
+      const cleanData = JSON.parse(JSON.stringify(data));
+      if (Array.isArray(cleanData)) {
+        cleanData.forEach(char => {
+          if (typeof char.avatarUrl === 'string' && char.avatarUrl.startsWith('data:')) {
+            delete char.avatarUrl;
+          }
+        });
+      }
+      localStorage.setItem(`rpg_tracker_preset_${id}`, JSON.stringify(cleanData));
       return true;
     } catch (e) {
       alert("Browser local storage is full! Please delete old presets or export them as files.");
@@ -228,7 +238,8 @@ export default function CharListEditor({ onClose, onOpenStatusEditor }) {
           }
         } else if (preset.type === 'file' || preset.type === 'server') {
           const fileName = preset.file || `${preset.id}.json`;
-          const response = await fetch(`/scripts/extensions/third-party/rpg-tracker-for-sillytavern/presets/${fileName}`);
+          const folderPath = window.RPGBridge?.extensionFolderPath || 'scripts/extensions/third-party/rpg-tracker-for-sillytavern';
+          const response = await fetch(`/${folderPath}/presets/${fileName}`);
           if (response.ok) {
             loadedChars = await response.json();
           } else {

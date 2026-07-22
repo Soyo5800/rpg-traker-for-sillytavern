@@ -1,5 +1,11 @@
 // src/core/ActivePrompt.js
 
+import {
+  DEFAULT_CYOA_PROMPT,
+  DEFAULT_WEATHER_PROMPT,
+  DEFAULT_WORLD_EVENTS_PROMPT
+} from './PromptSchema.js';
+
 export function buildStaticDefinitionsPrompt(trackerData) {
   const globalDefs = trackerData.globalDefinitions || {};
   const lines = [];
@@ -418,28 +424,40 @@ export function buildDynamicValuesPrompt(trackerData) {
   return `\n[CURRENT RPG STATUS REFERENCE]\n\`\`\`json\n${JSON.stringify(activeData, null, 2)}\n\`\`\`\n`;
 }
 
-export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', footerPrompt = '', forcePlayer = null) {
-  const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
-
-  // Generate dynamic schema layout template based on current configuration
-  const schemaExample = getDynamicSchemaExample(trackerData, forcePlayer) || '';
-
+// 유저 응답 요청(일반 대화) 시에만 결합되는 애드온 블록 독립 생성 함수
+export function buildAddonSection(trackerData) {
   const guidePromptsData = trackerData.guidePrompts || [];
   const activeGuides = guidePromptsData.filter(g => g.enabled && g.prompt && g.prompt.trim() !== '').map(g => `- ${g.prompt.trim()}`);
 
   const addons = trackerData.addons || {};
-  if (addons.cyoa) activeGuides.push("- CYOA Mode: Act as an interactive adventure where you present choices to the player at the end of each response.");
-  if (addons.weather) activeGuides.push("- Dynamic Weather: Include weather changes and environmental descriptions.");
-  if (addons.worldEvents) activeGuides.push("- World Events: Generate random world events that affect the current situation.");
+  if (addons.cyoa) {
+    const cyoaText = trackerData.cyoaPrompt !== undefined ? trackerData.cyoaPrompt : DEFAULT_CYOA_PROMPT;
+    if (cyoaText && cyoaText.trim() !== '') activeGuides.push(`- ${cyoaText.trim()}`);
+  }
+  if (addons.weather) {
+    const weatherText = trackerData.weatherPrompt !== undefined ? trackerData.weatherPrompt : DEFAULT_WEATHER_PROMPT;
+    if (weatherText && weatherText.trim() !== '') activeGuides.push(`- ${weatherText.trim()}`);
+  }
+  if (addons.worldEvents) {
+    const worldEventsText = trackerData.worldEventsPrompt !== undefined ? trackerData.worldEventsPrompt : DEFAULT_WORLD_EVENTS_PROMPT;
+    if (worldEventsText && worldEventsText.trim() !== '') activeGuides.push(`- ${worldEventsText.trim()}`);
+  }
 
-  const addonSection = activeGuides.length > 0
+  return activeGuides.length > 0
     ? `\n### SPECIAL INSTRUCTIONS / ACTIVE ADD-ONS\n${activeGuides.join('\n')}\n`
     : '';
+}
 
-  // Combine components into the final structured prompt block
+export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', footerPrompt = '', forcePlayer = null) {
+  const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
+  const schemaExample = getDynamicSchemaExample(trackerData, forcePlayer) || '';
+  const statusReference = buildDynamicValuesPrompt(trackerData) || '';
+  const addonSection = buildAddonSection(trackerData);
+
   const finalPrompt = [
     headerPrompt,
     schemaExample,
+    statusReference,
     footerPrompt,
     addonSection,
     staticDefs
@@ -449,6 +467,5 @@ export function buildDefinitionPromptWrapper(trackerData, headerPrompt = '', foo
 }
 
 export function buildStatusPromptWrapper(trackerData) {
-  const dynamicVals = buildDynamicValuesPrompt(trackerData);
-  return dynamicVals;
+  return buildDynamicValuesPrompt(trackerData);
 }

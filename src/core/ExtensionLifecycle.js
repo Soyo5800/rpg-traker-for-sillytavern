@@ -1,8 +1,8 @@
 // src/core/ExtensionLifecycle.js
 import { getContext, extension_settings } from "../../../../../extensions.js";
 import { eventSource, event_types, saveChat, saveChatConditional, setExtensionPrompt, extension_prompt_types, extension_prompt_roles } from "../../../../../../script.js";
-import { rehydrateFromHistory, applyLLMPatch, extractNormalizedPatch } from "./JSONTracker.js";
-import { buildDefinitionPromptWrapper, buildStatusPromptWrapper, buildStaticDefinitionsPrompt } from "./ActivePrompt.js";
+import { rehydrateFromHistory, rehydrateFromHistoryAsync, applyLLMPatch, extractNormalizedPatch } from "./JSONTracker.js";
+import { buildDefinitionPromptWrapper, buildDynamicValuesPrompt, buildStaticDefinitionsPrompt, buildAddonSection } from "./ActivePrompt.js";
 import { DEFAULT_PROMPT_HEADER_MERGED, DEFAULT_PROMPT_FOOTER_MERGED, DEFAULT_READONLY_CONTEXT_HEADER } from "./PromptSchema.js";
 import { parseResponse } from "./ResponseParser.js";
 import { setDeltaLog } from "../tracker/DeltaLogRenderer.js";
@@ -10,20 +10,24 @@ import { safeUpdateMessageBlock } from "./ExtensionBridge.js";
 import { triggerObserverNow } from "./ExtensionObserver.js";
 
 export function registerLifecycleEvents(extensionName) {
-    // 1. 생성 시작 시점에 프롬프트 세팅
     eventSource.on(event_types.GENERATION_STARTED, () => {
         if (window.RPGBridge && typeof window.RPGBridge.flushSave === 'function') {
             window.RPGBridge.flushSave();
         }
 
-        if (!extension_settings[extensionName].enabled) return;
+        // 백그라운드 콰이엇 프롬프트(수동 업데이트/캐릭터 생성) 진행 중일 때는 프롬프트 재주입 방지
+        if (window.RPGBridge?.isQuietUpdating) return;
+
+        if (!extension_settings[extensionName]?.enabled) return;
+
+        if (extension_settings.extension_prompts?.[`${extensionName}_status`]) {
+            delete extension_settings.extension_prompts[`${extensionName}_status`];
+        }
 
         if (extension_settings[extensionName].updateMode === 'isolated') {
             if (typeof window.extension_prompt_types !== 'undefined' && typeof setExtensionPrompt === 'function') {
                 setExtensionPrompt(`${extensionName}_def`, '', extension_prompt_types.IN_PROMPT, 0, false);
-                setExtensionPrompt(`${extensionName}_status`, '', extension_prompt_types.IN_CHAT, 0, false);
                 delete extension_settings.extension_prompts[`${extensionName}_def`];
-                delete extension_settings.extension_prompts[`${extensionName}_status`];
             }
             return;
         }
@@ -35,13 +39,15 @@ export function registerLifecycleEvents(extensionName) {
             if (trackerData && Array.isArray(trackerData.characters)) {
                 if (extension_settings[extensionName].updateMode === 'separated') {
                     const staticDefs = buildStaticDefinitionsPrompt(trackerData) || '';
-                    const statusPrompt = buildStatusPromptWrapper(trackerData);
+                    const statusPrompt = buildDynamicValuesPrompt(trackerData);
                     const readOnlyHeader = trackerData.systemPrompt_readonly !== undefined ? trackerData.systemPrompt_readonly : DEFAULT_READONLY_CONTEXT_HEADER;
-                    const readOnlyPrompt = `${readOnlyHeader}\n\n${statusPrompt}\n${staticDefs}`;
+
+                    // 유저 대화 응답 시에만 애드온 지침 포함
+                    const addonSection = buildAddonSection(trackerData);
+                    const readOnlyPrompt = `${readOnlyHeader}\n\n${statusPrompt}\n${staticDefs}\n${addonSection}`;
 
                     if (typeof extension_prompt_types !== 'undefined' && typeof setExtensionPrompt === 'function') {
-                        setExtensionPrompt(`${extensionName}_def`, '', extension_prompt_types.IN_PROMPT, 0, false);
-                        setExtensionPrompt(`${extensionName}_status`, readOnlyPrompt, extension_prompt_types.IN_CHAT, 0, false, extension_prompt_roles.SYSTEM || 0);
+                        setExtensionPrompt(`${extensionName}_def`, readOnlyPrompt, extension_prompt_types.IN_CHAT, 0, false, extension_prompt_roles.SYSTEM || 0);
                     }
                     return;
                 }
@@ -50,19 +56,16 @@ export function registerLifecycleEvents(extensionName) {
                 const footer = trackerData.systemPromptFooter_merged !== undefined ? trackerData.systemPromptFooter_merged : DEFAULT_PROMPT_FOOTER_MERGED;
 
                 const finalPrompt = buildDefinitionPromptWrapper(trackerData, header, footer);
-                const statusPrompt = buildStatusPromptWrapper(trackerData);
 
                 if (typeof extension_prompt_types !== 'undefined' && typeof setExtensionPrompt === 'function') {
                     setExtensionPrompt(`${extensionName}_def`, finalPrompt, extension_prompt_types.IN_PROMPT, 0, false, extension_prompt_roles.SYSTEM || 0);
-                    setExtensionPrompt(`${extensionName}_status`, statusPrompt, extension_prompt_types.IN_CHAT, 0, false, extension_prompt_roles.SYSTEM || 0);
                 }
             }
         }
     });
 
-    // 2. 생성 종료 시 응답 파싱 및 적용
     const processGenerationEnd = async () => {
-        if (!extension_settings[extensionName].enabled) return;
+        if (!extension_settings[extensionName]?.enabled) return;
 
         const context = getContext();
         if (context && context.chat && context.chat.length > 0) {
@@ -73,13 +76,16 @@ export function registerLifecycleEvents(extensionName) {
                 const { cleanedText, patch } = parseResponse(text);
 
                 if (patch && Object.keys(patch).length > 0) {
+                    const activeSwipeId = lastMessage.swipe_id || 0;
+                    if (Array.isArray(lastMessage.swipes) && lastMessage.swipes.length > activeSwipeId) {
+                        lastMessage.swipes[activeSwipeId] = cleanedText;
+                    }
                     lastMessage.mes = cleanedText;
-                    
-                    // 수신된 패치 데이터 구조 정규화 후 로그에 반영
+
                     const normPatch = extractNormalizedPatch(patch);
                     setDeltaLog(lastMessage, normPatch);
 
-                    const trackerData = window.RPGBridge?.currentTrackerData || rehydrateFromHistory(context.chat);
+                    const trackerData = window.RPGBridge?.currentTrackerData || (await rehydrateFromHistoryAsync(context.chat));
                     if (trackerData && Array.isArray(trackerData.characters)) {
                         const updatedData = applyLLMPatch(trackerData, normPatch);
                         if (window.RPGBridge && typeof window.RPGBridge.syncChatData === 'function') {

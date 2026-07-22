@@ -91,8 +91,8 @@ export function parseResponse(text) {
 
   const decodedText = decodeHtmlEntities(text);
 
-  // 1순위: 마크다운 코드 블록 + 핵심 키워드가 포함된 경우 (인사말 무시, 텍스트 내 어디서든 추출)
-  const jsonBlockRegex = /(?:\s*<!--(?:RPG_TRACKER)?\s*)?```(?:json|markdown)?\s*\n?(\{[\s\S]*?(?:"status"|"statusSchema"|"stats"|"profile"|"inventory"|"quests"|"Character Name"|"World"|"relations"|"events")[\s\S]*?\})\s*\n?```(?:\s*-->)?/i;
+  // 1순위: 마크다운 코드 블록 내의 모든 JSON 구조 유연하게 추출
+  const jsonBlockRegex = /(?:\s*<!--(?:RPG_TRACKER)?\s*)?```(?:json|markdown)?\s*\n?(\{[\s\S]*?\})\s*\n?```(?:\s*-->)?/i;
   const match = decodedText.match(jsonBlockRegex);
 
   if (match && match[1]) {

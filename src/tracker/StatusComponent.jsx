@@ -5,10 +5,27 @@ import { useRPG } from '../core/RPGControl';
 import { AutoGrowingTextArea } from '../utils';
 
 export default function StatusComponent({ char, characters = [], activeTabs, onOpenEditor }) {
-  const { patchCharacterField } = useRPG();
+  const { patchCharacterField, uiState, updateUiState } = useRPG();
+
+  // Retrieve relation collapse state from global uiState (persisted in localStorage)
+  const collapsedRelations = uiState.collapsedRelations || {};
+
+  const toggleTarget = (targetName) => {
+    const key = `${char.id}_${targetName}`;
+    const isCurrentlyExpanded = collapsedRelations[key] === true;
+    updateUiState({
+      collapsedRelations: {
+        ...collapsedRelations,
+        [key]: !isCurrentlyExpanded
+      }
+    });
+  };
 
   const profile = char.profile || { race: '', height: '', hair: '', eye: '', personality: '' };
   const relations = char.relations || {};
+
+  // Filter relations to only show targets where isInject is NOT false
+  const activeRelations = Object.entries(relations).filter(([_, data]) => data.isInject !== false);
 
   return (
     <div className={styles.tabContentStack}>
@@ -59,12 +76,16 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
             </button>
           </div>
 
-          {Object.keys(relations).length === 0 ? (
+          {activeRelations.length === 0 ? (
             <p className={styles.emptyPlaceholder}>No recorded relations.</p>
           ) : (
-            Object.entries(relations).map(([targetName, data]) => {
+            activeRelations.map(([targetName, data]) => {
               const targetChar = characters.find(c => (c.name || '').trim() === targetName.trim());
               const isTargetExist = !!targetChar;
+
+              // Unique key for persisting state per character and target relation
+              const relKey = `${char.id}_${targetName}`;
+              const isExpanded = collapsedRelations[relKey] === true;
 
               const metricsList = Object.entries(data.values || {}).map(([mName, mVal]) => {
                 const isObj = typeof mVal === 'object' && mVal !== null;
@@ -104,9 +125,19 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
               return (
                 <div key={targetName} className={styles.relationTargetCard}>
                   <div className={styles.relationTargetHeader}>
-                    <strong className={styles.targetNameText}>
-                      {targetName} {isTargetExist ? '(Synced)' : ''}
-                    </strong>
+                    <div className={styles.targetHeaderLeft}>
+                      <button
+                        type="button"
+                        className={`${styles.accordionToggleBtn} ${isExpanded ? styles.activeToggle : ''}`}
+                        onClick={() => toggleTarget(targetName)}
+                      >
+                        ▶
+                      </button>
+                      <strong className={styles.targetNameText}>
+                        {targetName}
+                      </strong>
+                      {isTargetExist && <span className={styles.syncBadge}>Synced</span>}
+                    </div>
                     <div className={styles.flexCenterGap}>
                       <LockIcon
                         isLocked={data.isLocked}
@@ -116,123 +147,127 @@ export default function StatusComponent({ char, characters = [], activeTabs, onO
                     </div>
                   </div>
 
-                  <div className={styles.relationSectionMyPerspective}>
-                    <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} ➔ {targetName}</span>
-                    <div className={styles.relationDescriptionArea}>
-                      <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
-                        {data.text || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
-                      </div>
-                    </div>
-                    {metricsList.length > 0 && (
-                      <div className={styles.relationMetricsGrid}>
-                        {metricsList.map((m) => {
-                          const min = m.min;
-                          const max = m.max;
-                          const val = Number(m.value);
-                          let left = '0%';
-                          let width = '0%';
-                          let color = m.colorPositive;
+                  {isExpanded && (
+                    <>
+                      <div className={styles.relationSectionMyPerspective}>
+                        <span className={styles.relationSectionSubTitle}>{char.name || 'Character'} ➔ {targetName}</span>
+                        <div className={styles.relationDescriptionArea}>
+                          <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
+                            {data.text || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
+                          </div>
+                        </div>
+                        {metricsList.length > 0 && (
+                          <div className={styles.relationMetricsGrid}>
+                            {metricsList.map((m) => {
+                              const min = m.min;
+                              const max = m.max;
+                              const val = Number(m.value);
+                              let left = '0%';
+                              let width = '0%';
+                              let color = m.colorPositive;
 
-                          if (min < 0 && max > 0) {
-                            const totalRange = max - min;
-                            const zeroPosition = (Math.abs(min) / totalRange) * 100;
-                            if (val >= 0) {
-                              left = `${zeroPosition}%`;
-                              width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
-                              color = m.colorPositive;
-                            } else {
-                              const negWidth = (Math.abs(val) / totalRange) * 100;
-                              left = `${Math.max(0, zeroPosition - negWidth)}%`;
-                              width = `${Math.min(zeroPosition, negWidth)}%`;
-                              color = m.colorNegative;
-                            }
-                          } else {
-                            const totalRange = max - min || 1;
-                            const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
-                            left = '0%';
-                            width = `${ratio}%`;
-                            color = m.colorPositive;
-                          }
+                              if (min < 0 && max > 0) {
+                                const totalRange = max - min;
+                                const zeroPosition = (Math.abs(min) / totalRange) * 100;
+                                if (val >= 0) {
+                                  left = `${zeroPosition}%`;
+                                  width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
+                                  color = m.colorPositive;
+                                } else {
+                                  const negWidth = (Math.abs(val) / totalRange) * 100;
+                                  left = `${Math.max(0, zeroPosition - negWidth)}%`;
+                                  width = `${Math.min(zeroPosition, negWidth)}%`;
+                                  color = m.colorNegative;
+                                }
+                              } else {
+                                const totalRange = max - min || 1;
+                                const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
+                                left = '0%';
+                                width = `${ratio}%`;
+                                color = m.colorPositive;
+                              }
 
-                          return (
-                            <div key={m.name} className={styles.gaugeCard}>
-                              <div className={styles.gaugeLabelRow}>
-                                <span className={styles.gaugeName}>{m.name}</span>
-                                <div className={styles.gaugeValues}>
-                                  <span className={styles.readOnlyNumberValue}>{m.value}</span>
+                              return (
+                                <div key={m.name} className={styles.gaugeCard}>
+                                  <div className={styles.gaugeLabelRow}>
+                                    <span className={styles.gaugeName}>{m.name}</span>
+                                    <div className={styles.gaugeValues}>
+                                      <span className={styles.readOnlyNumberValue}>{m.value}</span>
+                                    </div>
+                                  </div>
+                                  <div className={styles.gaugeTrackWrapper}>
+                                    {min < 0 && max > 0 && (
+                                      <div className={styles.gaugeZeroMarker} style={{ left: `${(Math.abs(min) / (max - min)) * 100}%` }} />
+                                    )}
+                                    <div className={styles.gaugeFill} style={{ left, width, backgroundColor: color }} />
+                                  </div>
                                 </div>
-                              </div>
-                              <div className={styles.gaugeTrackWrapper}>
-                                {min < 0 && max > 0 && (
-                                  <div className={styles.gaugeZeroMarker} style={{ left: `${(Math.abs(min) / (max - min)) * 100}%` }} />
-                                )}
-                                <div className={styles.gaugeFill} style={{ left, width, backgroundColor: color }} />
-                              </div>
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className={styles.relationSectionTargetPerspective}>
-                    <span className={styles.relationSectionSubTitle}>{targetName} ➔ {char.name || 'Character'}</span>
-                    <div className={styles.relationDescriptionArea}>
-                      <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
-                        {targetText || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
-                      </div>
-                    </div>
-                    {targetMetricsList.length > 0 && (
-                      <div className={styles.relationMetricsGrid}>
-                        {targetMetricsList.map((m) => {
-                          const min = m.min;
-                          const max = m.max;
-                          const val = Number(m.value);
-                          let left = '0%';
-                          let width = '0%';
-                          let color = m.colorPositive;
+                      <div className={styles.relationSectionTargetPerspective}>
+                        <span className={styles.relationSectionSubTitle}>{targetName} ➔ {char.name || 'Character'}</span>
+                        <div className={styles.relationDescriptionArea}>
+                          <div className={`${styles.textBlockInput} ${styles.readOnlyBlock}`}>
+                            {targetText || <span className={styles.emptyPlaceholderInline}>No description defined.</span>}
+                          </div>
+                        </div>
+                        {targetMetricsList.length > 0 && (
+                          <div className={styles.relationMetricsGrid}>
+                            {targetMetricsList.map((m) => {
+                              const min = m.min;
+                              const max = m.max;
+                              const val = Number(m.value);
+                              let left = '0%';
+                              let width = '0%';
+                              let color = m.colorPositive;
 
-                          if (min < 0 && max > 0) {
-                            const totalRange = max - min;
-                            const zeroPosition = (Math.abs(min) / totalRange) * 100;
-                            if (val >= 0) {
-                              left = `${zeroPosition}%`;
-                              width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
-                              color = m.colorPositive;
-                            } else {
-                              const negWidth = (Math.abs(val) / totalRange) * 100;
-                              left = `${Math.max(0, zeroPosition - negWidth)}%`;
-                              width = `${Math.min(zeroPosition, negWidth)}%`;
-                              color = m.colorNegative;
-                            }
-                          } else {
-                            const totalRange = max - min || 1;
-                            const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
-                            left = '0%';
-                            width = `${ratio}%`;
-                            color = m.colorPositive;
-                          }
+                              if (min < 0 && max > 0) {
+                                const totalRange = max - min;
+                                const zeroPosition = (Math.abs(min) / totalRange) * 100;
+                                if (val >= 0) {
+                                  left = `${zeroPosition}%`;
+                                  width = `${Math.min(100 - zeroPosition, (val / totalRange) * 100)}%`;
+                                  color = m.colorPositive;
+                                } else {
+                                  const negWidth = (Math.abs(val) / totalRange) * 100;
+                                  left = `${Math.max(0, zeroPosition - negWidth)}%`;
+                                  width = `${Math.min(zeroPosition, negWidth)}%`;
+                                  color = m.colorNegative;
+                                }
+                              } else {
+                                const totalRange = max - min || 1;
+                                const ratio = Math.min(100, Math.max(0, ((val - min) / totalRange) * 100));
+                                left = '0%';
+                                width = `${ratio}%`;
+                                color = m.colorPositive;
+                              }
 
-                          return (
-                            <div key={m.name} className={styles.gaugeCard}>
-                              <div className={styles.gaugeLabelRow}>
-                                <span className={styles.gaugeName}>{m.name}</span>
-                                <div className={styles.gaugeValues}>
-                                  <span className={styles.readOnlyNumberValue}>{m.value}</span>
+                              return (
+                                <div key={m.name} className={styles.gaugeCard}>
+                                  <div className={styles.gaugeLabelRow}>
+                                    <span className={styles.gaugeName}>{m.name}</span>
+                                    <div className={styles.gaugeValues}>
+                                      <span className={styles.readOnlyNumberValue}>{m.value}</span>
+                                    </div>
+                                  </div>
+                                  <div className={styles.gaugeTrackWrapper}>
+                                    {min < 0 && max > 0 && (
+                                      <div className={styles.gaugeZeroMarker} style={{ left: `${(Math.abs(min) / (max - min)) * 100}%` }} />
+                                    )}
+                                    <div className={styles.gaugeFill} style={{ left, width, backgroundColor: color }} />
+                                  </div>
                                 </div>
-                              </div>
-                              <div className={styles.gaugeTrackWrapper}>
-                                {min < 0 && max > 0 && (
-                                  <div className={styles.gaugeZeroMarker} style={{ left: `${(Math.abs(min) / (max - min)) * 100}%` }} />
-                                )}
-                                <div className={styles.gaugeFill} style={{ left, width, backgroundColor: color }} />
-                              </div>
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
               );
             })

@@ -1,4 +1,5 @@
 // src/core/RPGControl.jsx
+
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { defensiveMerge, reconstructTurnState } from './JSONTracker';
 import { getDefaultCharacters, DEFAULT_GUIDE_PROMPTS, getInitialTrackerData } from './PromptSchema';
@@ -12,14 +13,16 @@ const DEFAULT_SETTINGS = {
   panelPosition: 'left',
   theme: 'default',
   updateMode: 'merged',
-  maxBackupCount: 4,
+  contextMessageLimit: 4,
+  keepAllBackups: false,
+  maxBackupCount: 20,
   showUserStats: true,
   showInfoBox: true,
   showCharacterThoughts: true,
   showInventory: true,
   showQuests: true,
   presets: [],
-  characterSyncs: {}, // 채팅방 ID별 캐릭터 싱크 매핑 정보 영구 저장
+  characterSyncs: {},
   customColors: {
     bg: '#1a1a2e',
     accent: '#4a7ba7',
@@ -38,7 +41,6 @@ export function RPGControlProvider({ children }) {
   const [trackerData, setTrackerData] = useState(getDefaultTrackerData);
   const [isChatConnected, setIsChatConnected] = useState(false);
 
-  // 실시간 최신 설정 상태를 캡처하여 클로저 결함을 방지하는 참조 객체
   const settingsRef = useRef(settings);
   useEffect(() => {
     settingsRef.current = settings;
@@ -47,10 +49,8 @@ export function RPGControlProvider({ children }) {
     }
   }, [settings]);
 
-  // 스냅샷 모달
   const [snapshotModalData, setSnapshotModalData] = useState({ isOpen: false, mesId: null, historicalData: null });
 
-  // 로컬스토리지에서 이전 UI 상태를 복구하거나 기본값으로 초기화
   const [uiState, setUiState] = useState(() => {
     try {
       const cached = localStorage.getItem('rpg_tracker_ui_state');
@@ -67,7 +67,6 @@ export function RPGControlProvider({ children }) {
     };
   });
 
-  // UI 상태가 변경될 때마다 로컬스토리지에 저장하여 새로고침 시에도 기억
   const updateUiState = useCallback((updates) => {
     setUiState((prev) => {
       const next = { ...prev, ...updates };
@@ -129,10 +128,56 @@ export function RPGControlProvider({ children }) {
   const updateTrackerData = useCallback((newTrackerData) => {
     setTrackerData((prev) => {
       const updated = { ...prev, ...newTrackerData };
+
+      // 1. 캐릭터 삭제 시 크롭 이미지 찌꺼기 자동 청소
+      if (updated.characters && settingsRef.current?.croppedAvatars) {
+        const activeIds = new Set(updated.characters.map(c => c.id));
+        const currentCropped = settingsRef.current.croppedAvatars;
+        let hasChanges = false;
+        const cleanedCropped = { ...currentCropped };
+
+        Object.keys(currentCropped).forEach(id => {
+          if (!activeIds.has(id)) {
+            delete cleanedCropped[id];
+            hasChanges = true;
+          }
+        });
+
+        if (hasChanges) {
+          updateSettings({ croppedAvatars: cleanedCropped });
+        }
+      }
+
+      // 2. extension_settings에 남아있는 유령(Stale) characterSyncs 찌꺼기 자동 청소 (Pruning)
+      const context = window.SillyTavern?.getContext?.() || {};
+      const chatId = context.chatId;
+      if (chatId && settingsRef.current?.characterSyncs?.[chatId] && Array.isArray(updated.characters)) {
+        const currentSyncs = JSON.parse(JSON.stringify(settingsRef.current.characterSyncs));
+        const chatSync = currentSyncs[chatId] || {};
+        let hasSyncChanges = false;
+
+        Object.keys(chatSync).forEach(idxKey => {
+          const idx = parseInt(idxKey, 10);
+          if (isNaN(idx) || idx >= updated.characters.length) {
+            delete chatSync[idxKey];
+            hasSyncChanges = true;
+          }
+        });
+
+        if (hasSyncChanges) {
+          if (Object.keys(chatSync).length === 0) {
+            delete currentSyncs[chatId];
+          } else {
+            currentSyncs[chatId] = chatSync;
+          }
+          updateSettings({ characterSyncs: currentSyncs });
+        }
+      }
+
       saveTrackerDataToST(updated);
       return updated;
     });
-  }, [saveTrackerDataToST]);
+  }, [saveTrackerDataToST, updateSettings]);
 
   const patchCharacterField = useCallback((charId, pathArray, value) => {
     setTrackerData(prev => {
@@ -171,7 +216,6 @@ export function RPGControlProvider({ children }) {
     });
   }, [saveTrackerDataToST]);
 
-  // 캐릭터 동기화 이벤트를 전역 설정에 즉시 및 직접 보존 처리하는 제어기 (안정적인 배열 순서 색인으로 매핑)
   const syncCharacterToCard = useCallback((charId, target) => {
     const context = window.SillyTavern?.getContext?.() || {};
     const chatId = context.chatId;
@@ -181,10 +225,9 @@ export function RPGControlProvider({ children }) {
       const charIndex = prev.characters.findIndex(c => c.id === charId);
       if (charIndex === -1) return prev;
 
-      // 1. ST 백엔드 전역 설정 및 동기식 브릿지 캐시에 즉시 보존
       setSettings(prevSettings => {
-        const nextSyncs = { ...(prevSettings.characterSyncs || {}) };
-        nextSyncs[chatId] = { ...(nextSyncs[chatId] || {}) };
+        const nextSyncs = JSON.parse(JSON.stringify(prevSettings.characterSyncs || {}));
+        nextSyncs[chatId] = nextSyncs[chatId] || {};
 
         if (!target || target.type === 'Unsync') {
           delete nextSyncs[chatId][charIndex];
@@ -208,11 +251,16 @@ export function RPGControlProvider({ children }) {
         return updated;
       });
 
-      // 2. 현재 활성 메모리 세션의 타겟 상태에도 즉시 영구화 처리
       const updatedChars = prev.characters.map((c, idx) => {
         if (idx === charIndex) {
           if (!target || target.type === 'Unsync') {
-            return { ...c, syncedCardAvatar: null, syncedCardType: null };
+            const crop = settingsRef.current?.croppedAvatars?.[c.id];
+            return {
+              ...c,
+              syncedCardAvatar: null,
+              syncedCardType: null,
+              avatarUrl: crop || null
+            };
           }
           return {
             ...c,
@@ -279,31 +327,42 @@ export function RPGControlProvider({ children }) {
         if (stChatData) {
           setTrackerData((prev) => {
             const defaultData = getDefaultTrackerData();
+            const safePrev = prev || defaultData;
+
             const cleanBase = {
               ...defaultData,
-              systemPromptHeader_merged: prev.systemPromptHeader_merged,
-              systemPromptFooter_merged: prev.systemPromptFooter_merged,
-              systemPromptHeader_separated: prev.systemPromptHeader_separated,
-              systemPromptFooter_separated: prev.systemPromptFooter_separated,
-              globalDefinitions: prev.globalDefinitions,
-              addons: prev.addons
+              systemPromptHeader_merged: safePrev.systemPromptHeader_merged ?? defaultData.systemPromptHeader_merged,
+              systemPromptFooter_merged: safePrev.systemPromptFooter_merged ?? defaultData.systemPromptFooter_merged,
+              systemPromptHeader_separated: safePrev.systemPromptHeader_separated ?? defaultData.systemPromptHeader_separated,
+              systemPromptFooter_separated: safePrev.systemPromptFooter_separated ?? defaultData.systemPromptFooter_separated,
+              globalDefinitions: safePrev.globalDefinitions ?? defaultData.globalDefinitions,
+              addons: safePrev.addons ?? defaultData.addons,
+              addCharPrompt: safePrev.addCharPrompt ?? defaultData.addCharPrompt,
+              addPlayerCharPrompt: safePrev.addPlayerCharPrompt ?? defaultData.addPlayerCharPrompt,
+              cyoaPrompt: safePrev.cyoaPrompt ?? defaultData.cyoaPrompt,
+              weatherPrompt: safePrev.weatherPrompt ?? defaultData.weatherPrompt,
+              worldEventsPrompt: safePrev.worldEventsPrompt ?? defaultData.worldEventsPrompt
             };
             const merged = defensiveMerge(cleanBase, stChatData);
-            
-            // 세션 데이터 복원 시 지연 없는 브릿지 동기화 설정 오버레이 적용
+
             const context = window.SillyTavern?.getContext?.() || {};
             const chatId = context.chatId;
-            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId)
               || settingsRef.current.characterSyncs?.[chatId];
 
-            if (chatId && savedSyncs && Array.isArray(merged.characters)) {
+            if (chatId && Array.isArray(merged.characters)) {
               merged.characters.forEach((c, index) => {
-                const saved = savedSyncs[index];
+                const saved = savedSyncs?.[index];
                 if (saved) {
                   c.syncedCardAvatar = saved.syncedCardAvatar;
                   c.syncedCardType = saved.syncedCardType;
                   c.name = saved.name;
                   c.avatarUrl = saved.avatarUrl;
+                } else {
+                  c.syncedCardAvatar = null;
+                  c.syncedCardType = null;
+                  const globalCrop = settingsRef.current?.croppedAvatars?.[c.id];
+                  c.avatarUrl = globalCrop || null;
                 }
               });
             }
@@ -319,30 +378,42 @@ export function RPGControlProvider({ children }) {
           const recovered = window.RPGBridge.rehydrateFromHistory();
           setTrackerData((prev) => {
             const defaultData = getDefaultTrackerData();
+            const safePrev = prev || defaultData;
+
             const cleanBase = {
               ...defaultData,
-              systemPromptHeader_merged: prev.systemPromptHeader_merged,
-              systemPromptFooter_merged: prev.systemPromptFooter_merged,
-              systemPromptHeader_separated: prev.systemPromptHeader_separated,
-              systemPromptFooter_separated: prev.systemPromptFooter_separated,
-              globalDefinitions: prev.globalDefinitions,
-              addons: prev.addons
+              systemPromptHeader_merged: safePrev.systemPromptHeader_merged ?? defaultData.systemPromptHeader_merged,
+              systemPromptFooter_merged: safePrev.systemPromptFooter_merged ?? defaultData.systemPromptFooter_merged,
+              systemPromptHeader_separated: safePrev.systemPromptHeader_separated ?? defaultData.systemPromptHeader_separated,
+              systemPromptFooter_separated: safePrev.systemPromptFooter_separated ?? defaultData.systemPromptFooter_separated,
+              globalDefinitions: safePrev.globalDefinitions ?? defaultData.globalDefinitions,
+              addons: safePrev.addons ?? defaultData.addons,
+              addCharPrompt: safePrev.addCharPrompt ?? defaultData.addCharPrompt,
+              addPlayerCharPrompt: safePrev.addPlayerCharPrompt ?? defaultData.addPlayerCharPrompt,
+              cyoaPrompt: safePrev.cyoaPrompt ?? defaultData.cyoaPrompt,
+              weatherPrompt: safePrev.weatherPrompt ?? defaultData.weatherPrompt,
+              worldEventsPrompt: safePrev.worldEventsPrompt ?? defaultData.worldEventsPrompt
             };
             const merged = recovered ? defensiveMerge(cleanBase, recovered) : cleanBase;
 
             const context = window.SillyTavern?.getContext?.() || {};
             const chatId = context.chatId;
-            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+            const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId)
               || settingsRef.current.characterSyncs?.[chatId];
 
-            if (chatId && savedSyncs && Array.isArray(merged.characters)) {
+            if (chatId && Array.isArray(merged.characters)) {
               merged.characters.forEach((c, index) => {
-                const saved = savedSyncs[index];
+                const saved = savedSyncs?.[index];
                 if (saved) {
                   c.syncedCardAvatar = saved.syncedCardAvatar;
                   c.syncedCardType = saved.syncedCardType;
                   c.name = saved.name;
                   c.avatarUrl = saved.avatarUrl;
+                } else {
+                  c.syncedCardAvatar = null;
+                  c.syncedCardType = null;
+                  const globalCrop = settingsRef.current?.croppedAvatars?.[c.id];
+                  c.avatarUrl = globalCrop || null;
                 }
               });
             }
@@ -364,24 +435,28 @@ export function RPGControlProvider({ children }) {
           const defaultData = getDefaultTrackerData();
           const context = window.SillyTavern?.getContext?.() || {};
           const chatId = context.chatId;
-          const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId) 
+          const savedSyncs = window.RPGBridge?.getSTSettingsCharacterSyncs?.(chatId)
             || settingsRef.current.characterSyncs?.[chatId];
 
-          if (chatId && savedSyncs && Array.isArray(defaultData.characters)) {
+          if (chatId && Array.isArray(defaultData.characters)) {
             defaultData.characters.forEach((c, index) => {
-              const saved = savedSyncs[index];
+              const saved = savedSyncs?.[index];
               if (saved) {
                 c.syncedCardAvatar = saved.syncedCardAvatar;
                 c.syncedCardType = saved.syncedCardType;
                 c.name = saved.name;
                 c.avatarUrl = saved.avatarUrl;
+              } else {
+                c.syncedCardAvatar = null;
+                c.syncedCardType = null;
+                const globalCrop = settingsRef.current?.croppedAvatars?.[c.id];
+                c.avatarUrl = globalCrop || null;
               }
             });
           }
           return defaultData;
         });
       },
-      //스냅샷
       openSnapshotModal: (mesId, historicalData, existingPayload = null) => {
         setSnapshotModalData({ isOpen: true, mesId, historicalData, existingPayload });
       },
@@ -393,8 +468,6 @@ export function RPGControlProvider({ children }) {
         if (chatContainer) chatContainer.dispatchEvent(new Event('DOMSubtreeModified'));
       }
     };
-
-    console.log('[RPG Tracker] RPGControl Bridge is initialized and listening.');
   }, []);
 
   const isEnabled = settings.enabled;
@@ -416,14 +489,14 @@ export function RPGControlProvider({ children }) {
     trackerData,
     isChatConnected,
     snapshotModalData,
-    uiState,          // 글로벌 보관 중인 UI 접힘 상태 전달
-    updateUiState,    // 상태 업데이트 트리거 전달
+    uiState,
+    updateUiState,
     updateSettings,
     updateTrackerData,
     patchCharacterField,
     deleteCharacterField,
     patchWorldField,
-    syncCharacterToCard, // UI 컴포넌트에서 직접 호출 가능한 동기화 API 바인딩
+    syncCharacterToCard,
     revertToOriginalTurnState
   };
 
